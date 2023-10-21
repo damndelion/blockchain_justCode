@@ -33,6 +33,7 @@ type (
 	ChainUseCase interface {
 		Wallets(ctx context.Context) ([]string, error)
 		GetBalance(ctx context.Context, address string) (float64, error)
+		GetBalanceUSD(ctx context.Context, address string) (float64, error)
 		CreateWallet(ctx context.Context) (string, error)
 		Send(ctx context.Context, from string, to string, amount float64) error
 	}
@@ -40,6 +41,7 @@ type (
 	ChainRepo interface {
 		GetWallets(ctx context.Context) ([]string, error)
 		GetBalance(ctx context.Context, address string) (float64, error)
+		GetBalanceUSD(ctx context.Context, address string) (float64, error)
 		CreateWallet(ctx context.Context) (string, error)
 		Send(ctx context.Context, from string, to string, amount float64) error
 	}

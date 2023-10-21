@@ -21,6 +21,10 @@ func (b *Blockchain) GetBalance(ctx context.Context, address string) (float64, e
 	return b.repo.GetBalance(ctx, address)
 }
 
+func (b *Blockchain) GetBalanceUSD(ctx context.Context, address string) (float64, error) {
+	return b.repo.GetBalanceUSD(ctx, address)
+}
+
 func (b *Blockchain) CreateWallet(ctx context.Context) (string, error) {
 	wallet, err := b.repo.CreateWallet(ctx)
 	if err != nil {

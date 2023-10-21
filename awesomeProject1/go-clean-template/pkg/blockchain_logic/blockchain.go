@@ -281,13 +281,13 @@ type CoinGeckoResponse struct {
 	} `json:"bitcoin"`
 }
 
-func (bc *Blockchain) getBalanceInUSD(address string) {
+func (bc *Blockchain) GetBalanceInUSD(address string) float64 {
 	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
 
 	response, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error:", err)
-		return
+		return -1
 	}
 	defer response.Body.Close()
 
@@ -295,7 +295,7 @@ func (bc *Blockchain) getBalanceInUSD(address string) {
 
 	if err := json.NewDecoder(response.Body).Decode(&data); err != nil {
 		fmt.Println("Error:", err)
-		return
+		return -1
 	}
 
 	bitcoinPriceUSD := data.Bitcoin.USD
@@ -304,5 +304,5 @@ func (bc *Blockchain) getBalanceInUSD(address string) {
 	bitcoinBalance := bc.GetBalance(address)
 	totalBalanceUSD := bitcoinBalance * bitcoinPriceUSD
 
-	fmt.Printf("Total Balance in USD: $%.2f\n", totalBalanceUSD)
+	return totalBalanceUSD
 }

@@ -20,6 +20,7 @@ func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l log
 	{
 		blockchainHandler.GET("wallet/all", r.GetWallets)
 		blockchainHandler.GET("wallet/balance", r.GetBalance)
+		blockchainHandler.GET("wallet/usd/balance", r.GetBalanceUSD)
 		blockchainHandler.POST("wallet/create", r.CreateWallet)
 		blockchainHandler.POST("wallet/send", r.Send)
 
@@ -43,6 +44,18 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 	address := ctx.Query("address")
 	balance, err := bc.c.GetBalance(ctx, address)
+	if err != nil {
+		bc.l.Error(err, "http - v1 - user - all")
+		errorResponse(ctx, http.StatusInternalServerError, "database problems")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, balance)
+}
+
+func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
+	address := ctx.Query("address")
+	balance, err := bc.c.GetBalanceUSD(ctx, address)
 	if err != nil {
 		bc.l.Error(err, "http - v1 - user - all")
 		errorResponse(ctx, http.StatusInternalServerError, "database problems")

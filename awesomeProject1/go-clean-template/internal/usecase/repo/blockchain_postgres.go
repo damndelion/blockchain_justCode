@@ -27,6 +27,11 @@ func (ur *BlockchainRepo) GetBalance(ctx context.Context, address string) (balan
 	return res, nil
 }
 
+func (ur *BlockchainRepo) GetBalanceUSD(ctx context.Context, address string) (balance float64, err error) {
+	res := ur.chain.GetBalanceInUSD(address)
+	return res, nil
+}
+
 func (ur *BlockchainRepo) CreateWallet(ctx context.Context) (string, error) {
 	address := blockchain_logic.CreateWallet()
 	return address, nil
