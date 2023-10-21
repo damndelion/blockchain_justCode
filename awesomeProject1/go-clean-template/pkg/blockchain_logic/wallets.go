@@ -76,7 +76,6 @@ func (ws *Wallets) LoadFromFile() error {
 	decoder := gob.NewDecoder(bytes.NewReader(fileContent))
 	err = decoder.Decode(&wallets)
 	if err != nil {
-		fmt.Println("AA")
 		log.Panic(err)
 	}
 

@@ -41,25 +41,6 @@ func (tx Transaction) IsCoinbase() bool {
 	return len(tx.Vin) == 1 && len(tx.Vin[0].Txid) == 0 && tx.Vin[0].Vout == -1
 }
 
-//func GetBalance(address string) error {
-//	db, err := sql.Open("postgres", "user=postgres password=postgres dbname=postgres sslmode=disable")
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	defer db.Close()
-//	bc := InitBlockChain(db, address)
-//
-//	balance := 0
-//	UTXOs := bc.FindUTXO(address)
-//
-//	for _, out := range UTXOs {
-//		balance += out.Value
-//	}
-//
-//	fmt.Printf("Balance of '%s': %d\n", address, balance)
-//	return err
-//}
-
 func (tx *Transaction) Sign(privKey ecdsa.PrivateKey, prevTXs map[string]Transaction) {
 	if tx.IsCoinbase() {
 		return

@@ -3,7 +3,6 @@ package blockchain_logic
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 )
 
@@ -32,7 +31,6 @@ func (i *BlockchainIterator) Next() *Block {
 	// Attempt to decode the JSON data into []*Transaction
 
 	if err := json.Unmarshal([]byte(transactionsJSON), &block.Transactions); err != nil {
-		fmt.Println(transactionsJSON)
 
 		log.Fatal(err)
 		return nil

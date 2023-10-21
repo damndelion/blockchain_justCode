@@ -6,14 +6,13 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
-	"fmt"
 	"log"
 
 	"golang.org/x/crypto/ripemd160"
 )
 
 const version = byte(0x00)
-const walletFile = "awesomeProject1/go-clean-template/internal/blockchain/blockchain_logic/wallet.dat"
+const walletFile = "awesomeProject1/go-clean-template/pkg/blockchain_logic/wallet.dat"
 const addressChecksumLen = 4
 
 // Wallet stores private and public keys
@@ -93,17 +92,13 @@ func ListAddresses() []string {
 		log.Panic(err)
 	}
 	addresses := wallets.GetAddresses()
-
-	for _, address := range addresses {
-		fmt.Println(address)
-	}
 	return addresses
 }
 
-func CreateWallet() {
+func CreateWallet() string {
 	wallets, _ := NewWallets()
 	address := wallets.CreateWallet()
 	wallets.SaveToFile()
 
-	fmt.Printf("Your new address: %s\n", address)
+	return address
 }

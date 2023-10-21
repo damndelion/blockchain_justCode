@@ -11,3 +11,4 @@ logger:
 
 postgres:
   pool_max: 2
+  url : 'postgres://postgres:postgres@localhost:5432/postgres'

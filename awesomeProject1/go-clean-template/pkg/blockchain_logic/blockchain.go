@@ -63,7 +63,6 @@ func NewBlockchain(db *sql.DB, address string) *Blockchain {
 	var lastBlockHash string
 	err := db.QueryRow("SELECT hash FROM blocks ORDER BY id DESC LIMIT 1").Scan(&lastBlockHash)
 	if err != nil {
-		fmt.Println("aaa")
 		log.Fatal(err)
 	}
 	lastHash = lastBlockHash
@@ -255,7 +254,6 @@ func (bc *Blockchain) GetBalance(address string) float64 {
 		balance += out.Value
 	}
 
-	fmt.Printf("Balance of '%s': %f\n", address, balance)
 	return balance
 }
 

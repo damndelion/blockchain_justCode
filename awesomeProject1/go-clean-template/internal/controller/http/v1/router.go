@@ -2,7 +2,7 @@
 package v1
 
 import (
-	"github.com/evrone/go-clean-template/internal/blockchain/blockchain_logic"
+	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"net/http"
 

@@ -20,3 +20,16 @@ func (b *Blockchain) Wallets(ctx context.Context) ([]string, error) {
 func (b *Blockchain) GetBalance(ctx context.Context, address string) (float64, error) {
 	return b.repo.GetBalance(ctx, address)
 }
+
+func (b *Blockchain) CreateWallet(ctx context.Context) (string, error) {
+	wallet, err := b.repo.CreateWallet(ctx)
+	if err != nil {
+		return "", err
+	}
+	return wallet, nil
+}
+
+func (b *Blockchain) Send(ctx context.Context, from string, to string, amount float64) error {
+	b.repo.Send(ctx, from, to, amount)
+	return nil
+}
