@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 )
 
 const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
@@ -17,6 +18,7 @@ const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second
 type Blockchain struct {
 	tip string
 	Db  *sql.DB
+	mu  *sync.Mutex
 }
 
 func CreateBlockchain(db *sql.DB, address string) *Blockchain {
@@ -44,8 +46,8 @@ func CreateBlockchain(db *sql.DB, address string) *Blockchain {
 		}
 
 		lastHash = genesis.Hash
-
-		chain := Blockchain{lastHash, db}
+		mu := &sync.Mutex{}
+		chain := Blockchain{lastHash, db, mu}
 		fmt.Println("Done!")
 		return &chain
 	} else {
@@ -69,8 +71,8 @@ func NewBlockchain(db *sql.DB, address string) *Blockchain {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	chain := Blockchain{lastHash, db}
+	mu := &sync.Mutex{}
+	chain := Blockchain{lastHash, db, mu}
 
 	return &chain
 }
@@ -267,12 +269,19 @@ func (bc *Blockchain) Send(from, to string, amount float64) {
 
 	NewBlockchain(bc.Db, from)
 
-	tx := NewUTXOTransaction(from, to, amount, bc)
-	err := bc.MineBlock([]*Transaction{tx})
-	if err != nil {
-		return
-	}
-	fmt.Println("Success!")
+	go func() {
+		bc.mu.Lock()
+		defer bc.mu.Unlock()
+		tx := NewUTXOTransaction(from, to, amount, bc)
+
+		err := bc.MineBlock([]*Transaction{tx})
+
+		if err != nil {
+			return
+		}
+		fmt.Println("Success!")
+	}()
+
 }
 
 type CoinGeckoResponse struct {
@@ -299,7 +308,6 @@ func (bc *Blockchain) GetBalanceInUSD(address string) float64 {
 	}
 
 	bitcoinPriceUSD := data.Bitcoin.USD
-	fmt.Printf("Current Bitcoin Price: $%.2f\n", bitcoinPriceUSD)
 
 	bitcoinBalance := bc.GetBalance(address)
 	totalBalanceUSD := bitcoinBalance * bitcoinPriceUSD
