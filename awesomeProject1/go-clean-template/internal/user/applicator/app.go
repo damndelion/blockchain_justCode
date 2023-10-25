@@ -1,0 +1,65 @@
+// Package user configures and runs application.
+package applicator
+
+import (
+	"fmt"
+	"github.com/evrone/go-clean-template/config/user"
+	v1 "github.com/evrone/go-clean-template/internal/user/controller/http/v1"
+	"github.com/evrone/go-clean-template/internal/user/usecase"
+	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
+	"github.com/evrone/go-clean-template/pkg/cache"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/evrone/go-clean-template/pkg/httpserver"
+	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/evrone/go-clean-template/pkg/postgres"
+	"github.com/gin-gonic/gin"
+)
+
+// Run creates objects via constructors.
+func Run(cfg *user.Config) {
+	l := logger.New(cfg.Log.Level)
+
+	// Repository
+	_, pg, err := postgres.New(cfg.PG.URL)
+	if err != nil {
+		l.Fatal(fmt.Errorf("user - Run - postgres.New: %w", err))
+	}
+	defer pg.Close()
+
+	//Redis client
+	redisClient, err := cache.NewRedisClient()
+	if err != nil {
+		return
+	}
+	userCache := cache.NewUserCache(redisClient, 10*time.Minute)
+
+	// Use case
+	userUseCase := usecase.NewUser(repo.NewUserRepo(pg))
+
+	// HTTP Server
+	handler := gin.New()
+	v1.NewUserRouter(handler, l, userUseCase, userCache)
+
+	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
+
+	// Waiting signal
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case s := <-interrupt:
+		l.Info("user - Run - signal: " + s.String())
+	case err = <-httpServer.Notify():
+		l.Error(fmt.Errorf("user - Run - httpServer.Notify: %w", err))
+
+		// Shutdown
+		err = httpServer.Shutdown()
+		if err != nil {
+			l.Error(fmt.Errorf("user - Run - httpServer.Shutdown: %w", err))
+		}
+	}
+}

@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"github.com/evrone/go-clean-template/internal/usecase/repo"
+	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
 )
 
 type Blockchain struct {

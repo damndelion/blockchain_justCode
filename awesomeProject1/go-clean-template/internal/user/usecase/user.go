@@ -4,18 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/evrone/go-clean-template/internal/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/entity"
+	"github.com/evrone/go-clean-template/internal/usecase"
+	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
+	"github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/golang-jwt/jwt"
 	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
 type User struct {
-	repo UserRepo
+	repo usecase.UserRepo
 }
 
-func NewUser(repo UserRepo) *User {
+func NewUser(repo usecase.UserRepo) *User {
 	return &User{repo: repo}
 }
 
@@ -27,7 +29,7 @@ func (u *User) CreateUser(ctx context.Context, user *entity.User) (int, error) {
 	return u.repo.CreateUser(ctx, user)
 }
 
-func (u *User) Register(ctx context.Context, email, password string) error {
+func (u *User) Register(ctx context.Context, name, email, password string) error {
 	//email password
 	//is email exists return with message "go to login"
 
@@ -37,6 +39,7 @@ func (u *User) Register(ctx context.Context, email, password string) error {
 	}
 
 	_, err = u.repo.CreateUser(ctx, &entity.User{
+		Name:     name,
 		Email:    email,
 		Password: string(generatedHash),
 	})
@@ -75,8 +78,27 @@ func (u *User) Login(ctx context.Context, email, password string) (*dto.LoginRes
 		return nil, errors.New(fmt.Sprintf("passwords do not match %v", err))
 	}
 
+	claims := jwt.MapClaims{
+		"email": user.Email,
+		"name":  user.Name,
+		"exp":   time.Now().Add(time.Hour * 1).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+
+	tokenString, err := token.SignedString([]byte("practice_7"))
+	if err != nil {
+		return nil, err
+	}
+
+	err = Cre(ctx, claims)
+	if err != nil {
+		return nil, fmt.Errorf("CreateUserToken err: %w", err)
+	}
+
 	return &dto.LoginResponse{
 		Name:  user.Name,
 		Email: user.Email,
+		Token: tokenString,
 	}, nil
 }

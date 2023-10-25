@@ -1,9 +1,10 @@
 package v1
 
 import (
-	"github.com/evrone/go-clean-template/internal/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/entity"
-	"github.com/evrone/go-clean-template/internal/usecase"
+	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
+	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
+	"github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -21,13 +22,16 @@ type userRoutes struct {
 func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User) {
 	r := &userRoutes{u, l, uc}
 
+	adminHandler := handler.Group("/admin/user")
+	{
+		adminHandler.Use(middleware.JwtVerify())
+		adminHandler.GET("/all", r.GetUsers)
+		adminHandler.POST("/", r.CreateUser)
+		adminHandler.GET("/", r.GetUserByEmail)
+	}
+
 	userHandler := handler.Group("/user")
 	{
-		userHandler.GET("/all", r.GetUsers)
-		userHandler.POST("/", r.CreateUser)
-		userHandler.GET("/", r.GetUserByEmail)
-		userHandler.GET("/id", r.GetUserById)
-
 		userHandler.POST("/register", r.Register)
 		userHandler.POST("/login", r.Login)
 	}
@@ -73,7 +77,7 @@ func (ur *userRoutes) Register(ctx *gin.Context) {
 		return
 	}
 
-	err = ur.u.Register(ctx, registerRequest.Email, registerRequest.Password)
+	err = ur.u.Register(ctx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return

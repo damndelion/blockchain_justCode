@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/evrone/go-clean-template/internal/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/usecase"
 	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -33,7 +34,7 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 	wallets, err := bc.c.Wallets(ctx)
 	if err != nil {
 		bc.l.Error(err, "http - v1 - user - all")
-		errorResponse(ctx, http.StatusInternalServerError, "database problems")
+		v1.errorResponse(ctx, http.StatusInternalServerError, "database problems")
 
 		return
 	}
@@ -46,7 +47,7 @@ func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 	balance, err := bc.c.GetBalance(ctx, address)
 	if err != nil {
 		bc.l.Error(err, "http - v1 - user - all")
-		errorResponse(ctx, http.StatusInternalServerError, "database problems")
+		v1.errorResponse(ctx, http.StatusInternalServerError, "database problems")
 		return
 	}
 
@@ -58,7 +59,7 @@ func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
 	balance, err := bc.c.GetBalanceUSD(ctx, address)
 	if err != nil {
 		bc.l.Error(err, "http - v1 - user - all")
-		errorResponse(ctx, http.StatusInternalServerError, "database problems")
+		v1.errorResponse(ctx, http.StatusInternalServerError, "database problems")
 		return
 	}
 

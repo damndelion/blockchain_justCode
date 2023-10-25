@@ -31,13 +31,13 @@ Local development:
 ```sh
 # Postgres, RabbitMQ
 $ make compose-up
-# Run app with migrations
+# Run user with migrations
 $ make run
 ```
 
 Integration tests (can be run in CI):
 ```sh
-# DB, app + migrations, integration tests
+# DB, user + migrations, integration tests
 $ make compose-up-integration-test
 ```
 
@@ -85,7 +85,7 @@ It is included if an argument with the _migrate_ tag is specified.
 For example:
 
 ```sh
-$ go run -tags migrate ./cmd/app
+$ go run -tags migrate ./cmd/user
 ```
 
 ### `internal/controller`

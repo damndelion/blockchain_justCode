@@ -2,7 +2,7 @@ package repo
 
 import (
 	"context"
-	"github.com/evrone/go-clean-template/internal/entity"
+	"github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/evrone/go-clean-template/pkg/postgres"
 )
 

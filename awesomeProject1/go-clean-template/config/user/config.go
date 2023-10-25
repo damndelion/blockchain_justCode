@@ -9,7 +9,7 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App  `yaml:"app"`
+		App  `yaml:"user"`
 		HTTP `yaml:"http"`
 		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`
@@ -38,7 +38,7 @@ type (
 	}
 )
 
-// NewConfig returns app config.
+// NewConfig returns user config.
 func NewConfig() (*Config, error) {
 	cfg := &Config{}
 

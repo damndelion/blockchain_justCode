@@ -2,7 +2,7 @@ package main
 
 import (
 	blockchain2 "github.com/evrone/go-clean-template/config/blockchain"
-	"github.com/evrone/go-clean-template/internal/blockchain"
+	"github.com/evrone/go-clean-template/internal/blockchain/applicator"
 	"log"
 )
 
@@ -12,6 +12,6 @@ func main() {
 		log.Fatalf("Config error: %s", err)
 	}
 
-	blockchain.Run(cfg)
+	applicator.Run(cfg)
 
 }

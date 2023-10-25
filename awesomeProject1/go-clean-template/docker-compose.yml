@@ -15,7 +15,7 @@ services:
 
   app:
     build: .
-    container_name: app
+    container_name: user
     image: app
     environment:
       PG_URL: 'postgres://user:pass@postgres:5432/postgres'

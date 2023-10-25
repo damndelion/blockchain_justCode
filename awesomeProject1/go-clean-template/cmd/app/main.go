@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/evrone/go-clean-template/config/user"
-	"github.com/evrone/go-clean-template/internal/app"
+	"github.com/evrone/go-clean-template/internal/user/applicator"
 	"log"
 )
 
@@ -12,6 +12,6 @@ func main() {
 		log.Fatalf("Config error: %s", err)
 	}
 
-	app.Run(cfg)
+	applicator.Run(cfg)
 
 }
