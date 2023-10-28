@@ -2,19 +2,25 @@ package usecase
 
 import (
 	"context"
+	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
 )
 
 type Blockchain struct {
 	repo repo.BlockchainRepo
+	cfg  *blockchain.Config
 }
 
-func NewBlockchain(repo *repo.BlockchainRepo) *Blockchain {
-	return &Blockchain{repo: *repo}
+func NewBlockchain(repo *repo.BlockchainRepo, cfg *blockchain.Config) *Blockchain {
+	return &Blockchain{*repo, cfg}
 }
 
 func (b *Blockchain) Wallets(ctx context.Context) ([]string, error) {
 	return b.repo.GetWallets(ctx)
+}
+
+func (b *Blockchain) Wallet(ctx context.Context, userId string) (string, error) {
+	return b.repo.GetWallet(ctx, userId)
 }
 
 func (b *Blockchain) GetBalance(ctx context.Context, address string) (float64, error) {

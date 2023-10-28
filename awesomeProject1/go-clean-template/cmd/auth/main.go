@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/evrone/go-clean-template/config/auth"
 	"github.com/evrone/go-clean-template/internal/auth/applicator"
 	"log"
 )

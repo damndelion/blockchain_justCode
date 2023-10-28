@@ -9,6 +9,7 @@ import (
 func main() {
 	cfg, err := user.NewConfig()
 	if err != nil {
+
 		log.Fatalf("Config error: %s", err)
 	}
 

@@ -3,20 +3,20 @@ package repo
 import (
 	"context"
 	"github.com/evrone/go-clean-template/internal/user/entity"
-	"github.com/evrone/go-clean-template/pkg/postgres"
+	"gorm.io/gorm"
 )
 
 type UserRepo struct {
-	*postgres.Postgres
+	DB *gorm.DB
 }
 
-func NewUserRepo(pg *postgres.Postgres) *UserRepo {
-	return &UserRepo{pg}
+func NewUserRepo(db *gorm.DB) *UserRepo {
+	return &UserRepo{db}
 }
 
 func (ur *UserRepo) GetUsers(ctx context.Context) (users []*entity.User, err error) {
 
-	res := ur.Find(&users)
+	res := ur.DB.Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -25,7 +25,7 @@ func (ur *UserRepo) GetUsers(ctx context.Context) (users []*entity.User, err err
 
 func (ur *UserRepo) CreateUser(ctx context.Context, user *entity.User) (int, error) {
 
-	res := ur.WithContext(ctx).Create(user)
+	res := ur.DB.WithContext(ctx).Create(user)
 	if res.Error != nil {
 		return 0, res.Error
 	}
@@ -33,7 +33,7 @@ func (ur *UserRepo) CreateUser(ctx context.Context, user *entity.User) (int, err
 }
 
 func (ur *UserRepo) GetUserByEmail(ctx context.Context, email string) (user *entity.User, err error) {
-	res := ur.Where("email = ?", email).WithContext(ctx).Find(&user)
+	res := ur.DB.Where("email = ?", email).WithContext(ctx).Find(&user)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -41,7 +41,7 @@ func (ur *UserRepo) GetUserByEmail(ctx context.Context, email string) (user *ent
 }
 
 func (ur *UserRepo) GetUserById(ctx context.Context, id int) (user *entity.User, err error) {
-	res := ur.Where("id = ?", id).WithContext(ctx).Find(&user)
+	res := ur.DB.Where("id = ?", id).WithContext(ctx).Find(&user)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -49,7 +49,7 @@ func (ur *UserRepo) GetUserById(ctx context.Context, id int) (user *entity.User,
 }
 
 func (ur *UserRepo) GetUserByID(ctx context.Context, id string) (user *entity.User, err error) {
-	res := ur.WithContext(ctx).Where("id = ?", id).Find(&user)
+	res := ur.DB.WithContext(ctx).Where("id = ?", id).Find(&user)
 	if res.Error != nil {
 		return nil, res.Error
 	}

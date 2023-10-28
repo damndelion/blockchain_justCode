@@ -1,9 +1,7 @@
 package v1
 
 import (
-	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
-	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/user/entity"
+	"fmt"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -22,18 +20,11 @@ type userRoutes struct {
 func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User) {
 	r := &userRoutes{u, l, uc}
 
-	adminHandler := handler.Group("/admin/user")
+	adminHandler := handler.Group("user")
 	{
-		adminHandler.Use(middleware.JwtVerify())
 		adminHandler.GET("/all", r.GetUsers)
-		adminHandler.POST("/", r.CreateUser)
 		adminHandler.GET("/", r.GetUserByEmail)
-	}
-
-	userHandler := handler.Group("/user")
-	{
-		userHandler.POST("/register", r.Register)
-		userHandler.POST("/login", r.Login)
+		adminHandler.GET("/:id", r.GetUserById)
 	}
 
 }
@@ -50,64 +41,28 @@ func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, users)
 }
 
-func (ur *userRoutes) CreateUser(ctx *gin.Context) {
-	var user *entity.User
-
-	err := ctx.ShouldBindJSON(&user)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	insertedID, err := ur.u.CreateUser(ctx, user)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, insertedID)
-}
-
-func (ur *userRoutes) Register(ctx *gin.Context) {
-	var registerRequest dto.RegisterRequest
-
-	err := ctx.ShouldBindJSON(&registerRequest)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	err = ur.u.Register(ctx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"message": "user successfully registered"})
-}
-
-func (ur *userRoutes) Login(ctx *gin.Context) {
-	var loginRequest dto.LoginRequest
-
-	err := ctx.ShouldBindJSON(&loginRequest)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	token, err := ur.u.Login(ctx, loginRequest.Email, loginRequest.Password)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, token)
-}
+//func (ur *userRoutes) CreateUser(ctx *gin.Context) {
+//	var user *entity.User
+//
+//	err := ctx.ShouldBindJSON(&user)
+//	if err != nil {
+//		ctx.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//
+//	insertedID, err := ur.u.CreateUser(ctx, user)
+//	if err != nil {
+//		ctx.JSON(http.StatusInternalServerError, err)
+//		return
+//	}
+//
+//	ctx.JSON(http.StatusOK, insertedID)
+//}
 
 func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
 
 	email := ctx.Query("email")
-
+	fmt.Println(email)
 	user, err := ur.userCache.Get(ctx, email)
 	if err != nil {
 		return
@@ -133,7 +88,7 @@ func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
 
 func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 
-	id, _ := strconv.Atoi(ctx.Query("id"))
+	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	user, err := ur.userCache.Get(ctx, strconv.Itoa(id))
 	if err != nil {

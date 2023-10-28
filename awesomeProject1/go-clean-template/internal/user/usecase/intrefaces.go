@@ -3,7 +3,6 @@ package usecase
 
 import (
 	"context"
-	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/user/entity"
 )
 
@@ -17,8 +16,6 @@ type (
 		CreateUser(ctx context.Context, user *entity.User) (int, error)
 		GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 		GetUserById(ctx context.Context, id int) (*entity.User, error)
-		Register(ctx context.Context, name, email, password string) error
-		Login(ctx context.Context, email, password string) (*dto.LoginResponse, error)
 	}
 
 	//UserRepo

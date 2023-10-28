@@ -5,9 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"net/http"
+	"time"
 )
 
-func JwtVerify() gin.HandlerFunc {
+func JwtVerify(SecretKey string) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		tokenHeader := ctx.Request.Header.Get("Authorization")
@@ -22,17 +23,26 @@ func JwtVerify() gin.HandlerFunc {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return []byte("practice_7"), nil
+			return []byte(SecretKey), nil
 		})
-		if err != nil {
-			ctx.AbortWithStatus(http.StatusForbidden)
-
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			if exp, ok := claims["exp"].(float64); ok {
+				expirationTime := time.Unix(int64(exp), 0)
+				if time.Now().After(expirationTime) {
+					ctx.AbortWithStatus(http.StatusUnauthorized)
+					return
+				}
+			} else {
+				ctx.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+		} else {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
-		if !token.Valid {
-			ctx.AbortWithStatus(http.StatusUnauthorized)
-
+		if err != nil || !token.Valid {
+			ctx.AbortWithStatus(http.StatusForbidden)
 			return
 		}
 

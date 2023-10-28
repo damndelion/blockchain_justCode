@@ -12,3 +12,7 @@ logger:
 postgres:
   pool_max: 2
   url : 'postgres://postgres:postgres@localhost:5432/postgres'
+
+jwt:
+  secret_key: 'superSecretKey'
+  access_token_ttl: 900

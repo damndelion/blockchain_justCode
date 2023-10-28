@@ -14,22 +14,22 @@ type Postgres struct {
 }
 
 // New -.
-func New(url string) (*sql.DB, *Postgres, error) {
+func New(url string) (*gorm.DB, *sql.DB, error) {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return sqlDB, &Postgres{db}, nil
+	return db, sqlDB, nil
 }
 
 // Close -.
 func (p *Postgres) Close() {
-	d, err := p.DB.DB()
+	sqlDB, err := p.DB.DB()
 	if err != nil {
 		log.Printf("error closing database: %s", err.Error())
 	}
 
-	d.Close()
+	sqlDB.Close()
 }

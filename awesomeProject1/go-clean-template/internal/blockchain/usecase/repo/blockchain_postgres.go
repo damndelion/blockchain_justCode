@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 	"database/sql"
-	blockchain_logic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
 )
 
 type BlockchainRepo struct {
@@ -20,6 +20,14 @@ func (ur *BlockchainRepo) GetWallets(ctx context.Context) (wallets []string, err
 	res := blockchain_logic.ListAddresses()
 
 	return res, nil
+}
+
+func (ur *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet string, err error) {
+	query := "SELECT wallet FROM users WHERE id = $1"
+
+	err = ur.DB.QueryRow(query, userId).Scan(&userId)
+
+	return userId, nil
 }
 
 func (ur *BlockchainRepo) GetBalance(ctx context.Context, address string) (balance float64, err error) {

@@ -24,11 +24,12 @@ func Run(cfg *user.Config) {
 	l := logger.New(cfg.Log.Level)
 
 	// Repository
-	_, pg, err := postgres.New(cfg.PG.URL)
+	db, _, err := postgres.New(cfg.PG.URL)
 	if err != nil {
 		l.Fatal(fmt.Errorf("user - Run - postgres.New: %w", err))
 	}
-	defer pg.Close()
+	sqlDB, err := db.DB()
+	defer sqlDB.Close()
 
 	//Redis client
 	redisClient, err := cache.NewRedisClient()
@@ -38,7 +39,7 @@ func Run(cfg *user.Config) {
 	userCache := cache.NewUserCache(redisClient, 10*time.Minute)
 
 	// Use case
-	userUseCase := usecase.NewUser(repo.NewUserRepo(pg))
+	userUseCase := usecase.NewUser(repo.NewUserRepo(db))
 
 	// HTTP Server
 	handler := gin.New()

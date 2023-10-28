@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/config/blockchain"
+	v1 "github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
-	v1 "github.com/evrone/go-clean-template/internal/controller/http/v1"
 	blockchain_logic2 "github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -22,7 +22,7 @@ func Run(cfg *blockchain.Config) {
 	l := logger.New(cfg.Log.Level)
 
 	// Repository
-	db, _, err := postgres.New(cfg.PG.URL)
+	_, db, err := postgres.New(cfg.PG.URL)
 	if err != nil {
 		l.Fatal(fmt.Errorf("user - Run - postgres.New: %w", err))
 	}
@@ -31,7 +31,7 @@ func Run(cfg *blockchain.Config) {
 	address := blockchain_logic2.CreateWallet()
 
 	// Use case
-	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address))
+	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address), cfg)
 
 	blockchain_logic2.ListAddresses()
 	//address to create genesis block
@@ -39,7 +39,7 @@ func Run(cfg *blockchain.Config) {
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewBlockchainRouter(handler, l, chainUseCase, *chain)
+	v1.NewBlockchainRouter(handler, l, chainUseCase, *chain, cfg)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal

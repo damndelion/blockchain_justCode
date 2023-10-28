@@ -1,4 +1,4 @@
-package blockchain
+package auth
 
 import (
 	"fmt"
@@ -9,10 +9,11 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App  `yaml:"user"`
+		App  `yaml:"app"`
 		HTTP `yaml:"http"`
 		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`
+		JWT  `yaml:"jwt"`
 	}
 
 	// App -.
@@ -36,14 +37,20 @@ type (
 		PoolMax int    `env-required:"true" yaml:"pool_max" env:"PG_POOL_MAX"`
 		URL     string `env-required:"true"                 env:"PG_URL"`
 	}
+	// Jwt
+	JWT struct {
+		SecretKey      string `mapstructure:"secret_key" yaml:"secret_key"`
+		AccessTokenTTL int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`
+	}
 )
 
 // NewConfig returns user config.
 func NewConfig() (*Config, error) {
 	cfg := &Config{}
 
-	err := cleanenv.ReadConfig("awesomeProject1/go-clean-template/config/blockchain/config.yml", cfg)
+	err := cleanenv.ReadConfig("/Users/daniar/GolandProjects/blockchain/awesomeProject1/go-clean-template/config/auth/config.yml", cfg)
 	if err != nil {
+		fmt.Println("aaaa")
 		return nil, fmt.Errorf("config error: %w", err)
 	}
 

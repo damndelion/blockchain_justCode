@@ -3,46 +3,37 @@ package applicator
 
 import (
 	"fmt"
-	"github.com/evrone/go-clean-template/config/user"
-	v1 "github.com/evrone/go-clean-template/internal/user/controller/http/v1"
-	"github.com/evrone/go-clean-template/internal/user/usecase"
-	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
-	"github.com/evrone/go-clean-template/pkg/cache"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
+	"github.com/evrone/go-clean-template/config/auth"
+	v1 "github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
+	"github.com/evrone/go-clean-template/internal/auth/usecase"
+	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/evrone/go-clean-template/pkg/postgres"
 	"github.com/gin-gonic/gin"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 // Run creates objects via constructors.
-func Run(cfg *user.Config) {
+func Run(cfg *auth.Config) {
 	l := logger.New(cfg.Log.Level)
 
 	// Repository
-	_, pg, err := postgres.New(cfg.PG.URL)
+	db, _, err := postgres.New(cfg.PG.URL)
 	if err != nil {
 		l.Fatal(fmt.Errorf("user - Run - postgres.New: %w", err))
 	}
-	defer pg.Close()
-
-	//Redis client
-	redisClient, err := cache.NewRedisClient()
-	if err != nil {
-		return
-	}
-	userCache := cache.NewUserCache(redisClient, 10*time.Minute)
+	sqlDB, err := db.DB()
+	defer sqlDB.Close()
 
 	// Use case
-	userUseCase := usecase.NewUser(repo.NewUserRepo(pg))
+	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db), cfg)
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewUserRouter(handler, l, userUseCase, userCache)
+	v1.NewAuthRouter(handler, l, authUseCase)
 
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 

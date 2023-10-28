@@ -9,7 +9,7 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App  `yaml:"user"`
+		App  `yaml:"app"`
 		HTTP `yaml:"http"`
 		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`

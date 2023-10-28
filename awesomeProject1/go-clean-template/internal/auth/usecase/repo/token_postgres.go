@@ -2,30 +2,47 @@ package repo
 
 import (
 	"context"
-	"database/sql"
 	"github.com/evrone/go-clean-template/internal/auth/entity"
-	"log"
+	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"gorm.io/gorm"
 )
 
-type TokenRepo struct {
-	db *sql.DB
+type AuthRepo struct {
+	DB *gorm.DB
 }
 
-func NewTokenRepo(db *sql.DB) *TokenRepo {
-	return &TokenRepo{db}
+func NewAuthRepo(db *gorm.DB) *AuthRepo {
+	return &AuthRepo{db}
 }
 
-func (t *TokenRepo) CreateUserToken(ctx context.Context, userToken entity.Token) error {
-	_, err := t.db.Exec("INSERT INTO tokens (user_id, token) VALUES ($1, $2)",
-		userToken.UserID, userToken.Token)
-	if err != nil {
-		log.Fatal(err)
+func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken entity.Token) error {
+	if err := t.DB.Create(&userToken).Error; err != nil {
 		return err
 	}
+
 	return nil
+
 }
 
-func (t *TokenRepo) UpdateUserToken(ctx context.Context, userToken entity.Token) error {
+func (t *AuthRepo) UpdateUserToken(ctx context.Context, userToken entity.Token) error {
 	return nil
 
+}
+
+func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
+	result := t.DB.Create(&user)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return user.Id, nil
+
+}
+
+func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (user *userEntity.User, err error) {
+	res := t.DB.Where("email = ?", email).WithContext(ctx).Find(&user)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return user, nil
 }
