@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -50,8 +48,7 @@ func NewConfig() (*Config, error) {
 
 	err := cleanenv.ReadConfig("/Users/daniar/GolandProjects/blockchain/awesomeProject1/go-clean-template/config/auth/config.yml", cfg)
 	if err != nil {
-		fmt.Println("aaaa")
-		return nil, fmt.Errorf("config error: %w", err)
+		return nil, err
 	}
 
 	err = cleanenv.ReadEnv(cfg)

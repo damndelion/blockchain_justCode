@@ -24,7 +24,7 @@ func Run(cfg *blockchain.Config) {
 	// Repository
 	_, db, err := postgres.New(cfg.PG.URL)
 	if err != nil {
-		l.Fatal(fmt.Errorf("user - Run - postgres.New: %w", err))
+		l.Fatal(fmt.Errorf("blockchain - Run - postgres.New: %w", err))
 	}
 	defer db.Close()
 
@@ -50,12 +50,12 @@ func Run(cfg *blockchain.Config) {
 	case s := <-interrupt:
 		l.Info("user - Run - signal: " + s.String())
 	case err = <-httpServer.Notify():
-		l.Error(fmt.Errorf("user - Run - httpServer.Notify: %w", err))
+		l.Error(fmt.Errorf("blockchain - Run - httpServer.Notify: %w", err))
 
 		// Shutdown
 		err = httpServer.Shutdown()
 		if err != nil {
-			l.Error(fmt.Errorf("user - Run - httpServer.Shutdown: %w", err))
+			l.Error(fmt.Errorf("blockchain - Run - httpServer.Shutdown: %w", err))
 		}
 	}
 }

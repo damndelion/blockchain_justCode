@@ -1,8 +1,6 @@
 package blockchain
 
 import (
-	"fmt"
-
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -49,7 +47,7 @@ func NewConfig() (*Config, error) {
 
 	err := cleanenv.ReadConfig("awesomeProject1/go-clean-template/config/blockchain/config.yml", cfg)
 	if err != nil {
-		return nil, fmt.Errorf("config error: %w", err)
+		return nil, err
 	}
 
 	err = cleanenv.ReadEnv(cfg)

@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -14,10 +15,11 @@ func NewAuthRouter(handler *gin.Engine, l logger.Interface, u usecase.AuthUseCas
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
+	pprof.Register(handler)
 
 	// Swagger
-	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER_HTTP_HANDLER")
-	handler.GET("/swagger/*any", swaggerHandler)
+	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	handler.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	// K8s probe
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })

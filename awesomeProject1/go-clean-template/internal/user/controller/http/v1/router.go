@@ -4,6 +4,7 @@ import (
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -15,6 +16,7 @@ func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCas
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
+	pprof.Register(handler)
 
 	// Swagger
 	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER_HTTP_HANDLER")

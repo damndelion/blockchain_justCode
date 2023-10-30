@@ -6,7 +6,6 @@ import (
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -32,8 +31,8 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 	users, err := ur.u.Users(ctx)
 	if err != nil {
-		ur.l.Error(err, "http - v1 - user - all")
-		errorResponse(ctx, http.StatusInternalServerError, "database problems")
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
 
 		return
 	}
@@ -71,15 +70,15 @@ func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
 	if user == nil {
 		user, err = ur.u.GetUserByEmail(ctx, email)
 		if err != nil {
-			ur.l.Error(err, "http - v1 - user - all")
-			errorResponse(ctx, http.StatusInternalServerError, "database problems")
-
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail error")
 			return
 		}
 
 		err = ur.userCache.Set(ctx, email, user)
 		if err != nil {
-			log.Printf("could not cache user with email %s: %v", email, err)
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail cache error")
 		}
 	}
 
@@ -98,15 +97,15 @@ func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 	if user == nil {
 		user, err = ur.u.GetUserById(ctx, id)
 		if err != nil {
-			ur.l.Error(err, "http - v1 - user - all")
-			errorResponse(ctx, http.StatusInternalServerError, "database problems")
-
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
 			return
 		}
 
 		err = ur.userCache.Set(ctx, strconv.Itoa(id), user)
 		if err != nil {
-			log.Printf("could not cache user with email %d: %v", id, err)
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
 		}
 	}
 

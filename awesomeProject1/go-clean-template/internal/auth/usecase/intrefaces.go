@@ -3,8 +3,8 @@ package usecase
 
 import (
 	"context"
+	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
-	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 )
 
