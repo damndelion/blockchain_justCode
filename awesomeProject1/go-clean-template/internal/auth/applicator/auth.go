@@ -4,7 +4,7 @@ package applicator
 import (
 	"fmt"
 	"github.com/evrone/go-clean-template/config/auth"
-	v1 "github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
+	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
 	"github.com/evrone/go-clean-template/pkg/httpserver"

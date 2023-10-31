@@ -1,13 +1,14 @@
 package v1
 
 import (
+	_ "github.com/evrone/go-clean-template/cmd/auth/docs"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"net/http"
 )
 
@@ -18,10 +19,12 @@ func NewAuthRouter(handler *gin.Engine, l logger.Interface, u usecase.AuthUseCas
 	pprof.Register(handler)
 
 	// Swagger
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+
+	url := ginSwagger.URL("http://localhost:8082/swagger/doc.json") // The url pointing to API definition
 	handler.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	// K8s probe
+
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	// Prometheus metrics
@@ -30,6 +33,7 @@ func NewAuthRouter(handler *gin.Engine, l logger.Interface, u usecase.AuthUseCas
 	// Routers
 	h := handler.Group("/v1")
 	{
+
 		newAuthRoutes(h, u, l)
 	}
 }
