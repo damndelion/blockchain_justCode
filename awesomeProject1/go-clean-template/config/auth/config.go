@@ -37,8 +37,9 @@ type (
 	}
 	// Jwt
 	JWT struct {
-		SecretKey      string `mapstructure:"secret_key" yaml:"secret_key"`
-		AccessTokenTTL int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`
+		SecretKey       string `mapstructure:"secret_key" yaml:"secret_key"`
+		AccessTokenTTL  int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`
+		RefreshTokenTTL int64  `mapstructure:"refresh_token_ttl" yaml:"refresh_token_ttl"`
 	}
 )
 

@@ -48,7 +48,6 @@ func (u *User) GetUserByEmail(ctx context.Context, email string) (*entity.User, 
 }
 
 func (u *User) GetUserById(ctx context.Context, id int) (*entity.User, error) {
-	time.Sleep(2 * time.Second)
 
 	return u.repo.GetUserById(ctx, id)
 }

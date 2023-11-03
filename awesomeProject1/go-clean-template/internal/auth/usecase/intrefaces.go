@@ -16,6 +16,7 @@ type (
 	AuthUseCase interface {
 		Register(ctx context.Context, name, email, password string) error
 		Login(ctx context.Context, email, password string) (*dto.LoginResponse, error)
+		Refresh(ctx context.Context, refreshToken string) (string, error)
 	}
 
 	//Auth repo

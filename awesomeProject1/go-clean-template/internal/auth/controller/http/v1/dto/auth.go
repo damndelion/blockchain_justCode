@@ -12,7 +12,12 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	AccessToken string `json:"access_token"`
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token"`
 }

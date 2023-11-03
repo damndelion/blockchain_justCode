@@ -25,7 +25,7 @@ compose-down: ### Down docker-compose
 .PHONY: compose-down
 
 swag-v1: ### swag init
-	swag init -g /awesomeProject1/go-clean-template/internal/auth/controller/http/v1/router.go
+	swag init -g ../../../../../cmd/auth/main.go -o  ../../../../../docs/auth
 .PHONY: swag-v1
 
 run: swag-v1 ### swag run

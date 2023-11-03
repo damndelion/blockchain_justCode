@@ -1,7 +1,7 @@
 package v1
 
 import (
-	_ "github.com/evrone/go-clean-template/cmd/auth/docs"
+	_ "github.com/evrone/go-clean-template/docs/auth"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-contrib/pprof"

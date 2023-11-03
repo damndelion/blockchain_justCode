@@ -8,9 +8,11 @@ import (
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
+	"github.com/evrone/go-clean-template/pkg/jaeger"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/evrone/go-clean-template/pkg/postgres"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,6 +21,11 @@ import (
 // Run creates objects via constructors.
 func Run(cfg *auth.Config) {
 	l := logger.New(cfg.Log.Level)
+
+	//tracing
+	tracer, closer, _ := jaeger.InitJaeger()
+	defer closer.Close()
+	opentracing.SetGlobalTracer(tracer)
 
 	// Repository
 	db, _, err := postgres.New(cfg.PG.URL)

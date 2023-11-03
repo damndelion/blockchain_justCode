@@ -6,6 +6,7 @@ import (
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"net/http"
 )
 
@@ -14,42 +15,29 @@ type authRoutes struct {
 	l logger.Interface
 }
 
-// @title Gin Swagger Example API
-// @version 2.0
-// @description This is a sample server server.
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host localhost:8082
-// @BasePath /v1
-// @schemes http
 func newAuthRoutes(handler *gin.RouterGroup, u usecase.AuthUseCase, l logger.Interface) {
 	r := &authRoutes{u, l}
 
-	userHandler := handler.Group("/user")
+	userHandler := handler.Group("/auth")
 	{
 		userHandler.POST("/register", r.Register)
 		userHandler.POST("/login", r.Login)
+		userHandler.POST("/refresh", r.Refresh)
 	}
 
 }
 
-// Register
-// @summary     Show history
-// @description Show all translation history
-// @ID          history
-// @Tags  	    translation
-// @Accept      json
-// @Produce     json
-// @Success     200 {object} historyResponse
-// @Failure     500 {object} response
-// @Router /v1/user/register [post]
+// Register godoc
+// @Summary Register a new user
+// @Description Register a new user in the system
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param registerRequest body dto.RegisterRequest true "User registration request"
+// @Success 200 {string} string "User successfully registered"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/auth/register [post]
 func (ar *authRoutes) Register(ctx *gin.Context) {
 	var registerRequest dto.RegisterRequest
 	err := ctx.ShouldBindJSON(&registerRequest)
@@ -75,12 +63,15 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param loginRequest body LoginRequest true "User login request"
+// @Param loginRequest body dto.LoginRequest true "User login request"
 // @Success 200 {string} string "Access token"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /auth/login [post]
+// @Router /v1/auth/login [post]
 func (ar *authRoutes) Login(ctx *gin.Context) {
+	span := opentracing.StartSpan("login handler")
+	defer span.Finish()
+
 	var loginRequest dto.LoginRequest
 	err := ctx.ShouldBindJSON(&loginRequest)
 	if err != nil {
@@ -88,11 +79,36 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - auth - login dto error")
 		return
 	}
+	context := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 
-	token, err := ar.u.Login(ctx, loginRequest.Email, loginRequest.Password)
+	token, err := ar.u.Login(context, loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - login: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - login error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, token)
+}
+
+// Refresh godoc
+// @Summary User refresh token
+// @Description Create new access token by refresh token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param refreshRequest body dto.RefreshRequest true "User refresh request"
+// @Success 200 {string} string "Access token"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/auth/refresh [post]
+func (ar *authRoutes) Refresh(ctx *gin.Context) {
+	var refreshRequest dto.RefreshRequest
+	err := ctx.ShouldBindJSON(&refreshRequest)
+	token, err := ar.u.Refresh(ctx, refreshRequest.RefreshToken)
+	if err != nil {
+		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - refresh error")
 		return
 	}
 

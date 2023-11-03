@@ -16,4 +16,5 @@ postgres:
 jwt:
   secret_key: 'superSecretKey'
   access_token_ttl: 900
+  refresh_token_ttl: 3600
 

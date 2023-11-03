@@ -1,0 +1,95 @@
+basePath: /
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Service that does CRUD operations on user
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: User service
+  version: "1.0"
+paths:
+  /{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a user by their unique ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information
+          schema:
+            type: user
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a user by ID
+      tags:
+      - Users
+  /v1/users/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of users from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            type: users
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a list of all users
+      tags:
+      - Users
+  /v1/users/email:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a user by their email address
+      parameters:
+      - description: Email address of the user
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information
+          schema:
+            type: users
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a user by email
+      tags:
+      - Users
+schemes:
+- http
+swagger: "2.0"

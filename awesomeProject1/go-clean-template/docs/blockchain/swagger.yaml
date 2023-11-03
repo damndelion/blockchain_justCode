@@ -1,0 +1,247 @@
+basePath: /
+definitions:
+  v1.SendData:
+    properties:
+      amount:
+        type: number
+      from:
+        type: string
+      to:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Service that handles all blockchain request
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Blockchain service
+  version: "1.0"
+paths:
+  /v1/blockchain/balance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the balance of a specific address on the blockchain
+      parameters:
+      - description: Wallet Address
+        in: query
+        name: address
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Balance
+          schema:
+            type: number
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get the balance of an address
+      tags:
+      - Blockchain
+  /v1/blockchain/balanceUSD:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the balance in USD of a specific address on the blockchain
+      parameters:
+      - description: Wallet Address
+        in: query
+        name: address
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Balance in USD
+          schema:
+            type: number
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get the balance in USD of an address
+      tags:
+      - Blockchain
+  /v1/blockchain/createWallet:
+    post:
+      consumes:
+      - application/json
+      description: Create a new wallet on the blockchain
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New Wallet
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a new wallet
+      tags:
+      - Blockchain
+  /v1/blockchain/send:
+    post:
+      consumes:
+      - application/json
+      description: Send cryptocurrency from one address to another on the blockchain
+      parameters:
+      - description: Send Request
+        in: body
+        name: sendRequest
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SendData'
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Send cryptocurrency to another address
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/all:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of wallets from the blockchain
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of wallets
+          schema:
+            items:
+              items:
+                type: string
+              type: array
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a list of wallets
+      tags:
+      - Blockchain
+  /v1/blockchain/wallets/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a wallet from the blockchain for a specific user
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wallet details
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a wallet by user ID
+      tags:
+      - Blockchain
+schemes:
+- http
+swagger: "2.0"

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/evrone/go-clean-template/internal/auth/entity"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/opentracing/opentracing-go"
 	"gorm.io/gorm"
 )
 
@@ -40,6 +41,8 @@ func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, 
 }
 
 func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (user *userEntity.User, err error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "get user by email repo")
+	defer span.Finish()
 	res := t.DB.Where("email = ?", email).WithContext(ctx).Find(&user)
 	if res.Error != nil {
 		return nil, res.Error

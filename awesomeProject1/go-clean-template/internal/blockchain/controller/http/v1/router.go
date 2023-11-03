@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/evrone/go-clean-template/config/blockchain"
+	_ "github.com/evrone/go-clean-template/docs/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
 	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/logger"

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	_ "github.com/evrone/go-clean-template/docs/user"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
