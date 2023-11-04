@@ -20,7 +20,6 @@ func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken entity.Token) 
 	if err := t.DB.Create(&userToken).Error; err != nil {
 		return err
 	}
-
 	return nil
 
 }
@@ -30,6 +29,7 @@ func (t *AuthRepo) UpdateUserToken(ctx context.Context, userToken entity.Token) 
 
 }
 
+// CreateUser TODO grpc
 func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
 	result := t.DB.Create(&user)
 	if result.Error != nil {
@@ -40,6 +40,7 @@ func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, 
 
 }
 
+// GetUserByEmail TODO grpc
 func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (user *userEntity.User, err error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "get user by email repo")
 	defer span.Finish()

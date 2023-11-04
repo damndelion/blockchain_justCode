@@ -7,11 +7,12 @@ import (
 type (
 	// Config -.
 	Config struct {
-		App  `yaml:"app"`
-		HTTP `yaml:"http"`
-		Log  `yaml:"logger"`
-		PG   `yaml:"postgres"`
-		JWT  `yaml:"jwt"`
+		App        `yaml:"app"`
+		HTTP       `yaml:"http"`
+		Log        `yaml:"logger"`
+		PG         `yaml:"postgres"`
+		JWT        `yaml:"jwt"`
+		Blockchain `yaml:"blockchain"`
 	}
 
 	// App -.
@@ -38,6 +39,9 @@ type (
 	JWT struct {
 		SecretKey      string `mapstructure:"secret_key" yaml:"secret_key"`
 		AccessTokenTTL int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`
+	}
+	Blockchain struct {
+		GenesisAddress string `mapstructure:"genesis_address" yaml:"genesis_address"`
 	}
 )
 

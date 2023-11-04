@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -48,7 +47,6 @@ func CreateBlockchain(db *sql.DB, address string) *Blockchain {
 		lastHash = genesis.Hash
 		mu := &sync.Mutex{}
 		chain := Blockchain{lastHash, db, mu}
-		fmt.Println("Done!")
 		return &chain
 	} else {
 		return NewBlockchain(db, address)
@@ -279,7 +277,6 @@ func (bc *Blockchain) Send(from, to string, amount float64) {
 		if err != nil {
 			return
 		}
-		fmt.Println("Success!")
 	}()
 
 }
@@ -290,21 +287,19 @@ type CoinGeckoResponse struct {
 	} `json:"bitcoin"`
 }
 
-func (bc *Blockchain) GetBalanceInUSD(address string) float64 {
+func (bc *Blockchain) GetBalanceInUSD(address string) (float64, error) {
 	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
 
 	response, err := http.Get(url)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return -1
+		return -1, err
 	}
 	defer response.Body.Close()
 
 	var data CoinGeckoResponse
 
 	if err := json.NewDecoder(response.Body).Decode(&data); err != nil {
-		fmt.Println("Error:", err)
-		return -1
+		return -1, err
 	}
 
 	bitcoinPriceUSD := data.Bitcoin.USD
@@ -312,5 +307,5 @@ func (bc *Blockchain) GetBalanceInUSD(address string) float64 {
 	bitcoinBalance := bc.GetBalance(address)
 	totalBalanceUSD := bitcoinBalance * bitcoinPriceUSD
 
-	return totalBalanceUSD
+	return totalBalanceUSD, nil
 }

@@ -22,7 +22,6 @@ func NewWallets() (*Wallets, error) {
 
 	err := wallets.LoadFromFile()
 	if err != nil {
-		fmt.Println("No files")
 	}
 
 	return &wallets, err

@@ -82,7 +82,6 @@ func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
 
 	email := ctx.Query("email")
-	fmt.Println(email)
 	user, err := ur.userCache.Get(ctx, email)
 	if err != nil {
 		return

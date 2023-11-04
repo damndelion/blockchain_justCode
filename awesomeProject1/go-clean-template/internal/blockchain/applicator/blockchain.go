@@ -7,7 +7,7 @@ import (
 	v1 "github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
-	blockchain_logic2 "github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	blockchain_logic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/evrone/go-clean-template/pkg/postgres"
@@ -28,14 +28,14 @@ func Run(cfg *blockchain.Config) {
 	}
 	defer db.Close()
 
-	address := blockchain_logic2.CreateWallet()
+	address := blockchain_logic.CreateWallet()
 
 	// Use case
 	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address), cfg)
 
-	blockchain_logic2.ListAddresses()
+	blockchain_logic.ListAddresses()
 	//address to create genesis block
-	chain := blockchain_logic2.CreateBlockchain(db, address)
+	chain := blockchain_logic.CreateBlockchain(db, address)
 
 	// HTTP Server
 	handler := gin.New()

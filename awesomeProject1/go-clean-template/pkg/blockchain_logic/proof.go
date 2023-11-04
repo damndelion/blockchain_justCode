@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"log"
 	"math"
 	"math/big"
@@ -53,15 +52,12 @@ func (pow *ProofOfWork) Run() (int, string) {
 		intHash.SetBytes(hash[:])
 
 		if intHash.Cmp(pow.Target) == -1 {
-			fmt.Println(hex.EncodeToString(hash[:]))
-
 			break
 		} else {
 			nonce++
 		}
 
 	}
-	fmt.Println()
 
 	return nonce, hex.EncodeToString(hash[:])
 }

@@ -3,7 +3,9 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	"strconv"
 )
 
 type BlockchainRepo struct {
@@ -16,36 +18,79 @@ func NewBlockchainRepo(db *sql.DB, address string) *BlockchainRepo {
 	return &BlockchainRepo{db, chain}
 }
 
-func (ur *BlockchainRepo) GetWallets(ctx context.Context) (wallets []string, err error) {
+func (br *BlockchainRepo) GetWallets(ctx context.Context) (wallets []string, err error) {
 	res := blockchain_logic.ListAddresses()
 
 	return res, nil
 }
 
-func (ur *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet string, err error) {
+func (br *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet string, err error) {
 	query := "SELECT wallet FROM users WHERE id = $1"
 
-	err = ur.DB.QueryRow(query, userId).Scan(&userId)
+	err = br.DB.QueryRow(query, userId).Scan(&userId)
 
 	return userId, nil
 }
 
-func (ur *BlockchainRepo) GetBalance(ctx context.Context, address string) (balance float64, err error) {
-	res := ur.chain.GetBalance(address)
+func (br *BlockchainRepo) GetBalance(ctx context.Context, userId string) (balance float64, err error) {
+	address, err := br.GetWallet(ctx, userId)
+	if err != nil {
+		return 0, err
+	}
+	res := br.chain.GetBalance(address)
 	return res, nil
 }
 
-func (ur *BlockchainRepo) GetBalanceUSD(ctx context.Context, address string) (balance float64, err error) {
-	res := ur.chain.GetBalanceInUSD(address)
+func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userId string) (balance float64, err error) {
+	address, err := br.GetWallet(ctx, userId)
+	if err != nil {
+		return -1, err
+	}
+	res, err := br.chain.GetBalanceInUSD(address)
+	if err != nil {
+		return -1, err
+	}
 	return res, nil
 }
 
-func (ur *BlockchainRepo) CreateWallet(ctx context.Context) (string, error) {
+func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (string, error) {
 	address := blockchain_logic.CreateWallet()
+	err := br.SetUserWallet(ctx, userID, address)
+	if err != nil {
+		return "", err
+	}
 	return address, nil
 }
 
-func (ur *BlockchainRepo) Send(ctx context.Context, from string, to string, amount float64) error {
-	ur.chain.Send(from, to, amount)
+func (br *BlockchainRepo) Send(ctx context.Context, from string, to string, amount float64) error {
+	address, err := br.GetWallet(ctx, from)
+	if err != nil {
+		return err
+	}
+	br.chain.Send(address, to, amount)
+	return nil
+}
+
+func (br *BlockchainRepo) TopUp(ctx context.Context, from string, to string, amount float64) error {
+	address, err := br.GetWallet(ctx, to)
+	if err != nil {
+		return err
+	}
+	br.chain.Send(from, address, amount)
+	return nil
+}
+
+func (br *BlockchainRepo) SetUserWallet(ctx context.Context, userID string, address string) (err error) {
+	id, _ := strconv.Atoi(userID)
+	query := "SELECT wallet FROM users WHERE id = $2"
+	res, err := br.DB.Exec(query, address, id)
+	if res == nil {
+		return fmt.Errorf("user already have wallet existing")
+	}
+	query = "UPDATE users SET wallet = $1 WHERE id = $2"
+	_, err = br.DB.Exec(query, address, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -14,7 +14,6 @@ func JwtVerify(SecretKey string) gin.HandlerFunc {
 		tokenHeader := ctx.Request.Header.Get("Authorization")
 		if tokenHeader == "" {
 			ctx.AbortWithStatus(http.StatusForbidden)
-			fmt.Println("aaa")
 			return
 		}
 
