@@ -3,6 +3,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/user/entity"
 )
 
@@ -12,19 +13,22 @@ type (
 
 	// User
 	UserUseCase interface {
-		Users(ctx context.Context) ([]*entity.User, error)
-		CreateUser(ctx context.Context, user *entity.User) (int, error)
-		GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
-		GetUserById(ctx context.Context, id int) (*entity.User, error)
+		Users(ctx context.Context) ([]*userEntity.User, error)
+		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
+		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
+		GetUserById(ctx context.Context, id int) (*userEntity.User, error)
+		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
 	}
 
 	//UserRepo
 	UserRepo interface {
-		GetUsers(ctx context.Context) ([]*entity.User, error)
-		GetUserByID(ctx context.Context, id string) (user *entity.User, err error)
-		CreateUser(ctx context.Context, user *entity.User) (int, error)
-		GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
-		GetUserById(ctx context.Context, id int) (*entity.User, error)
-		//SetUserWallet(ctx context.Context, userID string, address string) (*entity.User, error)
+		GetUsers(ctx context.Context) ([]*userEntity.User, error)
+		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
+		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
+		GetUserByID(ctx context.Context, id int) (*userEntity.User, error)
+		SetUserWallet(ctx context.Context, userID string, address string) error
+		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
 	}
 )

@@ -1,4 +1,4 @@
-package entity
+package userEntity
 
 //todo isActive Role
 type User struct {
@@ -7,4 +7,5 @@ type User struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Wallet   string `json:"wallet"`
+	Valid    bool   `json:"valid"`
 }

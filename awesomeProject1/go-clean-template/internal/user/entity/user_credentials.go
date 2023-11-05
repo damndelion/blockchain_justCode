@@ -1,4 +1,4 @@
-package entity
+package userEntity
 
 type UserCredentials struct {
 	ID      int    `json:"id"`

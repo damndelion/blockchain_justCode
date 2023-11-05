@@ -40,7 +40,7 @@ type (
 func NewConfig() (*Config, error) {
 	cfg := &Config{}
 
-	err := cleanenv.ReadConfig("awesomeProject1/go-clean-template/config/user/config.yml", cfg)
+	err := cleanenv.ReadConfig("config/user/config.yml", cfg)
 	if err != nil {
 		return nil, err
 	}

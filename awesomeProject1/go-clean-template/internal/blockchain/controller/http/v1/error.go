@@ -1,13 +1,15 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 type response struct {
-	Error string `json:"error" example:"message"`
+	Error error `json:"error" example:"message"`
 }
 
-func errorResponse(c *gin.Context, code int, msg string) {
-	c.AbortWithStatusJSON(code, response{msg})
+func errorResponse(c *gin.Context, code int, msg error) {
+
+	c.AbortWithStatusJSON(code, fmt.Sprintf("%s", msg))
 }

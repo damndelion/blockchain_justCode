@@ -47,7 +47,7 @@ type (
 func NewConfig() (*Config, error) {
 	cfg := &Config{}
 
-	err := cleanenv.ReadConfig("/Users/daniar/GolandProjects/blockchain/awesomeProject1/go-clean-template/config/auth/config.yml", cfg)
+	err := cleanenv.ReadConfig("config/auth/config.yml", cfg)
 	if err != nil {
 		return nil, err
 	}

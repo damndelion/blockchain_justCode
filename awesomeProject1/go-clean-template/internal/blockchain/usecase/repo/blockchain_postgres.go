@@ -28,6 +28,9 @@ func (br *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet 
 	query := "SELECT wallet FROM users WHERE id = $1"
 
 	err = br.DB.QueryRow(query, userId).Scan(&userId)
+	if err != nil {
+		return "", err
+	}
 
 	return userId, nil
 }
@@ -63,27 +66,35 @@ func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (stri
 }
 
 func (br *BlockchainRepo) Send(ctx context.Context, from string, to string, amount float64) error {
+	//TODO grpc GetUserByID to get valid status
 	address, err := br.GetWallet(ctx, from)
 	if err != nil {
 		return err
 	}
-	br.chain.Send(address, to, amount)
+	err = br.chain.Send(address, to, amount)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (br *BlockchainRepo) TopUp(ctx context.Context, from string, to string, amount float64) error {
+	//TODO grpc GetUserByID to get valid status
 	address, err := br.GetWallet(ctx, to)
 	if err != nil {
 		return err
 	}
-	br.chain.Send(from, address, amount)
+	err = br.chain.Send(from, address, amount)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (br *BlockchainRepo) SetUserWallet(ctx context.Context, userID string, address string) (err error) {
 	id, _ := strconv.Atoi(userID)
-	query := "SELECT wallet FROM users WHERE id = $2"
-	res, err := br.DB.Exec(query, address, id)
+	query := "SELECT wallet FROM users WHERE id = $1"
+	res, err := br.DB.Exec(query, id)
 	if res == nil {
 		return fmt.Errorf("user already have wallet existing")
 	}

@@ -154,27 +154,29 @@ func NewCoinbaseTX(to, data string) *Transaction {
 	return &tx
 }
 
-func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain) *Transaction {
+func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain) (*Transaction, error) {
 	var inputs []TXInput
 	var outputs []TXOutput
 
 	wallets, err := NewWallets()
 	if err != nil {
-		log.Panic(err)
+		return nil, fmt.Errorf("%w", err)
+
 	}
 	wallet := wallets.GetWallet(from)
 	pubKeyHash := HashPubKey(wallet.PublicKey)
 	acc, validOutputs := bc.FindSpendableOutputs(pubKeyHash, amount)
 
 	if acc < amount {
-		log.Fatal("ERROR: Not enough funds")
+		return nil, fmt.Errorf("not enough funds")
+
 	}
 
 	// Build a list of inputs
 	for txid, outs := range validOutputs {
 		txID, err := hex.DecodeString(txid)
 		if err != nil {
-			log.Panic(err)
+			return nil, fmt.Errorf("%w", err)
 		}
 
 		for _, out := range outs {
@@ -193,5 +195,5 @@ func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain) *Transa
 	tx.ID = tx.Hash()
 	bc.SignTransaction(&tx, wallet.PrivateKey)
 
-	return &tx
+	return &tx, nil
 }

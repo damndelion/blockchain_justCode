@@ -12,7 +12,7 @@ import (
 )
 
 const version = byte(0x00)
-const walletFile = "awesomeProject1/go-clean-template/pkg/blockchain_logic/wallet.dat"
+const walletFile = "pkg/blockchain_logic/wallet.dat"
 const addressChecksumLen = 4
 
 // Wallet stores private and public keys

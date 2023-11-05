@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	_ "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
@@ -25,6 +26,8 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 		adminHandler.GET("/all", r.GetUsers)
 		adminHandler.GET("/email", r.GetUserByEmail)
 		adminHandler.GET("/:id", r.GetUserById)
+		adminHandler.POST("/info/:id", r.CreateUserDetailInfo)
+		adminHandler.PUT("/info/:id", r.SetUserDetailInfo)
 	}
 
 }
@@ -141,4 +144,44 @@ func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
+}
+
+func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
+
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	var userData dto.UserDetailRequest
+	err := ctx.ShouldBindJSON(&userData)
+
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+		return
+	}
+	err = ur.u.CreateUserDetailInfo(ctx, userData, id)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+		return
+	}
+	ctx.JSON(http.StatusOK, "Success")
+}
+
+func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
+
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	var userData dto.UserDetailRequest
+	err := ctx.ShouldBindJSON(&userData)
+
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+	err = ur.u.SetUserDetailInfo(ctx, userData, id)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+	ctx.JSON(http.StatusOK, "Success")
 }

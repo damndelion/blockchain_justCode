@@ -26,13 +26,13 @@ func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l log
 	{
 		blockchainHandler.Use(middleware.JwtVerify(cfg.SecretKey))
 		blockchainHandler.GET("/all", r.GetWallets)
-		blockchainHandler.GET("/:userId", r.GetWallet)
-		blockchainHandler.GET("/balance/:userId", r.GetBalance)
-		blockchainHandler.GET("/usd/balance/:userId", r.GetBalanceUSD)
+		blockchainHandler.GET("/", r.GetWallet)
+		blockchainHandler.GET("/balance", r.GetBalance)
+		blockchainHandler.GET("/usd/balance", r.GetBalanceUSD)
 		blockchainHandler.POST("/create", r.CreateWallet)
 		blockchainHandler.POST("/send", r.Send)
 		blockchainHandler.POST("/topup", r.TopUp)
-		blockchainHandler.GET("/qr/:userId", r.GetWalletQRCode)
+		blockchainHandler.GET("/qr", r.GetWalletQRCode)
 
 	}
 
@@ -53,7 +53,7 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 	wallets, err := bc.c.Wallets(ctx)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallets: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - getWallets error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 
@@ -74,18 +74,12 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/{userId} [get]
 func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
-	urlUserID := ctx.Param("userId")
 	authHeader := ctx.GetHeader("Authorization")
-
-	status := bc.c.CheckForIdInAccessToken(urlUserID, authHeader)
-	if !status {
-		errorResponse(ctx, http.StatusForbidden, "Access denied")
-		return
-	}
-	wallet, err := bc.c.Wallet(ctx, urlUserID)
+	userId, err := bc.c.GetIdFromToken(authHeader)
+	wallet, err := bc.c.Wallet(ctx, userId)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallet: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - getWallet error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 
@@ -106,17 +100,14 @@ func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/balance/{userId} [get]
 func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
-	urlUserID := ctx.Param("userId")
 	authHeader := ctx.GetHeader("Authorization")
+	fmt.Println(authHeader)
+	userId, err := bc.c.GetIdFromToken(authHeader)
 
-	status := bc.c.CheckForIdInAccessToken(urlUserID, authHeader)
-	if !status {
-		errorResponse(ctx, http.StatusForbidden, "Access denied")
-	}
-	balance, err := bc.c.GetBalance(ctx, urlUserID)
+	balance, err := bc.c.GetBalance(ctx, userId)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - getBalance error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 
@@ -137,17 +128,13 @@ func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/usd/balance/{userId} [get]
 func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
-	urlUserID := ctx.Param("userId")
 	authHeader := ctx.GetHeader("Authorization")
+	userId, err := bc.c.GetIdFromToken(authHeader)
 
-	status := bc.c.CheckForIdInAccessToken(urlUserID, authHeader)
-	if !status {
-		errorResponse(ctx, http.StatusForbidden, "Access denied")
-	}
-	balance, err := bc.c.GetBalanceUSD(ctx, urlUserID)
+	balance, err := bc.c.GetBalanceUSD(ctx, userId)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalanceUSD: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - getBalance error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 
@@ -172,13 +159,13 @@ func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
 	id, err := bc.c.GetIdFromToken(accessToken)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - createWallet: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - createWallet error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 	wallet, err := bc.c.CreateWallet(ctx, id)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - createWallet: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("http - v1 - blockchain - createWallet: %v", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 	ctx.JSON(http.StatusOK, wallet)
@@ -204,22 +191,22 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - blockchain - send request error")
+		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
 		return
 	}
-	userID := sendData.From
 	authHeader := ctx.GetHeader("Authorization")
+	userId, err := bc.c.GetIdFromToken(authHeader)
 
-	status := bc.c.CheckForIdInAccessToken(userID, authHeader)
+	status := bc.c.CheckForIdInAccessToken(userId, authHeader)
 	if !status {
-		errorResponse(ctx, http.StatusForbidden, "Access denied")
+		errorResponse(ctx, http.StatusForbidden, fmt.Errorf("Acess denied: %w ", err))
 		return
 	}
 
-	err = bc.c.Send(ctx, sendData.From, sendData.To, sendData.Amount)
+	err = bc.c.Send(ctx, userId, sendData.To, sendData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - send error")
+		errorResponse(ctx, http.StatusInternalServerError, err)
 
 		return
 	}
@@ -249,14 +236,14 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - topup: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - blockchain - topup request error")
+		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
 		return
 	}
 
 	err = bc.c.TopUp(ctx, "", id, topupData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - send error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 	ctx.JSON(http.StatusOK, "Success ")
@@ -276,26 +263,20 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/qr/{userId} [get]
 func (bc *chainRoutes) GetWalletQRCode(ctx *gin.Context) {
-
-	urlUserID := ctx.Param("userId")
 	authHeader := ctx.GetHeader("Authorization")
+	userId, err := bc.c.GetIdFromToken(authHeader)
 
-	status := bc.c.CheckForIdInAccessToken(urlUserID, authHeader)
-	if !status {
-		errorResponse(ctx, http.StatusForbidden, "Access denied")
-		return
-	}
-	wallet, err := bc.c.Wallet(ctx, urlUserID)
+	wallet, err := bc.c.Wallet(ctx, userId)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - GetWalletQRCode: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - blockchain - GetWalletQRCode error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
 		return
 	}
 
 	qrCode, err := qrcode.Encode(wallet, qrcode.Medium, 256)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("Failed to generate QR code: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "Failed to generate QR code")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("Failed to generate QR code: %w ", err))
 		return
 	}
 

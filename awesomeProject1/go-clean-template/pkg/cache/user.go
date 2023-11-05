@@ -9,8 +9,8 @@ import (
 )
 
 type User interface {
-	Get(ctx context.Context, key string) (*entity.User, error)
-	Set(ctx context.Context, key string, value *entity.User) error
+	Get(ctx context.Context, key string) (*userEntity.User, error)
+	Set(ctx context.Context, key string, value *userEntity.User) error
 }
 
 type UserCache struct {
@@ -25,14 +25,14 @@ func NewUserCache(redisCli *redis.Client, expiration time.Duration) User {
 	}
 }
 
-func (c *UserCache) Get(ctx context.Context, key string) (*entity.User, error) {
+func (c *UserCache) Get(ctx context.Context, key string) (*userEntity.User, error) {
 	value := c.redisCli.Get(ctx, key).Val()
 
 	if value == "" {
 		return nil, nil
 	}
 
-	var user *entity.User
+	var user *userEntity.User
 	err := json.Unmarshal([]byte(value), &user)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (c *UserCache) Get(ctx context.Context, key string) (*entity.User, error) {
 	return user, nil
 }
 
-func (c *UserCache) Set(ctx context.Context, key string, value *entity.User) error {
+func (c *UserCache) Set(ctx context.Context, key string, value *userEntity.User) error {
 	userJson, err := json.Marshal(value)
 	if err != nil {
 		return err

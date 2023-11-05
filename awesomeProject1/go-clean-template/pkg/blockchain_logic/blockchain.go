@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -257,27 +258,26 @@ func (bc *Blockchain) GetBalance(address string) float64 {
 	return balance
 }
 
-func (bc *Blockchain) Send(from, to string, amount float64) {
+func (bc *Blockchain) Send(from, to string, amount float64) error {
 	if !ValidateAddress(from) {
-		log.Panic("ERROR: Sender address is not valid")
+		return fmt.Errorf("ERROR: Sender address is not valid")
 	}
 	if !ValidateAddress(to) {
-		log.Panic("ERROR: Recipient address is not valid")
+		return fmt.Errorf("ERROR: Sender address is not valid")
 	}
 
 	NewBlockchain(bc.Db, from)
 
-	go func() {
-		bc.mu.Lock()
-		defer bc.mu.Unlock()
-		tx := NewUTXOTransaction(from, to, amount, bc)
+	tx, err := NewUTXOTransaction(from, to, amount, bc)
+	if err != nil {
+		return err
+	}
+	err = bc.MineBlock([]*Transaction{tx})
+	if err != nil {
+		return err
+	}
 
-		err := bc.MineBlock([]*Transaction{tx})
-
-		if err != nil {
-			return
-		}
-	}()
+	return nil
 
 }
 

@@ -43,7 +43,10 @@ func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, e
 }
 
 func (b *Blockchain) Send(ctx context.Context, from string, to string, amount float64) error {
-	b.repo.Send(ctx, from, to, amount)
+	err := b.repo.Send(ctx, from, to, amount)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
