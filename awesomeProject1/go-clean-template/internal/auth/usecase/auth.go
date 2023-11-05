@@ -2,28 +2,60 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/evrone/go-clean-template/config/auth"
+	dtoConsumer "github.com/evrone/go-clean-template/internal/auth/consumer/dto"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
+	"github.com/evrone/go-clean-template/internal/kafka"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/golang-jwt/jwt"
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/crypto/bcrypt"
+	"math/rand"
 	"time"
 )
 
+var confirmationChannels = make(map[string]chan bool)
+
 type Auth struct {
-	repo AuthRepo
-	cfg  *auth.Config
+	repo                     AuthRepo
+	cfg                      *auth.Config
+	userVerificationProducer *kafka.Producer
 }
 
-func NewAuth(repo AuthRepo, cfg *auth.Config) *Auth {
-	return &Auth{repo, cfg}
+func NewAuth(repo AuthRepo, cfg *auth.Config, userVerificationProducer *kafka.Producer) *Auth {
+	return &Auth{repo, cfg, userVerificationProducer}
 }
 
 func (t *Auth) Register(ctx context.Context, name, email, password string) error {
+	randomFloat := rand.Float64()
+	randomNumber := int(randomFloat * 10000)
+	if randomNumber < 1000 {
+		randomNumber += 1000
+	}
+	msg := dtoConsumer.UserCode{Email: email, Code: fmt.Sprintf("%d", randomNumber)}
+	b, err := json.Marshal(&msg)
+	if err != nil {
+		return fmt.Errorf("failed to marshall UserCode err: %w", err)
+	}
+
+	t.userVerificationProducer.ProduceMessage(b)
+
+	userIdentifier := email
+
+	confirmationChan := make(chan bool)
+	confirmationChannels[userIdentifier] = confirmationChan
+
+	success := <-confirmationChan
+
+	delete(confirmationChannels, userIdentifier)
+
+	if !success {
+		return errors.New("User registration confirmation failed")
+	}
 
 	generatedHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -90,6 +122,20 @@ func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, error)
 	}
 
 	return accessToken, nil
+}
+
+func (u *Auth) ConfirmUser(ctx context.Context, userIdentifier string, enteredCode string) bool {
+	expectedCode, _ := u.repo.GetUserCode(ctx, userIdentifier)
+
+	if enteredCode != expectedCode {
+		return false
+	}
+
+	if confirmationChan, exists := confirmationChannels[userIdentifier]; exists {
+		confirmationChan <- true
+	}
+
+	return true
 }
 
 func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (string, string, error) {

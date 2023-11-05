@@ -7,3 +7,8 @@ type Token struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+type UserVerifications struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+}

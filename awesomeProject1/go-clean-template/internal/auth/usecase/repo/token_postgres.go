@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"github.com/evrone/go-clean-template/internal/auth/entity"
+	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/opentracing/opentracing-go"
 	"gorm.io/gorm"
@@ -49,4 +50,13 @@ func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (user *user
 		return nil, res.Error
 	}
 	return user, nil
+}
+
+func (t *AuthRepo) GetUserCode(ctx context.Context, userIdentifier string) (string, error) {
+	var userCode string
+	res := t.DB.Model(&authEntity.UserVerifications{}).Select("code").Where("email = ?", userIdentifier).WithContext(ctx).First(&userCode)
+	if res.Error != nil {
+		return "", res.Error
+	}
+	return userCode, nil
 }

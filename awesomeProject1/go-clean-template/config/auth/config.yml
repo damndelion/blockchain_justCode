@@ -18,3 +18,12 @@ jwt:
   access_token_ttl: 900
   refresh_token_ttl: 3600
 
+Kafka:
+  Brokers:
+    - 127.0.0.1:19092
+  Producer:
+    topic: "user-verification"
+  Consumer:
+    topics:
+      - "user-verification"
+

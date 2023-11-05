@@ -18,11 +18,12 @@ type authRoutes struct {
 func newAuthRoutes(handler *gin.RouterGroup, u usecase.AuthUseCase, l logger.Interface) {
 	r := &authRoutes{u, l}
 
-	userHandler := handler.Group("/auth")
+	authHandler := handler.Group("/auth")
 	{
-		userHandler.POST("/register", r.Register)
-		userHandler.POST("/login", r.Login)
-		userHandler.POST("/refresh", r.Refresh)
+		authHandler.POST("/register", r.Register)
+		authHandler.POST("/login", r.Login)
+		authHandler.POST("/refresh", r.Refresh)
+		authHandler.POST("/confirm", r.Confirm)
 	}
 
 }
@@ -113,4 +114,18 @@ func (ar *authRoutes) Refresh(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, token)
+}
+
+func (ar *authRoutes) Confirm(ctx *gin.Context) {
+	var refreshRequest dto.ConfirmRequest
+	err := ctx.ShouldBindJSON(&refreshRequest)
+
+	status := ar.u.ConfirmUser(ctx, refreshRequest.Email, refreshRequest.Code)
+	if status == false {
+		ar.l.Error(fmt.Errorf("http - v1 - auth - Confirm: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "Invalid code")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, status)
 }

@@ -4,9 +4,11 @@ package applicator
 import (
 	"fmt"
 	"github.com/evrone/go-clean-template/config/auth"
+	"github.com/evrone/go-clean-template/internal/auth/consumer"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
+	"github.com/evrone/go-clean-template/internal/kafka"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
 	"github.com/evrone/go-clean-template/pkg/jaeger"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -35,8 +37,22 @@ func Run(cfg *auth.Config) {
 	sqlDB, err := db.DB()
 	defer sqlDB.Close()
 
+	userVerificationProducer, err := kafka.NewProducer(cfg)
+	if err != nil {
+		l.Error("failed NewProducer err: %v", err)
+	}
+
+	userVerificationConsumerCallback := consumer.NewUserVerificationCallback(l, db)
+
+	userVerificationConsumer, err := kafka.NewConsumer(l, cfg, userVerificationConsumerCallback)
+	if err != nil {
+		l.Fatal("failed NewConsumer err: %v", err)
+	}
+
+	go userVerificationConsumer.Start()
+
 	// Use case
-	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db), cfg)
+	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db), cfg, userVerificationProducer)
 
 	// HTTP Server
 	handler := gin.New()
