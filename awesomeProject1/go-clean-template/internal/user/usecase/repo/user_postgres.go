@@ -43,7 +43,7 @@ func (ur *UserRepo) GetUserByEmail(ctx context.Context, email string) (user *use
 	return user, nil
 }
 
-func (ur *UserRepo) GetUserByID(ctx context.Context, id int) (user *userEntity.User, err error) {
+func (ur *UserRepo) GetUserByID(ctx context.Context, id string) (user *userEntity.User, err error) {
 	res := ur.DB.Where("id = ?", id).WithContext(ctx).Find(&user)
 	if res.Error != nil {
 		return nil, res.Error
@@ -63,7 +63,7 @@ func (ur *UserRepo) SetUserWallet(ctx context.Context, userID string, address st
 	return nil
 }
 
-func (ur *UserRepo) CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error {
+func (ur *UserRepo) CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error {
 	userInfo := userEntity.UserInfo{
 		UserID:  id,
 		Age:     userData.Age,
@@ -97,7 +97,7 @@ func (ur *UserRepo) CreateUserDetailInfo(ctx context.Context, userData dto.UserD
 	return nil
 }
 
-func (ur *UserRepo) SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error {
+func (ur *UserRepo) SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error {
 	userInfo := userEntity.UserInfo{
 		UserID:  id,
 		Age:     userData.Age,

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/evrone/go-clean-template/config/user"
 	_ "github.com/evrone/go-clean-template/docs/user"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
@@ -13,7 +14,7 @@ import (
 	"net/http"
 )
 
-func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCase, uc cache.User) {
+func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCase, uc cache.User, cfg *user.Config) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -33,6 +34,6 @@ func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCas
 	// Routers
 	h := handler.Group("/v1")
 	{
-		newUserRoutes(h, u, l, uc)
+		newUserRoutes(h, u, l, uc, cfg)
 	}
 }

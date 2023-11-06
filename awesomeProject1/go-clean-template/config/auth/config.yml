@@ -18,3 +18,10 @@ jwt:
   access_token_ttl: 900
   refresh_token_ttl: 3600
 
+nats:
+  server: "nats://localhost:4222"
+  producer:
+    topic: "user-verification"
+  consumer:
+    topics:
+      - "user-verification"

@@ -21,3 +21,8 @@ type LoginResponse struct {
 type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
+
+type ConfirmRequest struct {
+	Email string `json:"email"`
+	Code  int    `json:"code"`
+}

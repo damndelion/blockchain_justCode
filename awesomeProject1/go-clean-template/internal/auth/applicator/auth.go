@@ -4,14 +4,17 @@ package applicator
 import (
 	"fmt"
 	"github.com/evrone/go-clean-template/config/auth"
+	consumer "github.com/evrone/go-clean-template/internal/auth/consumer"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
+	natsService "github.com/evrone/go-clean-template/internal/nats"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
 	"github.com/evrone/go-clean-template/pkg/jaeger"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/evrone/go-clean-template/pkg/postgres"
 	"github.com/gin-gonic/gin"
+	"github.com/nats-io/nats.go"
 	"github.com/opentracing/opentracing-go"
 	"os"
 	"os/signal"
@@ -34,9 +37,30 @@ func Run(cfg *auth.Config) {
 	}
 	sqlDB, err := db.DB()
 	defer sqlDB.Close()
+	nc, err := nats.Connect("nats://localhost:4222")
+	if err != nil {
+		l.Error("failed to connect to NATS server: %v", err)
+		return
+	}
+	defer nc.Close()
+
+	// Subscribe to the NATS subject for user verification
+	userVerificationProducer, err := natsService.NewProducer(cfg)
+
+	if err != nil {
+
+		l.Error("Failed to create NATS producer: %v", err)
+	}
+
+	userVerificationConsumerCallback := consumer.NewUserVerificationCallback(l, db, nc)
+	userVerificationConsumer, err := natsService.NewConsumer(l, cfg, userVerificationConsumerCallback)
+	if err != nil {
+		l.Fatal("Failed to create NATS consumer: %v", err)
+	}
+	go userVerificationConsumer.Start()
 
 	// Use case
-	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db), cfg)
+	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db), cfg, userVerificationProducer)
 
 	// HTTP Server
 	handler := gin.New()

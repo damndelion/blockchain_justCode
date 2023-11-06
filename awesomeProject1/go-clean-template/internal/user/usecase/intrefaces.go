@@ -16,9 +16,10 @@ type (
 		Users(ctx context.Context) ([]*userEntity.User, error)
 		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
-		GetUserById(ctx context.Context, id int) (*userEntity.User, error)
-		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
-		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		GetUserById(ctx context.Context, id string) (*userEntity.User, error)
+		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
+		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
+		GetIdFromToken(accessToken string) (string, error)
 	}
 
 	//UserRepo
@@ -26,9 +27,9 @@ type (
 		GetUsers(ctx context.Context) ([]*userEntity.User, error)
 		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
-		GetUserByID(ctx context.Context, id int) (*userEntity.User, error)
+		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
 		SetUserWallet(ctx context.Context, userID string, address string) error
-		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
-		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
+		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
 	}
 )

@@ -11,6 +11,7 @@ type (
 		HTTP `yaml:"http"`
 		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`
+		JWT  `yaml:"jwt"`
 	}
 
 	// App -.
@@ -33,6 +34,11 @@ type (
 	PG struct {
 		PoolMax int    `env-required:"true" yaml:"pool_max" env:"PG_POOL_MAX"`
 		URL     string `env-required:"true"                 env:"PG_URL"`
+	}
+	JWT struct {
+		SecretKey       string `mapstructure:"secret_key" yaml:"secret_key"`
+		AccessTokenTTL  int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`
+		RefreshTokenTTL int64  `mapstructure:"refresh_token_ttl" yaml:"refresh_token_ttl"`
 	}
 )
 

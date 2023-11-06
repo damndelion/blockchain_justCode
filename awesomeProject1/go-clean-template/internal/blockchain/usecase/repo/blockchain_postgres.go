@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"strconv"
@@ -57,8 +58,13 @@ func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userId string) (bal
 }
 
 func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (string, error) {
+	wallet, err := br.GetUserWallet(ctx, userID)
+	if wallet != nil {
+		return "", errors.New("Wallet already exists")
+	}
+
 	address := blockchain_logic.CreateWallet()
-	err := br.SetUserWallet(ctx, userID, address)
+	err = br.SetUserWallet(ctx, userID, address)
 	if err != nil {
 		return "", err
 	}
@@ -104,4 +110,14 @@ func (br *BlockchainRepo) SetUserWallet(ctx context.Context, userID string, addr
 		return err
 	}
 	return nil
+}
+
+//TODO grpc
+func (br *BlockchainRepo) GetUserWallet(ctx context.Context, id string) (sql.Result, error) {
+	query := "SELECT wallet FROM users WHERE id = $1"
+	res, err := br.DB.Exec(query, id)
+	if err != nil {
+		return nil, fmt.Errorf("user already have wallet existing")
+	}
+	return res, nil
 }

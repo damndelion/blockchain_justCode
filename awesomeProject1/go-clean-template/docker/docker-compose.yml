@@ -1,0 +1,12 @@
+version: '3'
+services:
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+
+  nats-streaming:
+    image: nats-streaming:latest
+    ports:
+      - "8222:8222" # NATS Streaming HTTP monitoring interface
+

@@ -39,11 +39,11 @@ func Run(cfg *user.Config) {
 	userCache := cache.NewUserCache(redisClient, 10*time.Minute)
 
 	// Use case
-	userUseCase := usecase.NewUser(repo.NewUserRepo(db))
+	userUseCase := usecase.NewUser(repo.NewUserRepo(db), cfg)
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewUserRouter(handler, l, userUseCase, userCache)
+	v1.NewUserRouter(handler, l, userUseCase, userCache, cfg)
 
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 

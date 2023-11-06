@@ -23,6 +23,7 @@ func newAuthRoutes(handler *gin.RouterGroup, u usecase.AuthUseCase, l logger.Int
 		userHandler.POST("/register", r.Register)
 		userHandler.POST("/login", r.Login)
 		userHandler.POST("/refresh", r.Refresh)
+		userHandler.POST("/confirm", r.Confirm)
 	}
 
 }
@@ -113,4 +114,17 @@ func (ar *authRoutes) Refresh(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, token)
+}
+
+func (ar *authRoutes) Confirm(ctx *gin.Context) {
+	var confirmRequest dto.ConfirmRequest
+	err := ctx.ShouldBindJSON(&confirmRequest)
+	err = ar.u.ConfirmUserCode(ctx, confirmRequest.Email, confirmRequest.Code)
+	if err != nil {
+		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - refresh error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "user Confirmed")
 }

@@ -33,7 +33,6 @@ func NewAuthRouter(handler *gin.Engine, l logger.Interface, u usecase.AuthUseCas
 	// Routers
 	h := handler.Group("/v1")
 	{
-
 		newAuthRoutes(h, u, l)
 	}
 }

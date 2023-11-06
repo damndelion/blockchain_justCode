@@ -9,7 +9,6 @@ import (
 )
 
 func JwtVerify(SecretKey string) gin.HandlerFunc {
-
 	return func(ctx *gin.Context) {
 		tokenHeader := ctx.Request.Header.Get("Authorization")
 		if tokenHeader == "" {

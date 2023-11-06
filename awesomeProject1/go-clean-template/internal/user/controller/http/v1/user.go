@@ -2,6 +2,8 @@ package v1
 
 import (
 	"fmt"
+	"github.com/evrone/go-clean-template/config/user"
+	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	_ "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
@@ -9,7 +11,6 @@ import (
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 type userRoutes struct {
@@ -18,16 +19,22 @@ type userRoutes struct {
 	userCache cache.User
 }
 
-func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User) {
+func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User, cfg *user.Config) {
 	r := &userRoutes{u, l, uc}
+
+	userHandler := handler.Group("user")
+	{
+		userHandler.Use(middleware.JwtVerify(cfg.SecretKey))
+		userHandler.POST("/info", r.CreateUserDetailInfo)
+		userHandler.PUT("/info", r.SetUserDetailInfo)
+	}
 
 	adminHandler := handler.Group("user")
 	{
 		adminHandler.GET("/all", r.GetUsers)
 		adminHandler.GET("/email", r.GetUserByEmail)
 		adminHandler.GET("/:id", r.GetUserById)
-		adminHandler.POST("/info/:id", r.CreateUserDetailInfo)
-		adminHandler.PUT("/info/:id", r.SetUserDetailInfo)
+
 	}
 
 }
@@ -121,9 +128,9 @@ func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
 // @Router /{id} [get]
 func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	id := ctx.Param("id")
 
-	user, err := ur.userCache.Get(ctx, strconv.Itoa(id))
+	user, err := ur.userCache.Get(ctx, id)
 	if err != nil {
 		return
 	}
@@ -136,7 +143,7 @@ func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 			return
 		}
 
-		err = ur.userCache.Set(ctx, strconv.Itoa(id), user)
+		err = ur.userCache.Set(ctx, id, user)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
@@ -147,17 +154,22 @@ func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 }
 
 func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
-
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	authHeader := ctx.GetHeader("Authorization")
+	userId, err := ur.u.GetIdFromToken(authHeader)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
 	var userData dto.UserDetailRequest
-	err := ctx.ShouldBindJSON(&userData)
+	err = ctx.ShouldBindJSON(&userData)
 
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
 		return
 	}
-	err = ur.u.CreateUserDetailInfo(ctx, userData, id)
+	err = ur.u.CreateUserDetailInfo(ctx, userData, userId)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
@@ -167,17 +179,22 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 }
 
 func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
-
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	var userData dto.UserDetailRequest
-	err := ctx.ShouldBindJSON(&userData)
-
+	authHeader := ctx.GetHeader("Authorization")
+	userId, err := ur.u.GetIdFromToken(authHeader)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
+		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
 		return
 	}
-	err = ur.u.SetUserDetailInfo(ctx, userData, id)
+	var userData dto.UserDetailRequest
+	err = ctx.ShouldBindJSON(&userData)
+
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+	err = ur.u.SetUserDetailInfo(ctx, userData, userId)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
