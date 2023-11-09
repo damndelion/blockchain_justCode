@@ -3,20 +3,20 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
+	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
-	"strconv"
 )
 
 type BlockchainRepo struct {
 	*sql.DB
-	chain *blockchain_logic.Blockchain
+	chain             *blockchain_logic.Blockchain
+	userGrpcTransport *transport.UserGrpcTransport
 }
 
-func NewBlockchainRepo(db *sql.DB, address string) *BlockchainRepo {
+func NewBlockchainRepo(db *sql.DB, address string, userGrpcTransport *transport.UserGrpcTransport) *BlockchainRepo {
 	chain := blockchain_logic.CreateBlockchain(db, address)
-	return &BlockchainRepo{db, chain}
+	return &BlockchainRepo{db, chain, userGrpcTransport}
 }
 
 func (br *BlockchainRepo) GetWallets(ctx context.Context) (wallets []string, err error) {
@@ -26,14 +26,12 @@ func (br *BlockchainRepo) GetWallets(ctx context.Context) (wallets []string, err
 }
 
 func (br *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet string, err error) {
-	query := "SELECT wallet FROM users WHERE id = $1"
-
-	err = br.DB.QueryRow(query, userId).Scan(&userId)
+	address, err := br.userGrpcTransport.GetUserWallet(ctx, userId)
 	if err != nil {
 		return "", err
 	}
 
-	return userId, nil
+	return address.Wallet, nil
 }
 
 func (br *BlockchainRepo) GetBalance(ctx context.Context, userId string) (balance float64, err error) {
@@ -41,6 +39,10 @@ func (br *BlockchainRepo) GetBalance(ctx context.Context, userId string) (balanc
 	if err != nil {
 		return 0, err
 	}
+	res := br.chain.GetBalance(address)
+	return res, nil
+}
+func (br *BlockchainRepo) GetBalanceByAddress(ctx context.Context, address string) (balance float64, err error) {
 	res := br.chain.GetBalance(address)
 	return res, nil
 }
@@ -58,13 +60,18 @@ func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userId string) (bal
 }
 
 func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (string, error) {
-	wallet, err := br.GetUserWallet(ctx, userID)
-	if wallet != nil {
-		return "", errors.New("Wallet already exists")
+	wallet, err := br.GetWallet(ctx, userID)
+	if wallet != "" {
+		return "", fmt.Errorf("User wallet already exists")
+	}
+	user, err := br.userGrpcTransport.GetUserByID(ctx, userID)
+	if user.Valid == false {
+		return "", fmt.Errorf("user is not valid")
 	}
 
 	address := blockchain_logic.CreateWallet()
-	err = br.SetUserWallet(ctx, userID, address)
+
+	_, err = br.userGrpcTransport.SetUserWallet(ctx, userID, address)
 	if err != nil {
 		return "", err
 	}
@@ -72,12 +79,11 @@ func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (stri
 }
 
 func (br *BlockchainRepo) Send(ctx context.Context, from string, to string, amount float64) error {
-	//TODO grpc GetUserByID to get valid status
-	address, err := br.GetWallet(ctx, from)
+	user, err := br.userGrpcTransport.GetUserByID(ctx, from)
 	if err != nil {
 		return err
 	}
-	err = br.chain.Send(address, to, amount)
+	err = br.chain.Send(user.Wallet, to, amount)
 	if err != nil {
 		return err
 	}
@@ -85,39 +91,14 @@ func (br *BlockchainRepo) Send(ctx context.Context, from string, to string, amou
 }
 
 func (br *BlockchainRepo) TopUp(ctx context.Context, from string, to string, amount float64) error {
-	//TODO grpc GetUserByID to get valid status
-	address, err := br.GetWallet(ctx, to)
+	user, err := br.userGrpcTransport.GetUserByID(ctx, to)
 	if err != nil {
 		return err
 	}
-	err = br.chain.Send(from, address, amount)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (br *BlockchainRepo) SetUserWallet(ctx context.Context, userID string, address string) (err error) {
-	id, _ := strconv.Atoi(userID)
-	query := "SELECT wallet FROM users WHERE id = $1"
-	res, err := br.DB.Exec(query, id)
-	if res == nil {
-		return fmt.Errorf("user already have wallet existing")
-	}
-	query = "UPDATE users SET wallet = $1 WHERE id = $2"
-	_, err = br.DB.Exec(query, address, id)
+	fmt.Println(user.Wallet)
+	err = br.chain.Send(from, user.Wallet, amount)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-//TODO grpc
-func (br *BlockchainRepo) GetUserWallet(ctx context.Context, id string) (sql.Result, error) {
-	query := "SELECT wallet FROM users WHERE id = $1"
-	res, err := br.DB.Exec(query, id)
-	if err != nil {
-		return nil, fmt.Errorf("user already have wallet existing")
-	}
-	return res, nil
 }

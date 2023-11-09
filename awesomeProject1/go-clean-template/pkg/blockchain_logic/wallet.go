@@ -2,10 +2,10 @@ package blockchain_logic
 
 import (
 	"bytes"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/x509"
 	"log"
 
 	"golang.org/x/crypto/ripemd160"
@@ -17,7 +17,7 @@ const addressChecksumLen = 4
 
 // Wallet stores private and public keys
 type Wallet struct {
-	PrivateKey ecdsa.PrivateKey
+	PrivateKey *rsa.PrivateKey
 	PublicKey  []byte
 }
 
@@ -75,15 +75,19 @@ func checksum(payload []byte) []byte {
 	return secondSHA[:addressChecksumLen]
 }
 
-func newKeyPair() (ecdsa.PrivateKey, []byte) {
-	curve := elliptic.P256()
-	private, err := ecdsa.GenerateKey(curve, rand.Reader)
+func newKeyPair() (*rsa.PrivateKey, []byte) {
+	private, err := rsa.GenerateKey(rand.Reader, 2048) // You can adjust the key size
 	if err != nil {
 		log.Panic(err)
 	}
-	pubKey := append(private.PublicKey.X.Bytes(), private.PublicKey.Y.Bytes()...)
 
-	return *private, pubKey
+	publicKey := &private.PublicKey
+	pubKeyBytes, err := x509.MarshalPKIXPublicKey(publicKey)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return private, pubKeyBytes
 }
 
 func ListAddresses() []string {

@@ -28,6 +28,7 @@ func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l log
 		blockchainHandler.GET("/all", r.GetWallets)
 		blockchainHandler.GET("/", r.GetWallet)
 		blockchainHandler.GET("/balance", r.GetBalance)
+		blockchainHandler.GET("/balance/address", r.GetBalanceByAddress)
 		blockchainHandler.GET("/usd/balance", r.GetBalanceUSD)
 		blockchainHandler.POST("/create", r.CreateWallet)
 		blockchainHandler.POST("/send", r.Send)
@@ -101,10 +102,28 @@ func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
 // @Router /v1/blockchain/balance/{userId} [get]
 func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
-	fmt.Println(authHeader)
 	userId, err := bc.c.GetIdFromToken(authHeader)
 
 	balance, err := bc.c.GetBalance(ctx, userId)
+	if err != nil {
+		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, balance)
+}
+
+func (bc *chainRoutes) GetBalanceByAddress(ctx *gin.Context) {
+	var sendData dto.AddressRequest
+	err := ctx.ShouldBindJSON(&sendData)
+	if err != nil {
+		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
+		return
+	}
+
+	balance, err := bc.c.GetBalanceByAddress(ctx, sendData.Address)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
@@ -196,12 +215,6 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 	}
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := bc.c.GetIdFromToken(authHeader)
-
-	status := bc.c.CheckForIdInAccessToken(userId, authHeader)
-	if !status {
-		errorResponse(ctx, http.StatusForbidden, fmt.Errorf("Acess denied: %w ", err))
-		return
-	}
 
 	err = bc.c.Send(ctx, userId, sendData.To, sendData.Amount)
 	if err != nil {

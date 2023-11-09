@@ -1,0 +1,24 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+    - selector: userservice.UserService.GetUserByEmail
+      post: "/grpc/v1/getUserByEmail"
+      body: "*"
+
+    - selector: userservice.UserService.GetUserByID
+      post: "/grpc/v1/getUserByID"
+      body: "*"
+
+    - selector: userservice.UserService.GetUserWallet
+      post: "/grpc/v1/getUserWallet"
+      body: "*"
+
+    - selector: userservice.UserService.CreateUser
+      post: "/grpc/v1/createUser"
+      body: "*"
+
+    - selector: userservice.UserService.SetUserWallet
+      post: "/grpc/v1/setUserWallet"
+      body: "*"

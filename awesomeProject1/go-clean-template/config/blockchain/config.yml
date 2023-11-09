@@ -18,4 +18,11 @@ jwt:
   access_token_ttl: 900
 
 blockchain:
-  genesis_address: "13MAGqpqLKDCv96g9CHLFeL2rFLuCkTYHR"
+  genesis_address: "1ARw8rRyYaHwqHu1o4G8xH5TnGPbBHqeV6"
+
+transport:
+  user:
+    host: http://127.0.0.1:8080
+    timeout: 5s
+  userGrpc:
+    host: localhost:9090

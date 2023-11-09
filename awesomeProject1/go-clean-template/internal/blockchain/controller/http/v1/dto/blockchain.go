@@ -8,3 +8,7 @@ type SendRequest struct {
 type TopUpRequest struct {
 	Amount float64 `json:"amount"`
 }
+
+type AddressRequest struct {
+	Address string `json:"address"`
+}

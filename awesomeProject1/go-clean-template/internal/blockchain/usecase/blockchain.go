@@ -4,18 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/evrone/go-clean-template/config/blockchain"
+	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
 	"github.com/golang-jwt/jwt"
 	"strconv"
 )
 
 type Blockchain struct {
-	repo repo.BlockchainRepo
-	cfg  *blockchain.Config
+	repo              repo.BlockchainRepo
+	cfg               *blockchain.Config
+	userGrpcTransport *transport.UserGrpcTransport
 }
 
-func NewBlockchain(repo *repo.BlockchainRepo, cfg *blockchain.Config) *Blockchain {
-	return &Blockchain{*repo, cfg}
+func NewBlockchain(repo *repo.BlockchainRepo, cfg *blockchain.Config, userGrpcTransport *transport.UserGrpcTransport) *Blockchain {
+	return &Blockchain{*repo, cfg, userGrpcTransport}
 }
 
 func (b *Blockchain) Wallets(ctx context.Context) ([]string, error) {
@@ -30,6 +32,9 @@ func (b *Blockchain) GetBalance(ctx context.Context, userId string) (float64, er
 	return b.repo.GetBalance(ctx, userId)
 }
 
+func (b *Blockchain) GetBalanceByAddress(ctx context.Context, address string) (float64, error) {
+	return b.repo.GetBalanceByAddress(ctx, address)
+}
 func (b *Blockchain) GetBalanceUSD(ctx context.Context, userId string) (float64, error) {
 	return b.repo.GetBalanceUSD(ctx, userId)
 }

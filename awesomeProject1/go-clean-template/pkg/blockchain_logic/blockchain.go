@@ -2,7 +2,7 @@ package blockchain_logic
 
 import (
 	"bytes"
-	"crypto/ecdsa"
+	"crypto/rsa"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
@@ -228,7 +228,7 @@ func (bc *Blockchain) VerifyTransaction(tx *Transaction) bool {
 	return tx.Verify(prevTXs)
 }
 
-func (bc *Blockchain) SignTransaction(tx *Transaction, privKey ecdsa.PrivateKey) {
+func (bc *Blockchain) SignTransaction(tx *Transaction, privKey *rsa.PrivateKey) {
 	prevTXs := make(map[string]Transaction)
 
 	for _, vin := range tx.Vin {

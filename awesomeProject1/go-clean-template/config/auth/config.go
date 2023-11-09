@@ -2,17 +2,19 @@ package auth
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"time"
 )
 
 type (
 	// Config -.
 	Config struct {
-		App  `yaml:"app"`
-		HTTP `yaml:"http"`
-		Log  `yaml:"logger"`
-		PG   `yaml:"postgres"`
-		JWT  `yaml:"jwt"`
-		Nats `yaml:"nats"`
+		App       `yaml:"app"`
+		HTTP      `yaml:"http"`
+		Log       `yaml:"logger"`
+		PG        `yaml:"postgres"`
+		JWT       `yaml:"jwt"`
+		Nats      `yaml:"nats"`
+		Transport `yaml:"transport"`
 	}
 
 	// App -.
@@ -52,6 +54,17 @@ type (
 	}
 	Consumer struct {
 		Topics []string `yaml:"topics"`
+	}
+	Transport struct {
+		User     UserTransport     `yaml:"user"`
+		UserGrpc UserGrpcTransport `yaml:"userGrpc"`
+	}
+	UserTransport struct {
+		Host    string        `yaml:"host"`
+		Timeout time.Duration `yaml:"timeout"`
+	}
+	UserGrpcTransport struct {
+		Host string `yaml:"host"`
 	}
 )
 

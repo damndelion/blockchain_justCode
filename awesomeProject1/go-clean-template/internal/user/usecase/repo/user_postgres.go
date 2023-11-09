@@ -2,11 +2,11 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/user/entity"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 type UserRepo struct {
@@ -52,14 +52,10 @@ func (ur *UserRepo) GetUserByID(ctx context.Context, id string) (user *userEntit
 }
 
 func (ur *UserRepo) SetUserWallet(ctx context.Context, userID string, address string) error {
-	id, _ := strconv.Atoi(userID)
-	query := "SELECT wallet FROM users WHERE id = $2"
-	res := ur.DB.Exec(query, address, id)
-	if res == nil {
-		return fmt.Errorf("user already have wallet existing")
+	err := ur.DB.Model(&userEntity.User{}).Where("id = ?", userID).Update("wallet", address).Error
+	if err != nil {
+		return err
 	}
-	query = "UPDATE users SET wallet = $1 WHERE id = $2"
-	res = ur.DB.Exec(query, address, id)
 	return nil
 }
 
@@ -129,4 +125,15 @@ func (ur *UserRepo) SetUserDetailInfo(ctx context.Context, userData dto.UserDeta
 		return err
 	}
 	return nil
+}
+
+func (ur *UserRepo) GetUserWallet(ctx context.Context, id string) (string, error) {
+	var user userEntity.User
+	if err := ur.DB.Model(&userEntity.User{}).Select("wallet").Where("id = ?", id).First(&user).Error; err != nil {
+		if errors.Is(gorm.ErrRecordNotFound, err) {
+			return "", fmt.Errorf("user does not have a wallet")
+		}
+		return "", err
+	}
+	return user.Wallet, nil
 }

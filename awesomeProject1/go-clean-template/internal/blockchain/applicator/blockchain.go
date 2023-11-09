@@ -5,6 +5,7 @@ import (
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/config/blockchain"
 	v1 "github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1"
+	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
 	blockchain_logic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
@@ -30,8 +31,10 @@ func Run(cfg *blockchain.Config) {
 
 	address := blockchain_logic.CreateWallet()
 
+	userGrpcTransport := transport.NewUserGrpcTransport(cfg.Transport.UserGrpc)
+
 	// Use case
-	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address), cfg)
+	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address, userGrpcTransport), cfg, userGrpcTransport)
 
 	blockchain_logic.ListAddresses()
 	//address to create genesis block

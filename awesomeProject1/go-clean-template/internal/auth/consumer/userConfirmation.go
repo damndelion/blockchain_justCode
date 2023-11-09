@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/evrone/go-clean-template/internal/auth/consumer/dto"
+	"github.com/evrone/go-clean-template/internal/auth/transport"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/nats-io/nats.go"
 	"gorm.io/gorm"
@@ -13,10 +14,11 @@ type UserVerificationCallback struct {
 	logger logger.Interface
 	db     *gorm.DB
 	nc     *nats.Conn
+	ut     *transport.UserGrpcTransport
 }
 
-func NewUserVerificationCallback(logger logger.Interface, db *gorm.DB, nc *nats.Conn) *UserVerificationCallback {
-	return &UserVerificationCallback{logger: logger, db: db, nc: nc}
+func NewUserVerificationCallback(logger logger.Interface, db *gorm.DB, nc *nats.Conn, ut *transport.UserGrpcTransport) *UserVerificationCallback {
+	return &UserVerificationCallback{logger: logger, db: db, nc: nc, ut: ut}
 }
 
 func (c *UserVerificationCallback) Callback(msg *nats.Msg) {
@@ -31,7 +33,6 @@ func (c *UserVerificationCallback) Callback(msg *nats.Msg) {
 		c.logger.Info("user code: %s", userVerification.Code)
 		fmt.Println(userVerification.Code)
 
-		// TODO: User creation by grpc
 		if err := c.db.Create(&userVerification).Error; err != nil {
 			c.logger.Error("failed to save user verification code: %v", err)
 		}

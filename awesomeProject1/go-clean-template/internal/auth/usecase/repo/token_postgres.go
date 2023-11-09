@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/evrone/go-clean-template/internal/auth/entity"
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
+	"github.com/evrone/go-clean-template/internal/auth/transport"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 
 	"github.com/opentracing/opentracing-go"
@@ -11,11 +12,12 @@ import (
 )
 
 type AuthRepo struct {
-	DB *gorm.DB
+	DB                *gorm.DB
+	userGrpcTransport *transport.UserGrpcTransport
 }
 
-func NewAuthRepo(db *gorm.DB) *AuthRepo {
-	return &AuthRepo{db}
+func NewAuthRepo(db *gorm.DB, userGrpcTransport *transport.UserGrpcTransport) *AuthRepo {
+	return &AuthRepo{db, userGrpcTransport}
 }
 
 func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken entity.Token) error {
@@ -31,25 +33,31 @@ func (t *AuthRepo) UpdateUserToken(ctx context.Context, userToken entity.Token) 
 
 }
 
-// CreateUser TODO grpc
 func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
-	result := t.DB.Create(&user)
-	if result.Error != nil {
-		return 0, result.Error
+	grpcUser, err := t.userGrpcTransport.CreateUser(ctx, user)
+	if err != nil {
+		return 0, err
 	}
-
-	return user.Id, nil
+	return int(grpcUser.Id), nil
 
 }
 
-// GetUserByEmail TODO grpc
-func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (user *userEntity.User, err error) {
+func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "get user by email repo")
 	defer span.Finish()
-	res := t.DB.Where("email = ?", email).WithContext(ctx).Find(&user)
-	if res.Error != nil {
-		return nil, res.Error
+	grpcUser, err := t.userGrpcTransport.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
 	}
+	user := &userEntity.User{
+		Id:       int(grpcUser.Id),
+		Name:     grpcUser.Name,
+		Email:    grpcUser.Email,
+		Password: grpcUser.Password,
+		Wallet:   grpcUser.Wallet,
+		Valid:    grpcUser.Valid,
+	}
+
 	return user, nil
 }
 

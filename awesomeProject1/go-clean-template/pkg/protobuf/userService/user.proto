@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package userservice;
+
+option go_package = "./;pb";
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+  string wallet = 5;
+  bool valid = 6;
+}
+
+service UserService {
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (User) {};
+  rpc GetUserByID(GetUserByIDRequest) returns (User) {};
+  rpc GetUserWallet(GetUserWalletRequest) returns (UserWalletResponse) {};
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {};
+  rpc SetUserWallet(SetUserWalletRequest) returns (SetUserWalletResponse) {};
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserByIDRequest {
+  string id = 1;
+}
+
+
+message GetUserWalletRequest {
+  string id = 1;
+}
+
+message UserWalletResponse {
+  string wallet = 1;
+}
+
+message CreateUserRequest {
+  User user = 1;
+}
+
+message CreateUserResponse {
+  int32 id = 1;
+}
+
+message SetUserWalletRequest {
+  string user_id = 1;
+  string address = 2;
+}
+
+message SetUserWalletResponse {
+  string error_message = 1;
+}
+
+

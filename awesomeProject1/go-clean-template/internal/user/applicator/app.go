@@ -4,6 +4,7 @@ package applicator
 import (
 	"fmt"
 	"github.com/evrone/go-clean-template/config/user"
+	"github.com/evrone/go-clean-template/internal/user/controller/grpc"
 	v1 "github.com/evrone/go-clean-template/internal/user/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
@@ -39,11 +40,21 @@ func Run(cfg *user.Config) {
 	userCache := cache.NewUserCache(redisClient, 10*time.Minute)
 
 	// Use case
-	userUseCase := usecase.NewUser(repo.NewUserRepo(db), cfg)
+	userRepo := repo.NewUserRepo(db)
+	userUseCase := usecase.NewUser(userRepo, cfg)
 
 	// HTTP Server
 	handler := gin.New()
 	v1.NewUserRouter(handler, l, userUseCase, userCache, cfg)
+
+	grpcService := grpc.NewService(l, userRepo)
+	grpcServer := grpc.NewServer(cfg.GrpcServer.Port, grpcService)
+	err = grpcServer.Start()
+	if err != nil {
+		l.Fatal("failed to start grpc-server err: %v", err)
+	}
+
+	defer grpcServer.Close()
 
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 

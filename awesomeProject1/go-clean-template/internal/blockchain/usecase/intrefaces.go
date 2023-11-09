@@ -18,6 +18,7 @@ type (
 		TopUp(ctx context.Context, from string, to string, amount float64) error
 		CheckForIdInAccessToken(urlUserID string, accessToken string) bool
 		GetIdFromToken(accessToken string) (string, error)
+		GetBalanceByAddress(ctx context.Context, address string) (float64, error)
 	}
 
 	ChainRepo interface {
@@ -29,5 +30,6 @@ type (
 		Send(ctx context.Context, from string, to string, amount float64) error
 		TopUp(ctx context.Context, from string, to string, amount float64) error
 		SetUserWallet(ctx context.Context, userID string, address string) (err error)
+		GetBalanceByAddress(ctx context.Context, address string) (balance float64, err error)
 	}
 )

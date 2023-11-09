@@ -6,6 +6,7 @@ import (
 	"github.com/evrone/go-clean-template/config/auth"
 	consumer "github.com/evrone/go-clean-template/internal/auth/consumer"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
+	"github.com/evrone/go-clean-template/internal/auth/transport"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
 	natsService "github.com/evrone/go-clean-template/internal/nats"
@@ -51,8 +52,9 @@ func Run(cfg *auth.Config) {
 
 		l.Error("Failed to create NATS producer: %v", err)
 	}
+	userGrpcTransport := transport.NewUserGrpcTransport(cfg.Transport.UserGrpc)
 
-	userVerificationConsumerCallback := consumer.NewUserVerificationCallback(l, db, nc)
+	userVerificationConsumerCallback := consumer.NewUserVerificationCallback(l, db, nc, userGrpcTransport)
 	userVerificationConsumer, err := natsService.NewConsumer(l, cfg, userVerificationConsumerCallback)
 	if err != nil {
 		l.Fatal("Failed to create NATS consumer: %v", err)
@@ -60,7 +62,7 @@ func Run(cfg *auth.Config) {
 	go userVerificationConsumer.Start()
 
 	// Use case
-	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db), cfg, userVerificationProducer)
+	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db, userGrpcTransport), cfg, userVerificationProducer)
 
 	// HTTP Server
 	handler := gin.New()

@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"time"
 )
 
 type (
@@ -13,6 +14,7 @@ type (
 		PG         `yaml:"postgres"`
 		JWT        `yaml:"jwt"`
 		Blockchain `yaml:"blockchain"`
+		Transport  `yaml:"transport"`
 	}
 
 	// App -.
@@ -42,6 +44,17 @@ type (
 	}
 	Blockchain struct {
 		GenesisAddress string `mapstructure:"genesis_address" yaml:"genesis_address"`
+	}
+	Transport struct {
+		User     UserTransport     `yaml:"user"`
+		UserGrpc UserGrpcTransport `yaml:"userGrpc"`
+	}
+	UserTransport struct {
+		Host    string        `yaml:"host"`
+		Timeout time.Duration `yaml:"timeout"`
+	}
+	UserGrpcTransport struct {
+		Host string `yaml:"host"`
 	}
 )
 
