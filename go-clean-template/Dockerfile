@@ -5,7 +5,7 @@ FROM golang:1.17
 WORKDIR /app
 
 # Copy the local package files to the container's workspace
-COPY ./cmd/auth /app
+COPY cmd/auth /app
 
 # Build the binary
 RUN go build -o  ./cmd/auth/main.go

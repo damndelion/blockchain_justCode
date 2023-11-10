@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"github.com/evrone/go-clean-template/internal/auth/entity"
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
 	"github.com/evrone/go-clean-template/internal/auth/transport"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
@@ -20,7 +19,7 @@ func NewAuthRepo(db *gorm.DB, userGrpcTransport *transport.UserGrpcTransport) *A
 	return &AuthRepo{db, userGrpcTransport}
 }
 
-func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken entity.Token) error {
+func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken authEntity.Token) error {
 	if err := t.DB.Create(&userToken).Error; err != nil {
 		return err
 	}
@@ -28,7 +27,7 @@ func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken entity.Token) 
 
 }
 
-func (t *AuthRepo) UpdateUserToken(ctx context.Context, userToken entity.Token) error {
+func (t *AuthRepo) UpdateUserToken(ctx context.Context, userToken authEntity.Token) error {
 	return nil
 
 }

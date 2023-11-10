@@ -1,6 +1,6 @@
 package userEntity
 
-//todo isActive Role
+// todo isActive Role
 type User struct {
 	Id       int    `json:"id"`
 	Name     string `json:"name"`
