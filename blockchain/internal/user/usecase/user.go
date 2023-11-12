@@ -23,7 +23,7 @@ func (u *User) Users(ctx context.Context) ([]*userEntity.User, error) {
 	return u.repo.GetUsers(ctx)
 }
 
-func (u *User) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
+func (u *User) CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error) {
 	return u.repo.CreateUser(ctx, user)
 }
 
@@ -60,43 +60,19 @@ func (u *User) UsersInfo(ctx context.Context) ([]*userEntity.UserInfo, error) {
 }
 
 func (u *User) UsersInfoWithFilter(ctx context.Context, params url.Values) ([]*userEntity.UserInfo, error) {
-	paramColumnMap := map[string]string{
-		"user_id": "user_id",
-		"age":     "age",
-		"phone":   "phone",
-		"address": "address",
-		"country": "country",
-		"city":    "city",
+	usersInfo, err := u.repo.GetUsersInfoWithFilter(ctx, params.Get("filter"), params.Get("value"))
+	if err != nil {
+		return nil, err
 	}
-
-	var usersInfo []*userEntity.UserInfo
-	var err error
-	for param := range paramColumnMap {
-		if value := params.Get(param); value != "" {
-			usersInfo, err = u.repo.GetUsersInfoWithFilter(ctx, param, value)
-		}
-	}
-
 	return usersInfo, err
 }
 
 func (u *User) UsersCredWithFilter(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error) {
-	paramColumnMap := map[string]string{
-		"user_id":  "user_id",
-		"card_num": "card_num",
-		"type":     "type",
-		"cvv":      "cvv",
+	usersCred, err := u.repo.GetUsersCredWithFilter(ctx, params.Get("filter"), params.Get("value"))
+	if err != nil {
+		return nil, err
 	}
-
-	var usersInfo []*userEntity.UserCredentials
-	var err error
-	for param := range paramColumnMap {
-		if value := params.Get(param); value != "" {
-			usersInfo, err = u.repo.GetUsersCredWithFilter(ctx, param, value)
-		}
-	}
-
-	return usersInfo, err
+	return usersCred, err
 }
 
 func (u *User) UsersCred(ctx context.Context) ([]*userEntity.UserCredentials, error) {
@@ -184,144 +160,62 @@ func (u *User) DeleteUserCred(ctx context.Context, id string) error {
 }
 
 func (u *User) UsersWithFilter(ctx context.Context, params url.Values) ([]*userEntity.User, error) {
-	paramColumnMap := map[string]string{
-		"id":     "id",
-		"name":   "name",
-		"email":  "email",
-		"wallet": "wallet",
-		"valid":  "valid",
+	users, err := u.repo.GetUsersWithFilter(ctx, params.Get("filter"), params.Get("value"))
+	if err != nil {
+		return nil, err
 	}
 
-	var users []*userEntity.User
-	var err error
-	for param := range paramColumnMap {
-		if value := params.Get(param); value != "" {
-			users, err = u.repo.GetUsersWithFilter(ctx, param, value)
-		}
-	}
-
-	return users, err
+	return users, nil
 }
 
 func (u *User) UsersWithSearch(ctx context.Context, params url.Values) ([]*userEntity.User, error) {
-	paramColumnMap := map[string]string{
-		"name":   "name",
-		"email":  "email",
-		"wallet": "wallet",
-		"valid":  "valid",
+	users, err := u.repo.GetUsersWithSearch(ctx, params.Get("search"), params.Get("value"))
+	if err != nil {
+		return nil, err
 	}
-
-	var users []*userEntity.User
-	var err error
-	for param := range paramColumnMap {
-		if value := params.Get(param); value != "" {
-			users, err = u.repo.GetUsersWithSearch(ctx, param, value)
-		}
-	}
-
-	return users, err
+	return users, nil
 }
 
 func (u *User) UsersWithSort(ctx context.Context, sort string, method string) ([]*userEntity.User, error) {
-	paramColumnMap := map[string]string{
-		"id":     "id",
-		"name":   "name",
-		"email":  "email",
-		"wallet": "wallet",
-		"valid":  "valid",
+	users, err := u.repo.GetUsersWithSort(ctx, sort, method)
+	if err != nil {
+		return nil, err
 	}
-
-	var users []*userEntity.User
-	var err error
-	for param := range paramColumnMap {
-		if param == sort {
-			users, err = u.repo.GetUsersWithSort(ctx, sort, method)
-		}
-	}
-
-	return users, err
+	return users, nil
 }
 
 func (u *User) UsersInfoWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserInfo, error) {
-	paramColumnMap := map[string]string{
-		"user_id": "user_id",
-		"age":     "age",
-		"phone":   "phone",
-		"address": "address",
-		"country": "country",
-		"city":    "city",
+	usersInfo, err := u.repo.GetUsersInfoWithSearch(ctx, params.Get("search"), params.Get("value"))
+	if err != nil {
+		return nil, err
 	}
-
-	var users []*userEntity.UserInfo
-	var err error
-	for param := range paramColumnMap {
-		if value := params.Get(param); value != "" {
-			users, err = u.repo.GetUsersInfoWithSearch(ctx, param, value)
-		}
-	}
-
-	return users, err
+	return usersInfo, err
 }
 
 func (u *User) UsersInfoWithSort(ctx context.Context, sort string, method string) ([]*userEntity.UserInfo, error) {
-	paramColumnMap := map[string]string{
-		"id":      "id",
-		"user_id": "user_id",
-		"age":     "age",
-		"phone":   "phone",
-		"address": "address",
-		"country": "country",
-		"city":    "city",
+	usersInfo, err := u.repo.GetUsersInfoWithSort(ctx, sort, method)
+	if err != nil {
+		return nil, err
 	}
 
-	var users []*userEntity.UserInfo
-	var err error
-	for param := range paramColumnMap {
-		if param == sort {
-			users, err = u.repo.GetUsersInfoWithSort(ctx, sort, method)
-		}
-	}
-
-	return users, err
+	return usersInfo, nil
 }
 
 func (u *User) UsersCredWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error) {
-	paramColumnMap := map[string]string{
-		"user_id":  "user_id",
-		"card_num": "card_num",
-		"type":     "type",
-		"cvv":      "cvv",
-	}
 
-	var users []*userEntity.UserCredentials
-	var err error
-	for param := range paramColumnMap {
-		if value := params.Get(param); value != "" {
-			users, err = u.repo.GetUsersCredWithSearch(ctx, param, value)
-		}
+	usersCred, err := u.repo.GetUsersCredWithSearch(ctx, params.Get("search"), params.Get("value"))
+	if err != nil {
+		return nil, err
 	}
-
-	return users, err
+	return usersCred, err
 }
 
 func (u *User) UsersCredWithSort(ctx context.Context, sort string, method string) ([]*userEntity.UserCredentials, error) {
-	paramColumnMap := map[string]string{
-		"id":       "id",
-		"user_id":  "user_id",
-		"card_num": "card_num",
-		"type":     "type",
-		"cvv":      "cvv",
+	usersCred, err := u.repo.GetUsersCredWithSort(ctx, sort, method)
+	if err != nil {
+		return nil, err
 	}
-
-	var users []*userEntity.UserCredentials
-	var err error
-	for param := range paramColumnMap {
-		if param == sort {
-			users, err = u.repo.GetUsersCredWithSort(ctx, sort, method)
-		}
-	}
-
-	return users, err
+	return usersCred, err
 }
 
 func (u *User) GetUserInfoById(ctx context.Context, id string) (*userEntity.UserInfo, error) {

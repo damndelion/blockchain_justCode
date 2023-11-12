@@ -25,7 +25,7 @@ type UserUpdateRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Wallet   string `json:"wallet"`
-	Valid    bool   `json:"valid"`
+	Valid    bool   `json:"valid,omitempty" default:"false"`
 }
 
 type UserCredRequest struct {

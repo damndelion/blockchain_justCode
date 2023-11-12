@@ -25,82 +25,35 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 	userHandler := handler.Group("user")
 	{
 		userHandler.Use(middleware.JwtVerify(cfg.SecretKey))
+
+		userHandler.GET("/", r.GetUser)
+		userHandler.GET("/info", r.GetUserDetailInfo)
+		userHandler.GET("/cred", r.GetUserDetailCred)
 		userHandler.POST("/info", r.CreateUserDetailInfo)
 		userHandler.PUT("/info", r.SetUserDetailInfo)
-		userHandler.GET("/:id", r.GetUserById)
-
 	}
 
 }
 
-//func (ur *userRoutes) CreateUser(ctx *gin.Context) {
-//	var user *entity.User
-//
-//	err := ctx.ShouldBindJSON(&user)
-//	if err != nil {
-//		ctx.JSON(http.StatusBadRequest, err)
-//		return
-//	}
-//
-//	insertedID, err := ur.u.CreateUser(ctx, user)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, err)
-//		return
-//	}
-//
-//	ctx.JSON(http.StatusOK, insertedID)
-//}
-
-// GetUserByEmail godoc
-// @Summary Get a user by email
-// @Description Retrieve a user by their email address
+// GetUser godoc
+// @Summary Get a user by jwt token
+// @Description Retrieve a user by their authorization token
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param email query string true "Email address of the user"
-// @Success 200 users body entity.User true "User information"
-// @Failure 400 {string} string "Bad Request"
+// @Param authorization header string true "JWT token"
+// @Success 200 user body entity.User true "User information"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/users/email [get]
-func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
-	email := ctx.Query("email")
-	user, err := ur.userCache.Get(ctx, email)
+// @Router /v1/user [get]
+func (ur *userRoutes) GetUser(ctx *gin.Context) {
+
+	authHeader := ctx.GetHeader("Authorization")
+	id, err := ur.u.GetIdFromToken(authHeader)
 	if err != nil {
 		return
 	}
-
-	if user == nil {
-		user, err = ur.u.GetUserByEmail(ctx, email)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail error")
-			return
-		}
-
-		err = ur.userCache.Set(ctx, email, user)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail cache error")
-		}
-	}
-
-	ctx.JSON(http.StatusOK, user)
-}
-
-// GetUserById godoc
-// @Summary Get a user by ID
-// @Description Retrieve a user by their unique ID
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param id path int true "User ID"
-// @Success 200 user body entity.User true "User information"
-// @Failure 400 {string} Bad Request
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /{id} [get]
-func (ur *userRoutes) GetUserById(ctx *gin.Context) {
-
-	id := ctx.Param("id")
 
 	user, err := ur.userCache.Get(ctx, id)
 	if err != nil {
@@ -125,6 +78,77 @@ func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+// GetUserDetailInfo godoc
+// @Summary Get a user information by jwt token
+// @Description Retrieve a user information by their authorization token
+// @Tags Users Information
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Success 200 user body entity.UserInfo true "User information"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/user/info [get]
+func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
+	authHeader := ctx.GetHeader("Authorization")
+	id, err := ur.u.GetIdFromToken(authHeader)
+	if err != nil {
+		return
+	}
+
+	userById, err := ur.u.GetUserInfoById(ctx, id)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userById)
+}
+
+// GetUserDetailCred godoc
+// @Summary Get a user credentials by jwt token
+// @Description Retrieve a user credentials by their authorization token
+// @Tags Users Credentials
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Success 200 user body entity.UserCred true "User credentials"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/user/cred [get]
+func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
+	authHeader := ctx.GetHeader("Authorization")
+	id, err := ur.u.GetIdFromToken(authHeader)
+	if err != nil {
+		return
+	}
+
+	userById, err := ur.u.GetUserCredById(ctx, id)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userById)
+}
+
+// CreateUserDetailInfo godoc
+// @Summary Create both user info and cred
+// @Description Creates user info and cred, sets users valid to true
+// @Tags Users Information
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param data body dto.UserDetailRequest true "JSON data"
+// @Success 200 {string} string "Success""
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/user/info [post]
 func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := ur.u.GetIdFromToken(authHeader)
@@ -150,6 +174,19 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Success")
 }
 
+// SetUserDetailInfo godoc
+// @Summary Update both user info and cred
+// @Description Update user info and cred
+// @Tags Users Information
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param data body dto.UserDetailRequest true "JSON data"
+// @Success 200 {string} string "Success""
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/user/info [put]
 func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := ur.u.GetIdFromToken(authHeader)

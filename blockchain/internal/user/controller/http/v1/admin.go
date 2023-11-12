@@ -28,28 +28,28 @@ func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.In
 		adminHandler.Use(middleware.AdminVerify(cfg.SecretKey, u))
 
 		adminHandler.GET("/all", r.GetUsers)
+		adminHandler.GET("/user/:id", r.GetUserById)
+		adminHandler.GET("/email", r.GetUserByEmail)
 		adminHandler.GET("/all/sort", r.GetUsersWithSort)
 		adminHandler.GET("/all/search", r.GetUsersWithSearch)
-		adminHandler.GET("/email", r.GetUserByEmail)
-		adminHandler.GET("/user/:id", r.GetUserById)
-		adminHandler.PUT("/user/:id", r.UpdateUser)
-		adminHandler.POST("/user", r.CreateUser)
+		adminHandler.POST("/user/:id", r.UpdateUser)
+		adminHandler.PUT("/user", r.CreateUser)
 		adminHandler.DELETE("/user/:id", r.DeleteUser)
 
 		adminHandler.GET("/info", r.GetUsersDetailInfo)
 		adminHandler.GET("/info/sort", r.GetUsersInfoWithSort)
 		adminHandler.GET("/info/search", r.GetUsersInfoWithSearch)
 		adminHandler.GET("/info/:id", r.GetUserDetailInfoById)
-		adminHandler.PUT("/info/:id", r.UpdateUserInfo)
-		adminHandler.POST("/info", r.CreateUserInfo)
+		adminHandler.POST("/info/:id", r.UpdateUserInfo)
+		adminHandler.PUT("/info", r.CreateUserInfo)
 		adminHandler.DELETE("/info/:id", r.DeleteUserInfo)
 
 		adminHandler.GET("/cred", r.GetUsersDetailCred)
 		adminHandler.GET("/cred/sort", r.GetUsersCredWithSort)
 		adminHandler.GET("/cred/search", r.GetUsersCredWithSearch)
 		adminHandler.GET("/cred/:id", r.GetUserDetailCredById)
-		adminHandler.PUT("/cred/:id", r.UpdateUserCredentials)
-		adminHandler.POST("/cred", r.CreateUserCred)
+		adminHandler.POST("/cred/:id", r.UpdateUserCred)
+		adminHandler.PUT("/cred", r.CreateUserCred)
 		adminHandler.DELETE("/cred/:id", r.DeleteUserCred)
 
 	}
@@ -62,9 +62,14 @@ func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.In
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param authorization header string true "JWT token"
+// @Param filter query string false "Filter column name"
+// @Param value query string false "Filter value"
 // @Success 200 users body entity.User true  "List of users"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/users/all [get]
+// @Router /v1/admin/all [get]
 func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 	var users []*userEntity.User
 	var err error
@@ -90,6 +95,98 @@ func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, users)
 }
 
+// GetUserById godoc
+// @Summary Get a user by ID
+// @Description Retrieve a user by their unique ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Success 200 user body entity.User true "User"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/user/{id} [get]
+func (ur *userRoutes) GetUserById(ctx *gin.Context) {
+
+	id := ctx.Param("id")
+
+	user, err := ur.userCache.Get(ctx, id)
+	if err != nil {
+		return
+	}
+
+	if user == nil {
+		user, err = ur.u.GetUserById(ctx, id)
+		if err != nil {
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
+			return
+		}
+
+		err = ur.userCache.Set(ctx, id, user)
+		if err != nil {
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
+		}
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
+
+// GetUserByEmail godoc
+// @Summary Get a user by email
+// @Description Retrieve a user by their email address
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param email query string true "Email address of the user"
+// @Success 200 users body entity.User true "User"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/email [get]
+func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
+	email := ctx.Query("email")
+	user, err := ur.userCache.Get(ctx, email)
+	if err != nil {
+		return
+	}
+
+	if user == nil {
+		user, err = ur.u.GetUserByEmail(ctx, email)
+		if err != nil {
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail error")
+			return
+		}
+
+		err = ur.userCache.Set(ctx, email, user)
+		if err != nil {
+			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail cache error")
+		}
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
+
+// GetUsersWithSort godoc
+// @Summary Get a users with sort
+// @Description Retrieve a user by sorting
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param sort query string true "Sort value"
+// @Param method query string true "Ascending or Descending"
+// @Success 200 users body entity.User true "User"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/all/sort [get]
 func (ur *userRoutes) GetUsersWithSort(ctx *gin.Context) {
 	sortParam := ctx.Query("sort")
 	methodParam := ctx.Query("method")
@@ -105,36 +202,20 @@ func (ur *userRoutes) GetUsersWithSort(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, users)
 }
 
-func (ur *userRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
-	sortParam := ctx.Query("sort")
-	methodParam := ctx.Query("method")
-	users, err := ur.u.UsersInfoWithSort(ctx, sortParam, methodParam)
-
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, users)
-}
-
-func (ur *userRoutes) GetUsersCredWithSort(ctx *gin.Context) {
-	sortParam := ctx.Query("sort")
-	methodParam := ctx.Query("method")
-	users, err := ur.u.UsersCredWithSort(ctx, sortParam, methodParam)
-
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, users)
-}
-
+// GetUsersWithSearch godoc
+// @Summary Get a users with search
+// @Description Retrieve a user by searching value
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param search query string true "Search column"
+// @Param value query string true "Search value"
+// @Success 200 users body entity.User true "User"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/all/search [get]
 func (ur *userRoutes) GetUsersWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
@@ -147,48 +228,20 @@ func (ur *userRoutes) GetUsersWithSearch(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, users)
 }
 
-func (ur *userRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
-	users, err := ur.u.UsersInfoWithSearch(ctx, ctx.Request.URL.Query())
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, users)
-}
-
-func (ur *userRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
-	users, err := ur.u.UsersCredWithSearch(ctx, ctx.Request.URL.Query())
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, users)
-}
-
-func (ur *userRoutes) CreateUser(ctx *gin.Context) {
-	var user *userEntity.User
-
-	err := ctx.ShouldBindJSON(&user)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	insertedID, err := ur.u.CreateUser(ctx, user)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, insertedID)
-}
-
+// UpdateUser godoc
+// @Summary Update user
+// @Description Update user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Param data body dto.UserUpdateRequest true "JSON data"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/user/{id} [post]
 func (ur *userRoutes) UpdateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var userData dto.UserUpdateRequest
@@ -209,6 +262,48 @@ func (ur *userRoutes) UpdateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Success")
 }
 
+// CreateUser godoc
+// @Summary Create user
+// @Description Create user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param data body dto.UserUpdateRequest true "JSON data"
+// @Success 200 {int} int id
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/user [put]
+func (ur *userRoutes) CreateUser(ctx *gin.Context) {
+	var userData dto.UserUpdateRequest
+
+	err := ctx.ShouldBindJSON(&userData)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	insertedID, err := ur.u.CreateUser(ctx, userData)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, insertedID)
+}
+
+// DeleteUser godoc
+// @Summary Delete user by id
+// @Description Delete user by id and linked info and cred
+// @Tags Users
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/user/{id} [delete]
 func (ur *userRoutes) DeleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -222,6 +317,19 @@ func (ur *userRoutes) DeleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Success")
 }
 
+// GetUsersDetailInfo godoc
+// @Summary Get a list of all user information
+// @Description Get a list of all user information
+// @Tags Users Information
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param filter query string false "Filter column name"
+// @Param value query string false "Filter value"
+// @Success 200 users body entity.UserInfo true  "List of users information"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info [get]
 func (ur *userRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 	var usersInfo []*userEntity.UserInfo
 	var err error
@@ -248,6 +356,159 @@ func (ur *userRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 
 }
 
+// GetUsersInfoWithSort godoc
+// @Summary Get a users information with sort
+// @Description Retrieve a user information by sorting
+// @Tags Users Information
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param sort query string true "Sort value"
+// @Param method query string true "Ascending or Descending"
+// @Success 200 users body entity.UserInfo true "User information"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info/sort [get]
+func (ur *userRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
+	sortParam := ctx.Query("sort")
+	methodParam := ctx.Query("method")
+	users, err := ur.u.UsersInfoWithSort(ctx, sortParam, methodParam)
+
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
+}
+
+// GetUsersInfoWithSearch godoc
+// @Summary Get a users information with search
+// @Description Retrieve a user information by searching value
+// @Tags Users Information
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param search query string true "Search column"
+// @Param value query string true "Search value"
+// @Success 200 users body entity.UserInfo true "User information"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info/search [get]
+func (ur *userRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
+	users, err := ur.u.UsersInfoWithSearch(ctx, ctx.Request.URL.Query())
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
+}
+
+// GetUserDetailInfoById godoc
+// @Summary Get a user information by ID
+// @Description Retrieve a user information by their unique ID
+// @Tags Users Information
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Success 200 user body entity.UserInfo true "User information"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info/{id} [get]
+func (ur *userRoutes) GetUserDetailInfoById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	userById, err := ur.u.GetUserInfoById(ctx, id)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, userById)
+}
+
+// UpdateUserInfo godoc
+// @Summary Update user information
+// @Description Update user information
+// @Tags Users Information
+// @Accept json
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Param data body dto.UserInfoRequest true "JSON data"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info/{id} [post]
+func (ur *userRoutes) UpdateUserInfo(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var userData dto.UserInfoRequest
+	err := ctx.ShouldBindJSON(&userData)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+
+	err = ur.u.UpdateUserInfo(ctx, userData, id)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Success")
+}
+
+// CreateUserInfo godoc
+// @Summary Create user information
+// @Description Create user information
+// @Tags Users Information
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param data body dto.UserInfoRequest true "JSON data"
+// @Success 200 {int} int id
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info [put]
+func (ur *userRoutes) CreateUserInfo(ctx *gin.Context) {
+	var userData dto.UserInfoRequest
+	err := ctx.ShouldBindJSON(&userData)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+
+	err = ur.u.CreateUserInfo(ctx, userData)
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Success")
+}
+
+// DeleteUserInfo godoc
+// @Summary Delete user information by user id
+// @Description Delete user information by user id
+// @Tags Users Information
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/info/{id} [delete]
 func (ur *userRoutes) DeleteUserInfo(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -261,18 +522,19 @@ func (ur *userRoutes) DeleteUserInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Success")
 }
 
-func (ur *userRoutes) DeleteUserCred(ctx *gin.Context) {
-	id := ctx.Param("id")
-
-	err := ur.u.DeleteUserCred(ctx, id)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
-		return
-	}
-
-	ctx.JSON(http.StatusOK, "Success")
-}
+// GetUsersDetailCred godoc
+// @Summary Get a list of all user credentials
+// @Description Get a list of all user credentials
+// @Tags Users Credentials
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param filter query string false "Filter column name"
+// @Param value query string false "Filter value"
+// @Success 200 users body entity.UserCred true  "List of users // @Tags Users credentials"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred [get]
 func (ur *userRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	var usersCred []*userEntity.UserCredentials
 	var err error
@@ -298,46 +560,97 @@ func (ur *userRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, usersCred)
 }
 
-func (ur *userRoutes) UpdateUserInfo(ctx *gin.Context) {
+// GetUsersCredWithSort godoc
+// @Summary Get a users credentials with sort
+// @Description Retrieve a user credentials by sorting
+// @Tags Users Credentials
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param sort query string true "Sort column"
+// @Param method query string true "Ascending or Descending"
+// @Success 200 users body entity.UserCred true "User credentials"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred/sort [get]
+func (ur *userRoutes) GetUsersCredWithSort(ctx *gin.Context) {
+	sortParam := ctx.Query("sort")
+	methodParam := ctx.Query("method")
+	users, err := ur.u.UsersCredWithSort(ctx, sortParam, methodParam)
+
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
+}
+
+// GetUsersCredWithSearch godoc
+// @Summary Get a users credentials with search
+// @Description Retrieve a user credentials by searching value
+// @Tags Users Credentials
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param search query string true "Search column"
+// @Param value query string true "Search value"
+// @Success 200 users body entity.UserCred true "User credentials"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred/search [get]
+func (ur *userRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
+	users, err := ur.u.UsersCredWithSearch(ctx, ctx.Request.URL.Query())
+	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
+}
+
+// GetUserDetailCredById godoc
+// @Summary Get a user credentials by ID
+// @Description Retrieve a user credentials by their unique ID
+// @Tags Users Credentials
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Success 200 user body entity.UserCred true "User credentials"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred/{id} [get]
+func (ur *userRoutes) GetUserDetailCredById(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var userData dto.UserInfoRequest
-	err := ctx.ShouldBindJSON(&userData)
+	userById, err := ur.u.GetUserCredById(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
 		return
 	}
 
-	err = ur.u.UpdateUserInfo(ctx, userData, id)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
-		return
-	}
-
-	ctx.JSON(http.StatusOK, "Success")
+	ctx.JSON(http.StatusOK, userById)
 }
 
-func (ur *userRoutes) CreateUserInfo(ctx *gin.Context) {
-	var userData dto.UserInfoRequest
-	err := ctx.ShouldBindJSON(&userData)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
-		return
-	}
-
-	err = ur.u.CreateUserInfo(ctx, userData)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
-		return
-	}
-
-	ctx.JSON(http.StatusOK, "Success")
-}
-
-func (ur *userRoutes) UpdateUserCredentials(ctx *gin.Context) {
+// UpdateUserCred godoc
+// @Summary Update user credentials
+// @Description Update user credentials
+// @Tags Users Credentials
+// @Accept json
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Param data body dto.UserCredRequest true "JSON data"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred/{id} [post]
+func (ur *userRoutes) UpdateUserCred(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var userData dto.UserCredRequest
 	err := ctx.ShouldBindJSON(&userData)
@@ -357,6 +670,19 @@ func (ur *userRoutes) UpdateUserCredentials(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Success")
 }
 
+// CreateUserCred godoc
+// @Summary Create user credentials
+// @Description Create user credentials
+// @Tags Users Credentials
+// @Accept json
+// @Produce json
+// @Param authorization header string true "JWT token"
+// @Param data body dto.UserCredRequest true "JSON data"
+// @Success 200 {int} int id
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred [put]
 func (ur *userRoutes) CreateUserCred(ctx *gin.Context) {
 	var userData dto.UserCredRequest
 	err := ctx.ShouldBindJSON(&userData)
@@ -376,26 +702,26 @@ func (ur *userRoutes) CreateUserCred(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Success")
 }
 
-func (ur *userRoutes) GetUserDetailInfoById(ctx *gin.Context) {
+// DeleteUserCred godoc
+// @Summary Delete user credentials by user id
+// @Description Delete user credentials by user id
+// @Tags Users Credentials
+// @Param authorization header string true "JWT token"
+// @Param id path int true "ID of the item"
+// @Success 200 {string} string "Success"
+// @Failure 400 {string} Bad Request
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/admin/cred/{id} [delete]
+func (ur *userRoutes) DeleteUserCred(ctx *gin.Context) {
 	id := ctx.Param("id")
-	userById, err := ur.u.GetUserInfoById(ctx, id)
+
+	err := ur.u.DeleteUserCred(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, userById)
-}
-
-func (ur *userRoutes) GetUserDetailCredById(ctx *gin.Context) {
-	id := ctx.Param("id")
-	userById, err := ur.u.GetUserCredById(ctx, id)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
-		return
-	}
-
-	ctx.JSON(http.StatusOK, userById)
+	ctx.JSON(http.StatusOK, "Success")
 }

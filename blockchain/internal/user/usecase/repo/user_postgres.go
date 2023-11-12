@@ -27,13 +27,19 @@ func (ur *UserRepo) GetUsers(ctx context.Context) (users []*userEntity.User, err
 	return users, nil
 }
 
-func (ur *UserRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
-	generatedHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+func (ur *UserRepo) CreateUser(ctx context.Context, userRequest dto.UserUpdateRequest) (int, error) {
+	generatedHash, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, err
 	}
-	user.Password = string(generatedHash)
-	res := ur.DB.WithContext(ctx).Create(user)
+	user := userEntity.User{
+		Name:     userRequest.Name,
+		Email:    userRequest.Email,
+		Password: string(generatedHash),
+		Wallet:   userRequest.Wallet,
+		Role:     "",
+	}
+	res := ur.DB.WithContext(ctx).Create(&user)
 	if res.Error != nil {
 		return 0, res.Error
 	}

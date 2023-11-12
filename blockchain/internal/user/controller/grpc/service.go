@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
@@ -71,7 +71,7 @@ func (s *Service) GetUserWallet(ctx context.Context, request *pb.GetUserWalletRe
 func (s *Service) CreateUser(ctx context.Context, request *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	user := request.GetUser()
 
-	newUser := &userEntity.User{
+	newUser := dto.UserUpdateRequest{
 		Name:     user.GetName(),
 		Email:    user.GetEmail(),
 		Password: user.GetPassword(),

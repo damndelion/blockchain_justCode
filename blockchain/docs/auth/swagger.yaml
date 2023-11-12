@@ -1,10 +1,22 @@
 basePath: /
 definitions:
+  dto.ConfirmRequest:
+    properties:
+      code:
+        type: integer
+      email:
+        type: string
+    type: object
   dto.LoginRequest:
     properties:
       email:
         type: string
       password:
+        type: string
+    type: object
+  dto.RefreshRequest:
+    properties:
+      refresh_token:
         type: string
     type: object
   dto.RegisterRequest:
@@ -22,7 +34,8 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: Service that authorizes user and generates jwt token
+  description: Service that handles authorization and authentication and generates
+    jwt token
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -30,6 +43,36 @@ info:
   title: Authorization service
   version: "1.0"
 paths:
+  /v1/auth/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm user by code
+      parameters:
+      - description: User Confirm request
+        in: body
+        name: refreshRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ConfirmRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User Confirmed
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Confirm user
+      tags:
+      - Auth
   /v1/auth/login:
     post:
       consumes:
@@ -50,7 +93,7 @@ paths:
           schema:
             type: string
         "400":
-          description: Invalid input
+          description: Bad Request
           schema:
             type: string
         "500":
@@ -58,6 +101,36 @@ paths:
           schema:
             type: string
       summary: User login
+      tags:
+      - Auth
+  /v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Create new access token by refresh token
+      parameters:
+      - description: User refresh request
+        in: body
+        name: refreshRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Access token
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: User refresh token
       tags:
       - Auth
   /v1/auth/register:

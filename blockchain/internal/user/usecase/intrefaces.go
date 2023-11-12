@@ -18,7 +18,7 @@ type (
 		UsersWithFilter(ctx context.Context, params url.Values) ([]*userEntity.User, error)
 		UsersWithSort(ctx context.Context, sort string, method string) ([]*userEntity.User, error)
 		UsersWithSearch(ctx context.Context, params url.Values) ([]*userEntity.User, error)
-		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
+		CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error)
 		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, id string) error
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
 		GetUserRole(ctx context.Context, id int) (string, error)
@@ -57,7 +57,7 @@ type (
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
 		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
 		GetUserRole(ctx context.Context, id int) (string, error)
-		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
+		CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error)
 		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, id string) error
 		SetUserWallet(ctx context.Context, userID string, address string) error
 		DeleteUser(ctx context.Context, id string) error

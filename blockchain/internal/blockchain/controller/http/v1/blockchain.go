@@ -68,12 +68,11 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "JWT Token"
-// @Param userId path string true "User ID"
-// @Success 200 {string} string "Wallet details"
+// @Success 200 {string} string "Wallet address"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/wallet/{userId} [get]
+// @Router /v1/blockchain/wallet [get]
 func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := bc.c.GetIdFromToken(authHeader)
@@ -93,13 +92,12 @@ func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
 // @Tags Blockchain
 // @Accept json
 // @Produce json
-// @Param address query string true "Wallet Address" // Specify the wallet address as a query parameter
-// @Param userId path string true "User ID"
+// @Param Authorization header string true "JWT Token"
 // @Success 200 {number} float64 "Balance"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/balance/{userId} [get]
+// @Router /v1/blockchain/wallet/balance [get]
 func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := bc.c.GetIdFromToken(authHeader)
@@ -114,16 +112,23 @@ func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, balance)
 }
 
+// GetBalanceByAddress godoc
+// @Summary Get the balance of an address
+// @Description Retrieve the balance of a specific address on the blockchain
+// @Tags Blockchain
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "JWT Token"
+// @Param address query string true "Wallet address"
+// @Success 200 {number} float64 "Balance"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/blockchain/wallet/balance/address [get]
 func (bc *chainRoutes) GetBalanceByAddress(ctx *gin.Context) {
-	var sendData dto.AddressRequest
-	err := ctx.ShouldBindJSON(&sendData)
-	if err != nil {
-		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
-		return
-	}
-
-	balance, err := bc.c.GetBalanceByAddress(ctx, sendData.Address)
+	address := ctx.Query("address")
+	fmt.Println(address)
+	balance, err := bc.c.GetBalanceByAddress(ctx, address)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
@@ -139,13 +144,12 @@ func (bc *chainRoutes) GetBalanceByAddress(ctx *gin.Context) {
 // @Tags Blockchain
 // @Accept json
 // @Produce json
-// @Param address query string true "Wallet Address" // Specify the wallet address as a query parameter
-// @Param userId path string true "User ID"
+// @Param Authorization header string true "JWT Token"
 // @Success 200 {number} float64 "Balance in USD"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/usd/balance/{userId} [get]
+// @Router /v1/blockchain/wallet/usd/balance [get]
 func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := bc.c.GetIdFromToken(authHeader)
@@ -166,7 +170,7 @@ func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
 // @Tags Blockchain
 // @Accept json
 // @Produce json
-// @Param userId path string true "User ID"
+// @Param Authorization header string true "JWT Token"
 // @Success 200 {string} string "New Wallet"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
@@ -196,8 +200,8 @@ func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
 // @Tags Blockchain
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "JWT Token"
 // @Param sendRequest body dto.SendRequest true "Send Request"
-// @Param userId path string true "User ID"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
@@ -232,8 +236,8 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 // @Tags Blockchain
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "JWT Token"
 // @Param topUpRequest body dto.TopUpRequest true "Top up Request"
-// @Param userId path string true "User ID"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
@@ -269,12 +273,11 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "JWT Token"
-// @Param userId path string true "User ID"
 // @Success 200 {string} string "Wallet QR code"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/wallet/qr/{userId} [get]
+// @Router /v1/blockchain/wallet/qr [get]
 func (bc *chainRoutes) GetWalletQRCode(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userId, err := bc.c.GetIdFromToken(authHeader)

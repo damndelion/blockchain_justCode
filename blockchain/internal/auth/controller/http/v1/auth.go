@@ -66,7 +66,7 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 // @Produce json
 // @Param loginRequest body dto.LoginRequest true "User login request"
 // @Success 200 {string} string "Access token"
-// @Failure 400 {string} string "Invalid input"
+// @Failure 400 {string} object dto.LoginResponse
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/auth/login [post]
 func (ar *authRoutes) Login(ctx *gin.Context) {
@@ -116,6 +116,17 @@ func (ar *authRoutes) Refresh(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, token)
 }
 
+// Confirm godoc
+// @Summary Confirm user
+// @Description Confirm user by code
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param refreshRequest body dto.ConfirmRequest true "User Confirm request"
+// @Success 200 {string} string "User Confirmed"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /v1/auth/confirm [post]
 func (ar *authRoutes) Confirm(ctx *gin.Context) {
 	var confirmRequest dto.ConfirmRequest
 	err := ctx.ShouldBindJSON(&confirmRequest)
@@ -126,5 +137,5 @@ func (ar *authRoutes) Confirm(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "user Confirmed")
+	ctx.JSON(http.StatusOK, "User Confirmed")
 }

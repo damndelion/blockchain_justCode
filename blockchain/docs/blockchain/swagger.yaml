@@ -1,13 +1,16 @@
 basePath: /
 definitions:
-  v1.SendData:
+  dto.SendRequest:
     properties:
       amount:
         type: number
-      from:
-        type: string
       to:
         type: string
+    type: object
+  dto.TopUpRequest:
+    properties:
+      amount:
+        type: number
     type: object
 host: localhost:8081
 info:
@@ -23,98 +26,22 @@ info:
   title: Blockchain service
   version: "1.0"
 paths:
-  /v1/blockchain/balance:
+  /v1/blockchain/wallet:
     get:
       consumes:
       - application/json
-      description: Retrieve the balance of a specific address on the blockchain
+      description: Retrieve a wallet from the blockchain for a specific user
       parameters:
-      - description: Wallet Address
-        in: query
-        name: address
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userId
+      - description: JWT Token
+        in: header
+        name: Authorization
         required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Balance
-          schema:
-            type: number
-        "400":
-          description: Invalid input
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Get the balance of an address
-      tags:
-      - Blockchain
-  /v1/blockchain/balanceUSD:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve the balance in USD of a specific address on the blockchain
-      parameters:
-      - description: Wallet Address
-        in: query
-        name: address
-        required: true
-        type: string
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Balance in USD
-          schema:
-            type: number
-        "400":
-          description: Invalid input
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Get the balance in USD of an address
-      tags:
-      - Blockchain
-  /v1/blockchain/createWallet:
-    post:
-      consumes:
-      - application/json
-      description: Create a new wallet on the blockchain
-      parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: New Wallet
+          description: Wallet address
           schema:
             type: string
         "400":
@@ -129,46 +56,7 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: Create a new wallet
-      tags:
-      - Blockchain
-  /v1/blockchain/send:
-    post:
-      consumes:
-      - application/json
-      description: Send cryptocurrency from one address to another on the blockchain
-      parameters:
-      - description: Send Request
-        in: body
-        name: sendRequest
-        required: true
-        schema:
-          $ref: '#/definitions/v1.SendData'
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            type: string
-        "400":
-          description: Invalid input
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Send cryptocurrency to another address
+      summary: Get a wallet by user ID
       tags:
       - Blockchain
   /v1/blockchain/wallet/all:
@@ -204,27 +92,93 @@ paths:
       summary: Get a list of wallets
       tags:
       - Blockchain
-  /v1/blockchain/wallets/{userId}:
+  /v1/blockchain/wallet/balance:
     get:
       consumes:
       - application/json
-      description: Retrieve a wallet from the blockchain for a specific user
+      description: Retrieve the balance of a specific address on the blockchain
       parameters:
       - description: JWT Token
         in: header
         name: Authorization
         required: true
         type: string
-      - description: User ID
-        in: path
-        name: userId
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Balance
+          schema:
+            type: number
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get the balance of an address
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/balance/address:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the balance of a specific address on the blockchain
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Wallet address
+        in: query
+        name: address
         required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Wallet details
+          description: Balance
+          schema:
+            type: number
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get the balance of an address
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new wallet on the blockchain
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New Wallet
           schema:
             type: string
         "400":
@@ -239,7 +193,151 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: Get a wallet by user ID
+      summary: Create a new wallet
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/qr:
+    get:
+      consumes:
+      - application/json
+      description: Return a wallet QR code by user ID
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wallet QR code
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get a wallet QR code by user ID
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/send:
+    post:
+      consumes:
+      - application/json
+      description: Send cryptocurrency from one address to another on the blockchain
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Send Request
+        in: body
+        name: sendRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Send cryptocurrency to another address
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/topup:
+    post:
+      consumes:
+      - application/json
+      description: TopUp top up of an account
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Top up Request
+        in: body
+        name: topUpRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TopUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: TopUp top up of an account
+      tags:
+      - Blockchain
+  /v1/blockchain/wallet/usd/balance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the balance in USD of a specific address on the blockchain
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Balance in USD
+          schema:
+            type: number
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get the balance in USD of an address
       tags:
       - Blockchain
 schemes:
