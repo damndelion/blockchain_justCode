@@ -1,13 +1,13 @@
 app:
-  name: 'go-clean-template'
+  name: 'blockchain'
   version: '1.0.0'
 
 http:
-  port: '8082'
+  port: '8081'
 
 logger:
   log_level: 'debug'
-  rollbar_env: 'go-clean-template'
+  rollbar_env: 'blockchain'
 
 postgres:
   pool_max: 2
@@ -16,15 +16,9 @@ postgres:
 jwt:
   secret_key: 'superSecretKey'
   access_token_ttl: 900
-  refresh_token_ttl: 3600
 
-nats:
-  server: "nats://localhost:4222"
-  producer:
-    topic: "user-verification"
-  consumer:
-    topics:
-      - "user-verification"
+blockchain:
+  genesis_address: "1ARw8rRyYaHwqHu1o4G8xH5TnGPbBHqeV6"
 
 transport:
   user:
