@@ -42,10 +42,7 @@ func (t *Auth) Register(ctx context.Context, name, email, password string) error
 		return fmt.Errorf("failed to marshall UserCode err: %w", err)
 	}
 
-	// Use NATS producer to publish the message
-	fmt.Println("try")
 	t.userVerificationProducer.ProduceMessage(b)
-	fmt.Println("send")
 
 	userIdentifier := email
 
@@ -60,14 +57,13 @@ func (t *Auth) Register(ctx context.Context, name, email, password string) error
 		return errors.New("User registration confirmation failed")
 	}
 
-	generatedHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	_, err = t.repo.CreateUser(ctx, &userEntity.User{
 		Name:     name,
 		Email:    email,
-		Password: string(generatedHash),
+		Password: password,
 	})
 	if err != nil {
 		return err
@@ -84,7 +80,6 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	if err != nil {
 		return nil, err
 	}
-
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("passwords do not match %v", err))
@@ -94,6 +89,7 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	return &dto.LoginResponse{
 		Name:         user.Name,
 		Email:        user.Email,
+		Role:         user.Role,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
@@ -132,6 +128,7 @@ func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (strin
 		"user_id": user.Id,
 		"email":   user.Email,
 		"name":    user.Name,
+		"role":    user.Role,
 		"exp":     time.Now().Add(time.Duration(u.cfg.AccessTokenTTL) * time.Second).Unix(),
 	}
 

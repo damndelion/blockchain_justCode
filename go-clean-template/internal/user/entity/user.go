@@ -8,4 +8,5 @@ type User struct {
 	Password string `json:"password"`
 	Wallet   string `json:"wallet"`
 	Valid    bool   `json:"valid"`
+	Role     string `json:"role"`
 }

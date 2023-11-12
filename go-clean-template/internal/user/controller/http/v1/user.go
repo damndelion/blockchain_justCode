@@ -27,37 +27,10 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 		userHandler.Use(middleware.JwtVerify(cfg.SecretKey))
 		userHandler.POST("/info", r.CreateUserDetailInfo)
 		userHandler.PUT("/info", r.SetUserDetailInfo)
-	}
-
-	adminHandler := handler.Group("user")
-	{
-		adminHandler.GET("/all", r.GetUsers)
-		adminHandler.GET("/email", r.GetUserByEmail)
-		adminHandler.GET("/:id", r.GetUserById)
+		userHandler.GET("/:id", r.GetUserById)
 
 	}
 
-}
-
-// GetUsers godoc
-// @Summary Get a list of all users
-// @Description Retrieve a list of users from the system
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Success 200 users body entity.User true  "List of users"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/users/all [get]
-func (ur *userRoutes) GetUsers(ctx *gin.Context) {
-	users, err := ur.u.Users(ctx)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, users)
 }
 
 //func (ur *userRoutes) CreateUser(ctx *gin.Context) {
@@ -90,7 +63,6 @@ func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/users/email [get]
 func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
-
 	email := ctx.Query("email")
 	user, err := ur.userCache.Get(ctx, email)
 	if err != nil {

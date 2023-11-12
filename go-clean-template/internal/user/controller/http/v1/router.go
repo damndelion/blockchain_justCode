@@ -35,5 +35,6 @@ func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCas
 	h := handler.Group("/v1")
 	{
 		newUserRoutes(h, u, l, uc, cfg)
+		newAdminRoutes(h, u, l, uc, cfg)
 	}
 }

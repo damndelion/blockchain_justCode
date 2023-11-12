@@ -45,7 +45,6 @@ func (s *Service) GetUserByEmail(ctx context.Context, request *pb.GetUserByEmail
 		s.logger.Error("failed to GetUserByEmail err: %v", err)
 		return nil, fmt.Errorf("GetUserByEmail err: %w", err)
 	}
-
 	return &pb.User{
 		Id:       int32(user.Id),
 		Name:     user.Name,
@@ -53,6 +52,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, request *pb.GetUserByEmail
 		Password: user.Password,
 		Wallet:   user.Wallet,
 		Valid:    user.Valid,
+		Role:     user.Role,
 	}, nil
 }
 

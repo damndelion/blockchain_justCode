@@ -296,6 +296,9 @@
         },
         "valid": {
           "type": "boolean"
+        },
+        "role": {
+          "type": "string"
         }
       }
     },

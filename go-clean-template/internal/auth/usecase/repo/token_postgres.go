@@ -5,7 +5,6 @@ import (
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
 	"github.com/evrone/go-clean-template/internal/auth/transport"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
-
 	"github.com/opentracing/opentracing-go"
 	"gorm.io/gorm"
 )
@@ -55,6 +54,7 @@ func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (*userEntit
 		Password: grpcUser.Password,
 		Wallet:   grpcUser.Wallet,
 		Valid:    grpcUser.Valid,
+		Role:     grpcUser.Role,
 	}
 
 	return user, nil

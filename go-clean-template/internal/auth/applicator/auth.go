@@ -38,6 +38,7 @@ func Run(cfg *auth.Config) {
 	}
 	sqlDB, err := db.DB()
 	defer sqlDB.Close()
+
 	nc, err := nats.Connect("nats://localhost:4222")
 	if err != nil {
 		l.Error("failed to connect to NATS server: %v", err)

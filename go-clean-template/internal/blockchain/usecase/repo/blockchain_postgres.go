@@ -95,7 +95,6 @@ func (br *BlockchainRepo) TopUp(ctx context.Context, from string, to string, amo
 	if err != nil {
 		return err
 	}
-	fmt.Println(user.Wallet)
 	err = br.chain.Send(from, user.Wallet, amount)
 	if err != nil {
 		return err

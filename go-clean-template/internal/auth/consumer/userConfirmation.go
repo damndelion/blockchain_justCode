@@ -26,7 +26,6 @@ func (c *UserVerificationCallback) Callback(msg *nats.Msg) {
 
 	err := json.Unmarshal(msg.Data, &userVerification)
 	if err != nil {
-		fmt.Println("aaa")
 		c.logger.Error("failed to unmarshal record value: %v", err)
 	} else {
 

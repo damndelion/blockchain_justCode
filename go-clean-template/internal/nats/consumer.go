@@ -1,7 +1,6 @@
 package nats
 
 import (
-	"fmt"
 	"github.com/evrone/go-clean-template/config/auth"
 	consumer "github.com/evrone/go-clean-template/internal/auth/consumer"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -39,10 +38,8 @@ func (c *Consumer) Start() {
 		_, err := c.nc.Subscribe(topic, c.callback.Callback)
 		if err != nil {
 			c.logger.Error("Failed to subscribe to subject %s: %v", topic, err)
-			fmt.Println("unsub")
 
 		}
 		c.logger.Info("Start consuming topic ", topic)
-		fmt.Println("subbbb")
 	}
 }
