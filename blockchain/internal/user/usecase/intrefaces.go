@@ -12,7 +12,7 @@ import (
 
 type (
 
-	// User
+	// UserUseCase -.
 	UserUseCase interface {
 		Users(ctx context.Context) ([]*userEntity.User, error)
 		UsersWithFilter(ctx context.Context, params url.Values) ([]*userEntity.User, error)
@@ -48,7 +48,7 @@ type (
 		GetIdFromToken(accessToken string) (string, error)
 	}
 
-	//UserRepo
+	//UserRepo -.
 	UserRepo interface {
 		GetUsers(ctx context.Context) ([]*userEntity.User, error)
 		GetUsersWithFilter(ctx context.Context, param string, value string) (users []*userEntity.User, err error)

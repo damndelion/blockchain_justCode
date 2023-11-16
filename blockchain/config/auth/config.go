@@ -15,6 +15,7 @@ type (
 		JWT       `yaml:"jwt"`
 		Nats      `yaml:"nats"`
 		Transport `yaml:"transport"`
+		Jaeger    `yaml:"jaeger"`
 	}
 
 	// App -.
@@ -38,14 +39,14 @@ type (
 		PoolMax int    `env-required:"true" yaml:"pool_max" env:"PG_POOL_MAX"`
 		URL     string `env-required:"true"                 env:"PG_URL"`
 	}
-	// Jwt
+	// JWT -.
 	JWT struct {
 		SecretKey       string `mapstructure:"secret_key" yaml:"secret_key"`
 		AccessTokenTTL  int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`
 		RefreshTokenTTL int64  `mapstructure:"refresh_token_ttl" yaml:"refresh_token_ttl"`
 	}
 	Nats struct {
-		Server   string   `yaml:"servers"`
+		Server   string   `yaml:"servers" env-required:"true"   env:"NATS_URL"`
 		Producer Producer `yaml:"producer"`
 		Consumer Consumer `yaml:"consumer"`
 	}
@@ -60,11 +61,14 @@ type (
 		UserGrpc UserGrpcTransport `yaml:"userGrpc"`
 	}
 	UserTransport struct {
-		Host    string        `yaml:"host"`
+		Host    string        `yaml:"host" env:"USER_TRANSPORT_URL"`
 		Timeout time.Duration `yaml:"timeout"`
 	}
 	UserGrpcTransport struct {
-		Host string `yaml:"host"`
+		Host string `yaml:"host" env:"USER_GRPC_URL"`
+	}
+	Jaeger struct {
+		URL string `env-required:"true" yaml:"url"   env:"JAEGER_URL"`
 	}
 )
 

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func AdminVerify(SecretKey string, u usecase.UserUseCase) gin.HandlerFunc {
+func AdminVerify(SecretKey string, _ usecase.UserUseCase) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenHeader := ctx.Request.Header.Get("Authorization")
 		if tokenHeader == "" {
@@ -19,7 +19,7 @@ func AdminVerify(SecretKey string, u usecase.UserUseCase) gin.HandlerFunc {
 
 		token, err := jwt.Parse(tokenHeader, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
 			return []byte(SecretKey), nil

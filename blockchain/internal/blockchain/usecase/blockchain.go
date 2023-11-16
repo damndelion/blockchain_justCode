@@ -55,7 +55,7 @@ func (b *Blockchain) Send(ctx context.Context, from string, to string, amount fl
 	return nil
 }
 
-func (b *Blockchain) TopUp(ctx context.Context, from string, to string, amount float64) error {
+func (b *Blockchain) TopUp(ctx context.Context, to string, amount float64) error {
 	err := b.repo.TopUp(ctx, b.cfg.GenesisAddress, to, amount)
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func (b *Blockchain) TopUp(ctx context.Context, from string, to string, amount f
 func (b *Blockchain) CheckForIdInAccessToken(urlUserID string, accessToken string) bool {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		return []byte(b.cfg.SecretKey), nil
@@ -86,7 +86,7 @@ func (b *Blockchain) CheckForIdInAccessToken(urlUserID string, accessToken strin
 func (b *Blockchain) GetIdFromToken(accessToken string) (string, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		return []byte(b.cfg.SecretKey), nil

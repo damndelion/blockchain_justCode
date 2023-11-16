@@ -1,0 +1,16 @@
+# Use the official Golang image as a parent image
+FROM golang:1.21.4
+
+WORKDIR /app
+
+COPY go.sum .
+COPY go.mod .
+
+
+RUN go mod download
+
+COPY .. .
+EXPOSE 8082
+RUN go build ./cmd/auth/main.go
+
+CMD ["go", "run", "./cmd/auth/main.go"]

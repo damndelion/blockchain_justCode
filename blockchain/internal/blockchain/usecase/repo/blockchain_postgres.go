@@ -19,7 +19,7 @@ func NewBlockchainRepo(db *sql.DB, address string, userGrpcTransport *transport.
 	return &BlockchainRepo{db, chain, userGrpcTransport}
 }
 
-func (br *BlockchainRepo) GetWallets(ctx context.Context) (wallets []string, err error) {
+func (br *BlockchainRepo) GetWallets(_ context.Context) (wallets []string, err error) {
 	res := blockchain_logic.ListAddresses()
 
 	return res, nil
@@ -42,7 +42,7 @@ func (br *BlockchainRepo) GetBalance(ctx context.Context, userId string) (balanc
 	res := br.chain.GetBalance(address)
 	return res, nil
 }
-func (br *BlockchainRepo) GetBalanceByAddress(ctx context.Context, address string) (balance float64, err error) {
+func (br *BlockchainRepo) GetBalanceByAddress(_ context.Context, address string) (balance float64, err error) {
 	res := br.chain.GetBalance(address)
 	return res, nil
 }
@@ -62,7 +62,7 @@ func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userId string) (bal
 func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (string, error) {
 	wallet, err := br.GetWallet(ctx, userID)
 	if wallet != "" {
-		return "", fmt.Errorf("User wallet already exists")
+		return "", fmt.Errorf("user wallet already exists")
 	}
 	user, err := br.userGrpcTransport.GetUserByID(ctx, userID)
 	if user.Valid == false {

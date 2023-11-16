@@ -19,7 +19,7 @@ type chainRoutes struct {
 	cfg *blockchain.Config
 }
 
-func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l logger.Interface, bc blockchain_logic.Blockchain, cfg *blockchain.Config) {
+func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l logger.Interface, _ blockchain_logic.Blockchain, cfg *blockchain.Config) {
 	r := &chainRoutes{c, l, cfg}
 
 	blockchainHandler := handler.Group("/blockchain/wallet")
@@ -257,7 +257,7 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 		return
 	}
 
-	err = bc.c.TopUp(ctx, "", id, topupData.Amount)
+	err = bc.c.TopUp(ctx, id, topupData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
@@ -291,7 +291,7 @@ func (bc *chainRoutes) GetWalletQRCode(ctx *gin.Context) {
 
 	qrCode, err := qrcode.Encode(wallet, qrcode.Medium, 256)
 	if err != nil {
-		bc.l.Error(fmt.Errorf("Failed to generate QR code: %w", err))
+		bc.l.Error(fmt.Errorf("failed to generate QR code: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("Failed to generate QR code: %w ", err))
 		return
 	}

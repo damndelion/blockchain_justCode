@@ -18,15 +18,10 @@ func NewAuthRepo(db *gorm.DB, userGrpcTransport *transport.UserGrpcTransport) *A
 	return &AuthRepo{db, userGrpcTransport}
 }
 
-func (t *AuthRepo) CreateUserToken(ctx context.Context, userToken authEntity.Token) error {
+func (t *AuthRepo) CreateUserToken(_ context.Context, userToken authEntity.Token) error {
 	if err := t.DB.Create(&userToken).Error; err != nil {
 		return err
 	}
-	return nil
-
-}
-
-func (t *AuthRepo) UpdateUserToken(ctx context.Context, userToken authEntity.Token) error {
 	return nil
 
 }
@@ -60,7 +55,7 @@ func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (*userEntit
 	return user, nil
 }
 
-func (t *AuthRepo) ConfirmCode(ctx context.Context, email string) (int, error) {
+func (t *AuthRepo) ConfirmCode(_ context.Context, email string) (int, error) {
 	var code int
 	res := t.DB.Model(&authEntity.UserCode{}).Where("email = ?", email).Pluck("code", &code)
 	if res.Error != nil {

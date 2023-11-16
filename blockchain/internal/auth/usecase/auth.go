@@ -30,7 +30,7 @@ func NewAuth(repo AuthRepo, cfg *auth.Config, userVerificationProducer *nats.Pro
 	return &Auth{repo, cfg, userVerificationProducer}
 }
 
-func (t *Auth) Register(ctx context.Context, name, email, password string) error {
+func (u *Auth) Register(ctx context.Context, name, email, password string) error {
 	randomFloat := rand.Float64()
 	randomNumber := int(randomFloat * 10000)
 	if randomNumber < 1000 {
@@ -39,10 +39,13 @@ func (t *Auth) Register(ctx context.Context, name, email, password string) error
 	msg := dtoConsumer.UserCode{Email: email, Code: fmt.Sprintf("%d", randomNumber)}
 	b, err := json.Marshal(&msg)
 	if err != nil {
-		return fmt.Errorf("failed to marshall UserCode err: %w", err)
+		return err
 	}
 
-	t.userVerificationProducer.ProduceMessage(b)
+	err = u.userVerificationProducer.ProduceMessage(b)
+	if err != nil {
+		return err
+	}
 
 	userIdentifier := email
 
@@ -54,13 +57,13 @@ func (t *Auth) Register(ctx context.Context, name, email, password string) error
 	delete(confirmationChannels, userIdentifier)
 
 	if !success {
-		return errors.New("User registration confirmation failed")
+		return errors.New("user registration confirmation failed")
 	}
 
 	if err != nil {
 		return err
 	}
-	_, err = t.repo.CreateUser(ctx, &userEntity.User{
+	_, err = u.repo.CreateUser(ctx, &userEntity.User{
 		Name:     name,
 		Email:    email,
 		Password: password,
@@ -99,13 +102,13 @@ func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, error)
 	claims := &jwt.StandardClaims{}
 	token, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(u.cfg.SecretKey), nil
 	})
 
 	if err != nil || !token.Valid {
-		return "", fmt.Errorf("Invalid refresh token: %v", err)
+		return "", fmt.Errorf("invalid refresh token: %v", err)
 	}
 
 	userEmail := claims.Subject
@@ -168,7 +171,6 @@ func (u *Auth) ConfirmUserCode(ctx context.Context, email string, userCode int) 
 		return err
 	}
 	if userCode == code {
-		// Codes match, unlock the confirmation channel
 		userIdentifier := email
 		confirmationChan, exists := confirmationChannels[userIdentifier]
 
@@ -180,12 +182,6 @@ func (u *Auth) ConfirmUserCode(ctx context.Context, email string, userCode int) 
 			return errors.New("confirmation channel not found")
 		}
 	} else {
-		return errors.New("Invalid user code")
-	}
-
-	if userCode == code {
-		return nil
-	} else {
-		return errors.New("Code is mismatched")
+		return errors.New("invalid user code")
 	}
 }

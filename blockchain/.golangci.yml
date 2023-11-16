@@ -58,8 +58,6 @@ linters:
     - asciicheck
     - bodyclose
     - cyclop
-    - deadcode
-    - depguard
     - dogsled
     - dupl
     - durationcheck
@@ -69,12 +67,10 @@ linters:
     - exportloopref
     - forbidigo
     - funlen
-    - gci
     - gochecknoglobals
     - gochecknoinits
     - gocognit
     - goconst
-    - gocritic
     - gocyclo
     - godot
     - godox
@@ -88,7 +84,6 @@ linters:
     - gosec
     - gosimple
     - govet
-    - ineffassign
     - makezero
     - misspell
     - nakedret
@@ -102,7 +97,6 @@ linters:
     - rowserrcheck
     - sqlclosecheck
     - staticcheck
-    - structcheck
     - stylecheck
     - tparallel
     - thelper
@@ -110,8 +104,6 @@ linters:
     - unconvert
     - unparam
     - unused
-    - varcheck
-    - wsl
     - whitespace
 
 # disable:

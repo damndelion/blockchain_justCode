@@ -55,27 +55,27 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 		return
 	}
 
-	user, err := ur.userCache.Get(ctx, id)
+	resUser, err := ur.userCache.Get(ctx, id)
 	if err != nil {
 		return
 	}
 
-	if user == nil {
-		user, err = ur.u.GetUserById(ctx, id)
+	if resUser == nil {
+		resUser, err = ur.u.GetUserById(ctx, id)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
 			return
 		}
 
-		err = ur.userCache.Set(ctx, id, user)
+		err = ur.userCache.Set(ctx, id, resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
 		}
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, resUser)
 }
 
 // GetUserDetailInfo godoc
@@ -154,7 +154,7 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 	userId, err := ur.u.GetIdFromToken(authHeader)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
 		return
 	}
 	var userData dto.UserDetailRequest

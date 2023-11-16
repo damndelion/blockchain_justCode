@@ -1,11 +1,12 @@
-// Package user configures and runs application.
 package applicator
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/evrone/go-clean-template/config/auth"
 	consumer "github.com/evrone/go-clean-template/internal/auth/consumer"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1"
+	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
 	"github.com/evrone/go-clean-template/internal/auth/transport"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/internal/auth/usecase/repo"
@@ -17,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 	"github.com/opentracing/opentracing-go"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
@@ -27,8 +29,14 @@ func Run(cfg *auth.Config) {
 	l := logger.New(cfg.Log.Level)
 
 	//tracing
-	tracer, closer, _ := jaeger.InitJaeger()
-	defer closer.Close()
+	tracer, closer, _ := jaeger.InitJaeger(cfg.Jaeger.URL)
+	defer func(closer io.Closer) {
+		err := closer.Close()
+		if err != nil {
+			l.Error("Failed to close Jaeger: %v", err)
+
+		}
+	}(closer)
 	opentracing.SetGlobalTracer(tracer)
 
 	// Repository
@@ -37,20 +45,24 @@ func Run(cfg *auth.Config) {
 		l.Fatal(fmt.Errorf("auth - Run - postgres.New: %w", err))
 	}
 	sqlDB, err := db.DB()
-	defer sqlDB.Close()
+	defer func(sqlDB *sql.DB) {
+		err := sqlDB.Close()
+		if err != nil {
+			l.Error("Failed to close DB: %v", err)
 
-	nc, err := nats.Connect("nats://localhost:4222")
+		}
+	}(sqlDB)
+
+	nc, err := nats.Connect(cfg.Nats.Server)
 	if err != nil {
 		l.Error("failed to connect to NATS server: %v", err)
 		return
 	}
 	defer nc.Close()
 
-	// Subscribe to the NATS subject for user verification
 	userVerificationProducer, err := natsService.NewProducer(cfg)
 
 	if err != nil {
-
 		l.Error("Failed to create NATS producer: %v", err)
 	}
 	userGrpcTransport := transport.NewUserGrpcTransport(cfg.Transport.UserGrpc)
@@ -62,6 +74,16 @@ func Run(cfg *auth.Config) {
 	}
 	go userVerificationConsumer.Start()
 
+	err = db.AutoMigrate(authEntity.Token{})
+	if err != nil {
+		l.Error("Failed to do migrations Token: %v", err)
+
+	}
+	err = db.AutoMigrate(authEntity.UserCode{})
+	if err != nil {
+		l.Error("Failed to do migrations UserCode: %v", err)
+
+	}
 	// Use case
 	authUseCase := usecase.NewAuth(repo.NewAuthRepo(db, userGrpcTransport), cfg, userVerificationProducer)
 

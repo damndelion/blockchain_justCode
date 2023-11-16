@@ -12,7 +12,7 @@ import (
 
 var Tracer opentracing.Tracer
 
-func InitJaeger() (opentracing.Tracer, io.Closer, error) {
+func InitJaeger(url string) (opentracing.Tracer, io.Closer, error) {
 	cfg := config.Configuration{
 		Sampler: &config.SamplerConfig{
 			Type:  jaeger.SamplerTypeRateLimiting,

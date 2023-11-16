@@ -21,7 +21,7 @@ type adminRoutes struct {
 }
 
 func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User, cfg *user.Config) {
-	r := &userRoutes{u, l, uc}
+	r := &adminRoutes{u, l, uc}
 
 	adminHandler := handler.Group("admin")
 	{
@@ -70,7 +70,7 @@ func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.In
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/all [get]
-func (ur *userRoutes) GetUsers(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 	var users []*userEntity.User
 	var err error
 	if len(ctx.Request.URL.Query()) == 0 {
@@ -108,31 +108,31 @@ func (ur *userRoutes) GetUsers(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user/{id} [get]
-func (ur *userRoutes) GetUserById(ctx *gin.Context) {
+func (ur *adminRoutes) GetUserById(ctx *gin.Context) {
 
 	id := ctx.Param("id")
 
-	user, err := ur.userCache.Get(ctx, id)
+	resUser, err := ur.userCache.Get(ctx, id)
 	if err != nil {
 		return
 	}
 
-	if user == nil {
-		user, err = ur.u.GetUserById(ctx, id)
+	if resUser == nil {
+		resUser, err = ur.u.GetUserById(ctx, id)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
 			return
 		}
 
-		err = ur.userCache.Set(ctx, id, user)
+		err = ur.userCache.Set(ctx, id, resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
 		}
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, resUser)
 }
 
 // GetUserByEmail godoc
@@ -148,29 +148,29 @@ func (ur *userRoutes) GetUserById(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/email [get]
-func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
+func (ur *adminRoutes) GetUserByEmail(ctx *gin.Context) {
 	email := ctx.Query("email")
-	user, err := ur.userCache.Get(ctx, email)
+	resUser, err := ur.userCache.Get(ctx, email)
 	if err != nil {
 		return
 	}
 
-	if user == nil {
-		user, err = ur.u.GetUserByEmail(ctx, email)
+	if resUser == nil {
+		resUser, err = ur.u.GetUserByEmail(ctx, email)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail error")
 			return
 		}
 
-		err = ur.userCache.Set(ctx, email, user)
+		err = ur.userCache.Set(ctx, email, resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail cache error")
 		}
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, resUser)
 }
 
 // GetUsersWithSort godoc
@@ -187,7 +187,7 @@ func (ur *userRoutes) GetUserByEmail(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/all/sort [get]
-func (ur *userRoutes) GetUsersWithSort(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersWithSort(ctx *gin.Context) {
 	sortParam := ctx.Query("sort")
 	methodParam := ctx.Query("method")
 	users, err := ur.u.UsersWithSort(ctx, sortParam, methodParam)
@@ -216,7 +216,7 @@ func (ur *userRoutes) GetUsersWithSort(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/all/search [get]
-func (ur *userRoutes) GetUsersWithSearch(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
@@ -242,7 +242,7 @@ func (ur *userRoutes) GetUsersWithSearch(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user/{id} [post]
-func (ur *userRoutes) UpdateUser(ctx *gin.Context) {
+func (ur *adminRoutes) UpdateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var userData dto.UserUpdateRequest
 	err := ctx.ShouldBindJSON(&userData)
@@ -275,7 +275,7 @@ func (ur *userRoutes) UpdateUser(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user [put]
-func (ur *userRoutes) CreateUser(ctx *gin.Context) {
+func (ur *adminRoutes) CreateUser(ctx *gin.Context) {
 	var userData dto.UserUpdateRequest
 
 	err := ctx.ShouldBindJSON(&userData)
@@ -304,7 +304,7 @@ func (ur *userRoutes) CreateUser(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user/{id} [delete]
-func (ur *userRoutes) DeleteUser(ctx *gin.Context) {
+func (ur *adminRoutes) DeleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	err := ur.u.DeleteUser(ctx, id)
@@ -330,7 +330,7 @@ func (ur *userRoutes) DeleteUser(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info [get]
-func (ur *userRoutes) GetUsersDetailInfo(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 	var usersInfo []*userEntity.UserInfo
 	var err error
 	if len(ctx.Request.URL.Query()) == 0 {
@@ -369,7 +369,7 @@ func (ur *userRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/sort [get]
-func (ur *userRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
 	sortParam := ctx.Query("sort")
 	methodParam := ctx.Query("method")
 	users, err := ur.u.UsersInfoWithSort(ctx, sortParam, methodParam)
@@ -397,7 +397,7 @@ func (ur *userRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/search [get]
-func (ur *userRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersInfoWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
@@ -421,7 +421,7 @@ func (ur *userRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/{id} [get]
-func (ur *userRoutes) GetUserDetailInfoById(ctx *gin.Context) {
+func (ur *adminRoutes) GetUserDetailInfoById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	userById, err := ur.u.GetUserInfoById(ctx, id)
 	if err != nil {
@@ -446,7 +446,7 @@ func (ur *userRoutes) GetUserDetailInfoById(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/{id} [post]
-func (ur *userRoutes) UpdateUserInfo(ctx *gin.Context) {
+func (ur *adminRoutes) UpdateUserInfo(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var userData dto.UserInfoRequest
 	err := ctx.ShouldBindJSON(&userData)
@@ -479,7 +479,7 @@ func (ur *userRoutes) UpdateUserInfo(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info [put]
-func (ur *userRoutes) CreateUserInfo(ctx *gin.Context) {
+func (ur *adminRoutes) CreateUserInfo(ctx *gin.Context) {
 	var userData dto.UserInfoRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
@@ -509,7 +509,7 @@ func (ur *userRoutes) CreateUserInfo(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/{id} [delete]
-func (ur *userRoutes) DeleteUserInfo(ctx *gin.Context) {
+func (ur *adminRoutes) DeleteUserInfo(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	err := ur.u.DeleteUserInfo(ctx, id)
@@ -535,7 +535,7 @@ func (ur *userRoutes) DeleteUserInfo(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred [get]
-func (ur *userRoutes) GetUsersDetailCred(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	var usersCred []*userEntity.UserCredentials
 	var err error
 	if len(ctx.Request.URL.Query()) == 0 {
@@ -573,7 +573,7 @@ func (ur *userRoutes) GetUsersDetailCred(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/sort [get]
-func (ur *userRoutes) GetUsersCredWithSort(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersCredWithSort(ctx *gin.Context) {
 	sortParam := ctx.Query("sort")
 	methodParam := ctx.Query("method")
 	users, err := ur.u.UsersCredWithSort(ctx, sortParam, methodParam)
@@ -601,7 +601,7 @@ func (ur *userRoutes) GetUsersCredWithSort(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/search [get]
-func (ur *userRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
+func (ur *adminRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersCredWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
@@ -625,7 +625,7 @@ func (ur *userRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/{id} [get]
-func (ur *userRoutes) GetUserDetailCredById(ctx *gin.Context) {
+func (ur *adminRoutes) GetUserDetailCredById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	userById, err := ur.u.GetUserCredById(ctx, id)
 	if err != nil {
@@ -650,7 +650,7 @@ func (ur *userRoutes) GetUserDetailCredById(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/{id} [post]
-func (ur *userRoutes) UpdateUserCred(ctx *gin.Context) {
+func (ur *adminRoutes) UpdateUserCred(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var userData dto.UserCredRequest
 	err := ctx.ShouldBindJSON(&userData)
@@ -683,7 +683,7 @@ func (ur *userRoutes) UpdateUserCred(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred [put]
-func (ur *userRoutes) CreateUserCred(ctx *gin.Context) {
+func (ur *adminRoutes) CreateUserCred(ctx *gin.Context) {
 	var userData dto.UserCredRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
@@ -713,7 +713,7 @@ func (ur *userRoutes) CreateUserCred(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/{id} [delete]
-func (ur *userRoutes) DeleteUserCred(ctx *gin.Context) {
+func (ur *adminRoutes) DeleteUserCred(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	err := ur.u.DeleteUserCred(ctx, id)

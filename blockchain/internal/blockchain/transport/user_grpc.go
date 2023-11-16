@@ -6,6 +6,7 @@ import (
 	"github.com/evrone/go-clean-template/config/blockchain"
 	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type UserGrpcTransport struct {
@@ -14,7 +15,7 @@ type UserGrpcTransport struct {
 }
 
 func NewUserGrpcTransport(config blockchain.UserGrpcTransport) *UserGrpcTransport {
-	opts := []grpc.DialOption{grpc.WithInsecure()}
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
 	conn, _ := grpc.Dial(config.Host, opts...)
 

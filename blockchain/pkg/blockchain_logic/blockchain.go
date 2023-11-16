@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -211,7 +212,7 @@ func (bc *Blockchain) FindTransaction(ID []byte) (Transaction, error) {
 		}
 	}
 
-	return Transaction{}, errors.New("Transaction is not found")
+	return Transaction{}, errors.New("transaction is not found")
 }
 
 func (bc *Blockchain) VerifyTransaction(tx *Transaction) bool {
@@ -294,7 +295,12 @@ func (bc *Blockchain) GetBalanceInUSD(address string) (float64, error) {
 	if err != nil {
 		return -1, err
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(response.Body)
 
 	var data CoinGeckoResponse
 

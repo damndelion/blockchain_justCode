@@ -36,6 +36,7 @@ type (
 		PoolMax int    `env-required:"true" yaml:"pool_max" env:"PG_POOL_MAX"`
 		URL     string `env-required:"true"                 env:"PG_URL"`
 	}
+	// JWT -.
 	JWT struct {
 		SecretKey       string `mapstructure:"secret_key" yaml:"secret_key"`
 		AccessTokenTTL  int64  `mapstructure:"access_token_ttl" yaml:"access_token_ttl"`

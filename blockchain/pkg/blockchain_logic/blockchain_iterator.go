@@ -3,6 +3,7 @@ package blockchain_logic
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 )
 
@@ -21,7 +22,7 @@ func (i *BlockchainIterator) Next() *Block {
 	err := row.Scan(&block.Hash, &transactionsJSON, &block.PrevHash, &block.Timestamp, &block.Nonce)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil // End of the blockchain
 		}
 

@@ -18,7 +18,7 @@ jwt:
   access_token_ttl: 900
 
 blockchain:
-  genesis_address: "1ARw8rRyYaHwqHu1o4G8xH5TnGPbBHqeV6"
+  genesis_address: "1Pq4qTbgTH4KhmFiPQ91YXVyyK5oo6aX1G"
 
 transport:
   user:

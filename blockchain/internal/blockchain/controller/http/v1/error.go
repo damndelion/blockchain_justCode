@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,6 +9,5 @@ type response struct {
 }
 
 func errorResponse(c *gin.Context, code int, msg error) {
-
-	c.AbortWithStatusJSON(code, fmt.Sprintf("%s", msg))
+	c.AbortWithStatusJSON(code, response{msg})
 }

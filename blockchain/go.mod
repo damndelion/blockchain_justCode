@@ -1,6 +1,6 @@
 module github.com/evrone/go-clean-template
 
-go 1.17
+go 1.21.4
 
 require (
 	github.com/Eun/go-hit v0.5.23

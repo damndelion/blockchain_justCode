@@ -1,6 +1,9 @@
 package userEntity
 
+import "gorm.io/gorm"
+
 type UserInfo struct {
+	gorm.Model
 	ID      int    `json:"id"`
 	UserID  string `json:"user_id"`
 	Age     int    `json:"age"`

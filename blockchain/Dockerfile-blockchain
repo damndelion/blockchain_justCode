@@ -1,0 +1,16 @@
+# Use the official Golang image as a parent image
+FROM golang:1.21.4
+
+WORKDIR /app
+
+COPY go.sum .
+COPY go.mod .
+
+
+RUN go mod download
+
+COPY .. .
+EXPOSE 8081
+RUN go build ./cmd/blockchain/main.go
+
+CMD ["go", "run", "./cmd/blockchain/main.go"]

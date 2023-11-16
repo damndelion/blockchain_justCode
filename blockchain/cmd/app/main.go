@@ -28,5 +28,6 @@ func main() {
 		log.Fatalf("Config error: %s", err)
 	}
 
-	applicator.Run(cfg)
+	log.Print("aaaa")
+	applicator.Runn(cfg)
 }

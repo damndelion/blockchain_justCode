@@ -36,7 +36,13 @@ func (s *Server) Start() error {
 
 	pb.RegisterUserServiceServer(s.grpcServer, s.service)
 
-	go s.grpcServer.Serve(listener)
+	go func() {
+		err := s.grpcServer.Serve(listener)
+		fmt.Println(s.grpcServer.GetServiceInfo())
+		if err != nil {
+			return
+		}
+	}()
 
 	return nil
 }
