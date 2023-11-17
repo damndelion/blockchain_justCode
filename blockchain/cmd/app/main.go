@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/evrone/go-clean-template/config/user"
 	"github.com/evrone/go-clean-template/internal/user/applicator"
-	"log"
 )
 
 // @title User service
@@ -20,14 +21,12 @@ import (
 
 // @host localhost:8080
 // @BasePath /
-// @schemes http
+// @schemes http.
 func main() {
 	cfg, err := user.NewConfig()
 	if err != nil {
-
 		log.Fatalf("Config error: %s", err)
 	}
 
-	log.Print("aaaa")
-	applicator.Runn(cfg)
+	applicator.Run(cfg)
 }

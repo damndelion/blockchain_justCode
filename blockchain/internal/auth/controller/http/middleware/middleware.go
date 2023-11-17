@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
 func JwtVerify(SecretKey string) gin.HandlerFunc {
@@ -13,6 +14,7 @@ func JwtVerify(SecretKey string) gin.HandlerFunc {
 		tokenHeader := ctx.Request.Header.Get("Authorization")
 		if tokenHeader == "" {
 			ctx.AbortWithStatus(http.StatusForbidden)
+
 			return
 		}
 
@@ -28,19 +30,22 @@ func JwtVerify(SecretKey string) gin.HandlerFunc {
 				expirationTime := time.Unix(int64(exp), 0)
 				if time.Now().After(expirationTime) {
 					ctx.AbortWithStatus(http.StatusUnauthorized)
+
 					return
 				}
 			} else {
 				ctx.AbortWithStatus(http.StatusUnauthorized)
+
 				return
 			}
 		} else {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
+
 			return
 		}
-
 		if err != nil || !token.Valid {
 			ctx.AbortWithStatus(http.StatusForbidden)
+
 			return
 		}
 

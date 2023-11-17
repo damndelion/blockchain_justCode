@@ -38,7 +38,6 @@ func (c *Consumer) Start() {
 		_, err := c.nc.Subscribe(topic, c.callback.Callback)
 		if err != nil {
 			c.logger.Error("Failed to subscribe to subject %s: %v", topic, err)
-
 		}
 		c.logger.Info("Start consuming topic ", topic)
 	}

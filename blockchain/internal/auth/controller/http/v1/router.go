@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"net/http"
+
 	_ "github.com/evrone/go-clean-template/docs/auth"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -9,7 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 )
 
 func NewAuthRouter(handler *gin.Engine, l logger.Interface, u usecase.AuthUseCase) {

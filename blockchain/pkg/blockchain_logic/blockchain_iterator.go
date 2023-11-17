@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"database/sql"
@@ -20,7 +20,6 @@ func (i *BlockchainIterator) Next() *Block {
 	row := i.db.QueryRow("SELECT hash, transactions, previous_hash, timestamp, nonce FROM blocks WHERE hash = $1", i.currentHash)
 
 	err := row.Scan(&block.Hash, &transactionsJSON, &block.PrevHash, &block.Timestamp, &block.Nonce)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil // End of the blockchain
@@ -29,11 +28,9 @@ func (i *BlockchainIterator) Next() *Block {
 		log.Panic(err)
 	}
 
-	// Attempt to decode the JSON data into []*Transaction
-
-	if err := json.Unmarshal([]byte(transactionsJSON), &block.Transactions); err != nil {
-
+	if err = json.Unmarshal([]byte(transactionsJSON), &block.Transactions); err != nil {
 		log.Fatal(err)
+
 		return nil
 	}
 

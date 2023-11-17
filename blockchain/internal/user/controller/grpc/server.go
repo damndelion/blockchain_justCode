@@ -1,10 +1,12 @@
 package grpc
 
 import (
+	"errors"
 	"fmt"
+	"net"
+
 	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
 	"google.golang.org/grpc"
-	"net"
 )
 
 type Server struct {
@@ -31,14 +33,13 @@ func NewServer(
 func (s *Server) Start() error {
 	listener, err := net.Listen("tcp", s.port)
 	if err != nil {
-		return fmt.Errorf("failed to listen grpc port: %s", s.port)
+		return errors.New(fmt.Sprintf("failed to listen grpc port: %s", s.port))
 	}
 
 	pb.RegisterUserServiceServer(s.grpcServer, s.service)
 
 	go func() {
-		err := s.grpcServer.Serve(listener)
-		fmt.Println(s.grpcServer.GetServiceInfo())
+		err = s.grpcServer.Serve(listener)
 		if err != nil {
 			return
 		}

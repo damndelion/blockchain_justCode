@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"bytes"
@@ -22,8 +22,10 @@ func NewProof(b *Block) *ProofOfWork {
 	target := big.NewInt(1)
 	target.Lsh(target, uint(256-Difficulty))
 	pow := &ProofOfWork{b, target}
+
 	return pow
 }
+
 func (pow *ProofOfWork) InitData(nonce int) string {
 	data := strings.Join(
 		[]string{
@@ -36,7 +38,6 @@ func (pow *ProofOfWork) InitData(nonce int) string {
 	)
 
 	return data
-
 }
 
 func (pow *ProofOfWork) Run() (int, string) {
@@ -53,10 +54,8 @@ func (pow *ProofOfWork) Run() (int, string) {
 
 		if intHash.Cmp(pow.Target) == -1 {
 			break
-		} else {
-			nonce++
 		}
-
+		nonce++
 	}
 
 	return nonce, hex.EncodeToString(hash[:])
@@ -78,7 +77,6 @@ func ToHex(num int64) []byte {
 	err := binary.Write(buff, binary.BigEndian, num)
 	if err != nil {
 		log.Panic(err)
-
 	}
 
 	return buff.Bytes()

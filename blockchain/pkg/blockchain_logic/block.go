@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"bytes"
@@ -25,7 +25,6 @@ func CreateBlock(transactions []*Transaction, prevHash string) *Block {
 }
 
 func Genesis(coinbase *Transaction) *Block {
-
 	return CreateBlock([]*Transaction{coinbase}, "0")
 }
 

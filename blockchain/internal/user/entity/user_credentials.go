@@ -1,4 +1,4 @@
-package userEntity
+package userentity
 
 import "gorm.io/gorm"
 

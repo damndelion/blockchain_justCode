@@ -1,8 +1,9 @@
 package auth
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
 	"time"
+
+	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type (

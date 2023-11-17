@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
 	"github.com/evrone/go-clean-template/internal/auth/transport"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
@@ -22,8 +23,8 @@ func (t *AuthRepo) CreateUserToken(_ context.Context, userToken authEntity.Token
 	if err := t.DB.Create(&userToken).Error; err != nil {
 		return err
 	}
-	return nil
 
+	return nil
 }
 
 func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
@@ -31,8 +32,8 @@ func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, 
 	if err != nil {
 		return 0, err
 	}
-	return int(grpcUser.Id), nil
 
+	return int(grpcUser.Id), nil
 }
 
 func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error) {
@@ -43,7 +44,7 @@ func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (*userEntit
 		return nil, err
 	}
 	user := &userEntity.User{
-		Id:       int(grpcUser.Id),
+		ID:       int(grpcUser.Id),
 		Name:     grpcUser.Name,
 		Email:    grpcUser.Email,
 		Password: grpcUser.Password,

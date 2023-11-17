@@ -12,7 +12,7 @@ import (
 
 var Tracer opentracing.Tracer
 
-func InitJaeger(url string) (opentracing.Tracer, io.Closer, error) {
+func InitJaeger(_ string) (opentracing.Tracer, io.Closer, error) {
 	cfg := config.Configuration{
 		Sampler: &config.SamplerConfig{
 			Type:  jaeger.SamplerTypeRateLimiting,
@@ -26,11 +26,16 @@ func InitJaeger(url string) (opentracing.Tracer, io.Closer, error) {
 	var err error
 	var closer io.Closer
 	Tracer, closer, err = cfg.New("auth-service")
+
 	return Tracer, closer, err
 }
 
 func StartSpanFromRequest(tracer opentracing.Tracer, r *http.Request, funcDesc string) opentracing.Span {
-	spanCtx, _ := Extract(tracer, r)
+	spanCtx, err := Extract(tracer, r)
+	if err != nil {
+		return nil
+	}
+
 	return tracer.StartSpan(funcDesc, ext.RPCServerOption(spanCtx))
 }
 

@@ -3,9 +3,10 @@ package postgres
 
 import (
 	"database/sql"
+	"log"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 // Postgres -.
@@ -16,6 +17,9 @@ type Postgres struct {
 // New -.
 func New(url string) (*gorm.DB, *sql.DB, error) {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
+	if err != nil {
+		return nil, nil, err
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, nil, err

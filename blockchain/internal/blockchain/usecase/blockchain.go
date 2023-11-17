@@ -3,11 +3,12 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
 	"github.com/golang-jwt/jwt"
-	"strconv"
 )
 
 type Blockchain struct {
@@ -24,19 +25,20 @@ func (b *Blockchain) Wallets(ctx context.Context) ([]string, error) {
 	return b.repo.GetWallets(ctx)
 }
 
-func (b *Blockchain) Wallet(ctx context.Context, userId string) (string, error) {
-	return b.repo.GetWallet(ctx, userId)
+func (b *Blockchain) Wallet(ctx context.Context, userID string) (string, error) {
+	return b.repo.GetWallet(ctx, userID)
 }
 
-func (b *Blockchain) GetBalance(ctx context.Context, userId string) (float64, error) {
-	return b.repo.GetBalance(ctx, userId)
+func (b *Blockchain) GetBalance(ctx context.Context, userID string) (float64, error) {
+	return b.repo.GetBalance(ctx, userID)
 }
 
 func (b *Blockchain) GetBalanceByAddress(ctx context.Context, address string) (float64, error) {
 	return b.repo.GetBalanceByAddress(ctx, address)
 }
-func (b *Blockchain) GetBalanceUSD(ctx context.Context, userId string) (float64, error) {
-	return b.repo.GetBalanceUSD(ctx, userId)
+
+func (b *Blockchain) GetBalanceUSD(ctx context.Context, userID string) (float64, error) {
+	return b.repo.GetBalanceUSD(ctx, userID)
 }
 
 func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, error) {
@@ -44,14 +46,16 @@ func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, e
 	if err != nil {
 		return "", err
 	}
+
 	return wallet, nil
 }
 
-func (b *Blockchain) Send(ctx context.Context, from string, to string, amount float64) error {
+func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) error {
 	err := b.repo.Send(ctx, from, to, amount)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -60,10 +64,11 @@ func (b *Blockchain) TopUp(ctx context.Context, to string, amount float64) error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (b *Blockchain) CheckForIdInAccessToken(urlUserID string, accessToken string) bool {
+func (b *Blockchain) CheckForIDInAccessToken(urlUserID, accessToken string) bool {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -76,14 +81,18 @@ func (b *Blockchain) CheckForIdInAccessToken(urlUserID string, accessToken strin
 	if err != nil || !token.Valid {
 		return false
 	}
-	urlUserIDFormat, _ := strconv.ParseFloat(urlUserID, 8)
+	urlUserIDFormat, err := strconv.ParseFloat(urlUserID, 32)
+	if err != nil {
+		return false
+	}
 	if claims["user_id"] != urlUserIDFormat {
 		return false
 	}
+
 	return true
 }
 
-func (b *Blockchain) GetIdFromToken(accessToken string) (string, error) {
+func (b *Blockchain) GetIDFromToken(accessToken string) (string, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -97,5 +106,6 @@ func (b *Blockchain) GetIdFromToken(accessToken string) (string, error) {
 		return "", err
 	}
 	id := fmt.Sprintf("%v", claims["user_id"])
+
 	return id, nil
 }

@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/evrone/go-clean-template/config/user"
 	_ "github.com/evrone/go-clean-template/docs/user"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
@@ -12,7 +14,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 )
 
 func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCase, uc cache.User, cfg *user.Config) {

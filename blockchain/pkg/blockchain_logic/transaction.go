@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"bytes"
@@ -8,12 +8,10 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	_ "database/sql"
 	"encoding/gob"
 	"encoding/hex"
-	_ "encoding/hex"
+	"errors"
 	"fmt"
-	_ "fmt"
 	"log"
 	"math/big"
 )
@@ -106,6 +104,7 @@ func (tx *Transaction) Hash() []byte {
 
 	return hash[:]
 }
+
 func (tx *Transaction) Verify(prevTXs map[string]Transaction) bool {
 	txCopy := tx.TrimmedCopy()
 	curve := elliptic.P256()
@@ -130,13 +129,14 @@ func (tx *Transaction) Verify(prevTXs map[string]Transaction) bool {
 		y.SetBytes(vin.PubKey[(keyLen / 2):])
 
 		rawPubKey := ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}
-		if ecdsa.Verify(&rawPubKey, txCopy.ID, &r, &s) == false {
+		if !ecdsa.Verify(&rawPubKey, txCopy.ID, &r, &s) {
 			return false
 		}
 	}
 
 	return true
 }
+
 func NewCoinbaseTX(to, data string) *Transaction {
 	if data == "" {
 		randData := make([]byte, 20)
@@ -162,23 +162,21 @@ func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain) (*Trans
 
 	wallets, err := NewWallets()
 	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-
+		return nil, errors.New(fmt.Sprintf("%v", err))
 	}
 	wallet := wallets.GetWallet(from)
 	pubKeyHash := HashPubKey(wallet.PublicKey)
 	acc, validOutputs := bc.FindSpendableOutputs(pubKeyHash, amount)
 
 	if acc < amount {
-		return nil, fmt.Errorf("not enough funds")
-
+		return nil, errors.New(fmt.Sprintf("not enough funds"))
 	}
 
 	// Build a list of inputs
 	for txid, outs := range validOutputs {
 		txID, err := hex.DecodeString(txid)
 		if err != nil {
-			return nil, fmt.Errorf("%w", err)
+			return nil, errors.New(fmt.Sprintf("%v", err))
 		}
 
 		for _, out := range outs {

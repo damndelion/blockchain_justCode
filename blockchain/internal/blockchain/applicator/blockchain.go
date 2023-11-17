@@ -3,20 +3,21 @@ package applicator
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/config/blockchain"
 	v1 "github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1"
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
-	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/httpserver"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/evrone/go-clean-template/pkg/postgres"
 	"github.com/gin-gonic/gin"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // Run creates objects via constructors.
@@ -29,22 +30,22 @@ func Run(cfg *blockchain.Config) {
 		l.Fatal(fmt.Errorf("blockchain - Run - postgres.New: %w", err))
 	}
 	defer func(db *sql.DB) {
-		err := db.Close()
+		err = db.Close()
 		if err != nil {
 			l.Error(fmt.Errorf("blockchain - DB: %w", err))
 		}
 	}(db)
 
-	address := blockchain_logic.CreateWallet()
+	address := blockchainlogic.CreateWallet()
 
 	userGrpcTransport := transport.NewUserGrpcTransport(cfg.Transport.UserGrpc)
 
 	// Use case
 	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address, userGrpcTransport), cfg, userGrpcTransport)
 
-	blockchain_logic.ListAddresses()
-	//address to create genesis block
-	chain := blockchain_logic.CreateBlockchain(db, address)
+	blockchainlogic.ListAddresses()
+	// address to create genesis block
+	chain := blockchainlogic.CreateBlockchain(db, address)
 
 	// HTTP Server
 	handler := gin.New()

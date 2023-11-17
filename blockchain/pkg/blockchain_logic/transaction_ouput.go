@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import "bytes"
 

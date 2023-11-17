@@ -3,9 +3,10 @@ package cache
 import (
 	"context"
 	"encoding/json"
-	"github.com/evrone/go-clean-template/internal/user/entity"
-	"github.com/redis/go-redis/v9"
 	"time"
+
+	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/redis/go-redis/v9"
 )
 
 type User interface {
@@ -42,10 +43,10 @@ func (c *UserCache) Get(ctx context.Context, key string) (*userEntity.User, erro
 }
 
 func (c *UserCache) Set(ctx context.Context, key string, value *userEntity.User) error {
-	userJson, err := json.Marshal(value)
+	userJSON, err := json.Marshal(value)
 	if err != nil {
 		return err
 	}
 
-	return c.redisCli.Set(ctx, key, string(userJson), c.Expiration).Err()
+	return c.redisCli.Set(ctx, key, string(userJSON), c.Expiration).Err()
 }

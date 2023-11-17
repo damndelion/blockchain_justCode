@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/user/entity"
+	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -23,6 +24,7 @@ func (ur *UserRepo) GetUsers(_ context.Context) (users []*userEntity.User, err e
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
@@ -42,7 +44,8 @@ func (ur *UserRepo) CreateUser(ctx context.Context, userRequest dto.UserUpdateRe
 	if res.Error != nil {
 		return 0, res.Error
 	}
-	return user.Id, nil
+
+	return user.ID, nil
 }
 
 func (ur *UserRepo) UpdateUser(_ context.Context, userData dto.UserUpdateRequest, id string) error {
@@ -72,6 +75,7 @@ func (ur *UserRepo) GetUserRole(_ context.Context, id int) (string, error) {
 	if result.Error != nil {
 		return "", result.Error
 	}
+
 	return user.Role, nil
 }
 
@@ -80,6 +84,7 @@ func (ur *UserRepo) GetUserByEmail(ctx context.Context, email string) (user *use
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return user, nil
 }
 
@@ -88,6 +93,7 @@ func (ur *UserRepo) GetUserByID(ctx context.Context, id string) (user *userEntit
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return user, nil
 }
 
@@ -95,10 +101,10 @@ func (ur *UserRepo) DeleteUser(ctx context.Context, id string) error {
 	err := ur.DB.Where("user_id = ?", id).Delete(&userEntity.UserCredentials{}).WithContext(ctx).Error
 	err = ur.DB.Where("user_id = ?", id).Delete(&userEntity.UserInfo{}).WithContext(ctx).Error
 	err = ur.DB.Where("id = ?", id).Delete(&userEntity.User{}).WithContext(ctx).Error
-
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -107,6 +113,7 @@ func (ur *UserRepo) DeleteUserInfo(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -115,14 +122,16 @@ func (ur *UserRepo) DeleteUserCred(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (ur *UserRepo) SetUserWallet(_ context.Context, userID string, address string) error {
+func (ur *UserRepo) SetUserWallet(_ context.Context, userID, address string) error {
 	err := ur.DB.Model(&userEntity.User{}).Where("id = ?", userID).Update("wallet", address).Error
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -168,21 +177,24 @@ func (ur *UserRepo) CreateUserDetailInfo(_ context.Context, userData dto.UserDet
 		CVV:     string(generatedCVV),
 	}
 	tx := ur.DB.Begin()
-	if err := tx.Create(&userCredentials).Error; err != nil {
+	if err = tx.Create(&userCredentials).Error; err != nil {
 		tx.Rollback()
+
 		return err
 	}
 
-	if err := tx.Create(&userInfo).Error; err != nil {
+	if err = tx.Create(&userInfo).Error; err != nil {
 		tx.Rollback()
+
 		return err
 	}
 
 	tx.Commit()
 
-	if err := ur.DB.Model(&userEntity.User{}).Where("id = ?", id).Update("valid", true).Error; err != nil {
+	if err = ur.DB.Model(&userEntity.User{}).Where("id = ?", id).Update("valid", true).Error; err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -204,11 +216,13 @@ func (ur *UserRepo) SetUserDetailInfo(_ context.Context, userData dto.UserDetail
 	tx := ur.DB.Begin()
 	if err := tx.Model(&userCredentials).Where("user_id = ?", id).Updates(&userCredentials).Error; err != nil {
 		tx.Rollback()
+
 		return err
 	}
 
 	if err := tx.Model(&userInfo).Where("user_id = ?", id).Updates(&userInfo).Error; err != nil {
 		tx.Rollback()
+
 		return err
 	}
 
@@ -217,6 +231,7 @@ func (ur *UserRepo) SetUserDetailInfo(_ context.Context, userData dto.UserDetail
 	if err := ur.DB.Model(&userEntity.User{}).Where("id = ?", id).Update("valid", true).Error; err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -252,6 +267,7 @@ func (ur *UserRepo) CreateUserInfo(_ context.Context, userData dto.UserInfoReque
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -275,6 +291,7 @@ func (ur *UserRepo) CreateUserCred(_ context.Context, userData dto.UserCredReque
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -298,46 +315,52 @@ func (ur *UserRepo) GetUserWallet(_ context.Context, id string) (string, error) 
 	var user userEntity.User
 	if err := ur.DB.Model(&userEntity.User{}).Select("wallet").Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(gorm.ErrRecordNotFound, err) {
-			return "", fmt.Errorf("user does not have a wallet")
+			return "", errors.New(fmt.Sprintf("user does not have a wallet"))
 		}
+
 		return "", err
 	}
+
 	return user.Wallet, nil
 }
 
-func (ur *UserRepo) GetUsersWithFilter(_ context.Context, param string, value string) (users []*userEntity.User, err error) {
+func (ur *UserRepo) GetUsersWithFilter(_ context.Context, param, value string) (users []*userEntity.User, err error) {
 	res := ur.DB.Where(fmt.Sprintf("%s = ?", param), value).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersInfoWithFilter(_ context.Context, param string, value string) (users []*userEntity.UserInfo, err error) {
+func (ur *UserRepo) GetUsersInfoWithFilter(_ context.Context, param, value string) (users []*userEntity.UserInfo, err error) {
 	res := ur.DB.Where(fmt.Sprintf("%s = ?", param), value).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersCredWithFilter(_ context.Context, param string, value string) (users []*userEntity.UserCredentials, err error) {
+func (ur *UserRepo) GetUsersCredWithFilter(_ context.Context, param, value string) (users []*userEntity.UserCredentials, err error) {
 	res := ur.DB.Where(fmt.Sprintf("%s = ?", param), value).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersWithSort(_ context.Context, sort string, method string) (users []*userEntity.User, err error) {
+func (ur *UserRepo) GetUsersWithSort(_ context.Context, sort, method string) (users []*userEntity.User, err error) {
 	res := ur.DB.Order(fmt.Sprintf("%s %s", sort, method)).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersWithSearch(_ context.Context, param string, value string) (users []*userEntity.User, err error) {
+func (ur *UserRepo) GetUsersWithSearch(_ context.Context, param, value string) (users []*userEntity.User, err error) {
 	res := ur.DB.Where(fmt.Sprintf("%s ILIKE ?", param), "%"+value+"%").
 		Or(fmt.Sprintf("%s ILIKE ?", param), value+"%").
 		Or(fmt.Sprintf("%s ILIKE ?", param), "%"+value).
@@ -345,18 +368,20 @@ func (ur *UserRepo) GetUsersWithSearch(_ context.Context, param string, value st
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersInfoWithSort(_ context.Context, sort string, method string) (users []*userEntity.UserInfo, err error) {
+func (ur *UserRepo) GetUsersInfoWithSort(_ context.Context, sort, method string) (users []*userEntity.UserInfo, err error) {
 	res := ur.DB.Order(fmt.Sprintf("%s %s", sort, method)).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersInfoWithSearch(_ context.Context, param string, value string) (users []*userEntity.UserInfo, err error) {
+func (ur *UserRepo) GetUsersInfoWithSearch(_ context.Context, param, value string) (users []*userEntity.UserInfo, err error) {
 	res := ur.DB.Where(fmt.Sprintf("%s ILIKE ?", param), "%"+value+"%").
 		Or(fmt.Sprintf("%s ILIKE ?", param), value+"%").
 		Or(fmt.Sprintf("%s ILIKE ?", param), "%"+value).
@@ -364,18 +389,20 @@ func (ur *UserRepo) GetUsersInfoWithSearch(_ context.Context, param string, valu
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersCredWithSort(_ context.Context, sort string, method string) (users []*userEntity.UserCredentials, err error) {
+func (ur *UserRepo) GetUsersCredWithSort(_ context.Context, sort, method string) (users []*userEntity.UserCredentials, err error) {
 	res := ur.DB.Order(fmt.Sprintf("%s %s", sort, method)).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersCredWithSearch(_ context.Context, param string, value string) (users []*userEntity.UserCredentials, err error) {
+func (ur *UserRepo) GetUsersCredWithSearch(_ context.Context, param, value string) (users []*userEntity.UserCredentials, err error) {
 	res := ur.DB.Where(fmt.Sprintf("%s ILIKE ?", param), "%"+value+"%").
 		Or(fmt.Sprintf("%s ILIKE ?", param), value+"%").
 		Or(fmt.Sprintf("%s ILIKE ?", param), "%"+value).
@@ -383,13 +410,16 @@ func (ur *UserRepo) GetUsersCredWithSearch(_ context.Context, param string, valu
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return users, nil
 }
+
 func (ur *UserRepo) GetUserInfoByID(ctx context.Context, id string) (userInfo *userEntity.UserInfo, err error) {
 	res := ur.DB.Where("user_id = ?", id).WithContext(ctx).Find(&userInfo)
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return userInfo, nil
 }
 
@@ -398,5 +428,6 @@ func (ur *UserRepo) GetUserCredByID(ctx context.Context, id string) (userCred *u
 	if res.Error != nil {
 		return nil, res.Error
 	}
+
 	return userCred, nil
 }

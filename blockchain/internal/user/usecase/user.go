@@ -3,11 +3,12 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"net/url"
+
 	"github.com/evrone/go-clean-template/config/user"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/user/entity"
+	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/golang-jwt/jwt"
-	"net/url"
 )
 
 type User struct {
@@ -32,6 +33,7 @@ func (u *User) UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, i
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -40,6 +42,7 @@ func (u *User) DeleteUser(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -51,7 +54,7 @@ func (u *User) GetUserRole(ctx context.Context, id int) (string, error) {
 	return u.repo.GetUserRole(ctx, id)
 }
 
-func (u *User) GetUserById(ctx context.Context, id string) (*userEntity.User, error) {
+func (u *User) GetUserByID(ctx context.Context, id string) (*userEntity.User, error) {
 	return u.repo.GetUserByID(ctx, id)
 }
 
@@ -64,6 +67,7 @@ func (u *User) UsersInfoWithFilter(ctx context.Context, params url.Values) ([]*u
 	if err != nil {
 		return nil, err
 	}
+
 	return usersInfo, err
 }
 
@@ -72,6 +76,7 @@ func (u *User) UsersCredWithFilter(ctx context.Context, params url.Values) ([]*u
 	if err != nil {
 		return nil, err
 	}
+
 	return usersCred, err
 }
 
@@ -84,6 +89,7 @@ func (u *User) CreateUserDetailInfo(ctx context.Context, userData dto.UserDetail
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -92,6 +98,7 @@ func (u *User) SetUserDetailInfo(ctx context.Context, userData dto.UserDetailReq
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -100,10 +107,11 @@ func (u *User) DeleteUserInfo(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (u *User) GetIdFromToken(accessToken string) (string, error) {
+func (u *User) GetIDFromToken(accessToken string) (string, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -112,11 +120,11 @@ func (u *User) GetIdFromToken(accessToken string) (string, error) {
 		return []byte(u.cfg.SecretKey), nil
 	})
 	claims := token.Claims.(jwt.MapClaims)
-
 	if err != nil || !token.Valid {
 		return "", err
 	}
 	id := fmt.Sprintf("%v", claims["user_id"])
+
 	return id, nil
 }
 
@@ -125,6 +133,7 @@ func (u *User) UpdateUserInfo(ctx context.Context, userData dto.UserInfoRequest,
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -133,6 +142,7 @@ func (u *User) CreateUserInfo(ctx context.Context, userData dto.UserInfoRequest)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -141,6 +151,7 @@ func (u *User) CreateUserCred(ctx context.Context, userData dto.UserCredRequest)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -149,13 +160,16 @@ func (u *User) UpdateUserCredentials(ctx context.Context, userData dto.UserCredR
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
+
 func (u *User) DeleteUserCred(ctx context.Context, id string) error {
 	err := u.repo.DeleteUserCred(ctx, id)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -173,14 +187,16 @@ func (u *User) UsersWithSearch(ctx context.Context, params url.Values) ([]*userE
 	if err != nil {
 		return nil, err
 	}
+
 	return users, nil
 }
 
-func (u *User) UsersWithSort(ctx context.Context, sort string, method string) ([]*userEntity.User, error) {
+func (u *User) UsersWithSort(ctx context.Context, sort, method string) ([]*userEntity.User, error) {
 	users, err := u.repo.GetUsersWithSort(ctx, sort, method)
 	if err != nil {
 		return nil, err
 	}
+
 	return users, nil
 }
 
@@ -189,10 +205,11 @@ func (u *User) UsersInfoWithSearch(ctx context.Context, params url.Values) ([]*u
 	if err != nil {
 		return nil, err
 	}
+
 	return usersInfo, err
 }
 
-func (u *User) UsersInfoWithSort(ctx context.Context, sort string, method string) ([]*userEntity.UserInfo, error) {
+func (u *User) UsersInfoWithSort(ctx context.Context, sort, method string) ([]*userEntity.UserInfo, error) {
 	usersInfo, err := u.repo.GetUsersInfoWithSort(ctx, sort, method)
 	if err != nil {
 		return nil, err
@@ -202,26 +219,27 @@ func (u *User) UsersInfoWithSort(ctx context.Context, sort string, method string
 }
 
 func (u *User) UsersCredWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error) {
-
 	usersCred, err := u.repo.GetUsersCredWithSearch(ctx, params.Get("search"), params.Get("value"))
 	if err != nil {
 		return nil, err
 	}
+
 	return usersCred, err
 }
 
-func (u *User) UsersCredWithSort(ctx context.Context, sort string, method string) ([]*userEntity.UserCredentials, error) {
+func (u *User) UsersCredWithSort(ctx context.Context, sort, method string) ([]*userEntity.UserCredentials, error) {
 	usersCred, err := u.repo.GetUsersCredWithSort(ctx, sort, method)
 	if err != nil {
 		return nil, err
 	}
+
 	return usersCred, err
 }
 
-func (u *User) GetUserInfoById(ctx context.Context, id string) (*userEntity.UserInfo, error) {
+func (u *User) GetUserInfoByID(ctx context.Context, id string) (*userEntity.UserInfo, error) {
 	return u.repo.GetUserInfoByID(ctx, id)
 }
 
-func (u *User) GetUserCredById(ctx context.Context, id string) (*userEntity.UserCredentials, error) {
+func (u *User) GetUserCredByID(ctx context.Context, id string) (*userEntity.UserCredentials, error) {
 	return u.repo.GetUserCredByID(ctx, id)
 }

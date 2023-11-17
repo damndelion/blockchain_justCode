@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"bytes"
@@ -8,24 +8,25 @@ import (
 	"os"
 )
 
-// Wallets stores a collection of wallets
+// Wallets stores a collection of wallets.
 type Wallets struct {
 	Wallets map[string]*Wallet
 }
 
-// NewWallets creates Wallets and fills it from a file if it exists
+// NewWallets creates Wallets and fills it from a file if it exists.
 func NewWallets() (*Wallets, error) {
 	wallets := Wallets{}
 	wallets.Wallets = make(map[string]*Wallet)
 
 	err := wallets.LoadFromFile()
 	if err != nil {
+		return nil, err
 	}
 
 	return &wallets, err
 }
 
-// CreateWallet adds a Wallet to Wallets
+// CreateWallet adds a Wallet to Wallets.
 func (ws *Wallets) CreateWallet() string {
 	wallet := NewWallet()
 	address := fmt.Sprintf("%s", wallet.GetAddress())
@@ -35,7 +36,7 @@ func (ws *Wallets) CreateWallet() string {
 	return address
 }
 
-// GetAddresses returns an array of addresses stored in the wallet file
+// GetAddresses returns an array of addresses stored in the wallet file.
 func (ws *Wallets) GetAddresses() []string {
 	var addresses []string
 
@@ -46,12 +47,12 @@ func (ws *Wallets) GetAddresses() []string {
 	return addresses
 }
 
-// GetWallet returns a Wallet by its address
+// GetWallet returns a Wallet by its address.
 func (ws Wallets) GetWallet(address string) Wallet {
 	return *ws.Wallets[address]
 }
 
-// LoadFromFile loads wallets from the file
+// LoadFromFile loads wallets from the file.
 func (ws *Wallets) LoadFromFile() error {
 	if _, err := os.Stat(walletFile); os.IsNotExist(err) {
 		return err
@@ -65,6 +66,7 @@ func (ws *Wallets) LoadFromFile() error {
 		// The file is empty, create a new Wallets object
 		ws.Wallets = make(map[string]*Wallet)
 		ws.SaveToFile()
+
 		return nil
 	}
 
@@ -81,7 +83,7 @@ func (ws *Wallets) LoadFromFile() error {
 	return nil
 }
 
-// SaveToFile saves wallets to a file
+// SaveToFile saves wallets to a file.
 func (ws Wallets) SaveToFile() {
 	var content bytes.Buffer
 
@@ -91,7 +93,7 @@ func (ws Wallets) SaveToFile() {
 		log.Panic(err)
 	}
 
-	err = os.WriteFile(walletFile, content.Bytes(), 0644)
+	err = os.WriteFile(walletFile, content.Bytes(), 0600)
 	if err != nil {
 		log.Panic(err)
 	}

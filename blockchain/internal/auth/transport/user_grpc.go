@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"fmt"
+
 	"github.com/evrone/go-clean-template/config/auth"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
@@ -18,8 +19,10 @@ type UserGrpcTransport struct {
 func NewUserGrpcTransport(config auth.UserGrpcTransport) *UserGrpcTransport {
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
-	conn, _ := grpc.Dial(config.Host, opts...)
-
+	conn, err := grpc.Dial(config.Host, opts...)
+	if err != nil {
+		return nil
+	}
 	client := pb.NewUserServiceClient(conn)
 
 	return &UserGrpcTransport{
@@ -32,7 +35,6 @@ func (t *UserGrpcTransport) GetUserByEmail(ctx context.Context, email string) (*
 	resp, err := t.client.GetUserByEmail(ctx, &pb.GetUserByEmailRequest{
 		Email: email,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot GetUserByID: %w", err)
 	}
@@ -47,7 +49,7 @@ func (t *UserGrpcTransport) GetUserByEmail(ctx context.Context, email string) (*
 func (t *UserGrpcTransport) CreateUser(ctx context.Context, user *userEntity.User) (*pb.CreateUserResponse, error) {
 	grpcUser := &pb.CreateUserRequest{
 		User: &pb.User{
-			Id:       int32(user.Id),
+			Id:       int32(user.ID),
 			Name:     user.Name,
 			Email:    user.Email,
 			Password: user.Password,
@@ -56,7 +58,6 @@ func (t *UserGrpcTransport) CreateUser(ctx context.Context, user *userEntity.Use
 		},
 	}
 	resp, err := t.client.CreateUser(ctx, grpcUser)
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot CreateUser: %w", err)
 	}
@@ -72,7 +73,6 @@ func (t *UserGrpcTransport) GetUserByID(ctx context.Context, id string) (*pb.Use
 	resp, err := t.client.GetUserByID(ctx, &pb.GetUserByIDRequest{
 		Id: id,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot GetUserByID: %w", err)
 	}
@@ -88,7 +88,6 @@ func (t *UserGrpcTransport) GetUserWallet(ctx context.Context, id string) (*pb.U
 	resp, err := t.client.GetUserWallet(ctx, &pb.GetUserWalletRequest{
 		Id: id,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot GetUserWallet: %w", err)
 	}

@@ -2,12 +2,13 @@ package v1
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/auth/usecase"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
-	"net/http"
 )
 
 type authRoutes struct {
@@ -25,7 +26,6 @@ func newAuthRoutes(handler *gin.RouterGroup, u usecase.AuthUseCase, l logger.Int
 		userHandler.POST("/refresh", r.Refresh)
 		userHandler.POST("/confirm", r.Confirm)
 	}
-
 }
 
 // Register godoc
@@ -38,13 +38,14 @@ func newAuthRoutes(handler *gin.RouterGroup, u usecase.AuthUseCase, l logger.Int
 // @Success 200 {string} string "User successfully registered"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/auth/register [post]
+// @Router /v1/auth/register [post].
 func (ar *authRoutes) Register(ctx *gin.Context) {
 	var registerRequest dto.RegisterRequest
 	err := ctx.ShouldBindJSON(&registerRequest)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - auth - registration dto error")
+
 		return
 	}
 
@@ -52,6 +53,7 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - registration error")
+
 		return
 	}
 
@@ -68,7 +70,7 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 // @Success 200 {string} string "Access token"
 // @Failure 400 {string} object dto.LoginResponse
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/auth/login [post]
+// @Router /v1/auth/login [post].
 func (ar *authRoutes) Login(ctx *gin.Context) {
 	span := opentracing.StartSpan("login handler")
 	defer span.Finish()
@@ -78,6 +80,7 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - login: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - auth - login dto error")
+
 		return
 	}
 	context := opentracing.ContextWithSpan(ctx.Request.Context(), span)
@@ -86,6 +89,7 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - login: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - login error")
+
 		return
 	}
 
@@ -102,18 +106,23 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 // @Success 200 {string} string "Access token"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/auth/refresh [post]
+// @Router /v1/auth/refresh [post].
 func (ar *authRoutes) Refresh(ctx *gin.Context) {
 	var refreshRequest dto.RefreshRequest
 	err := ctx.ShouldBindJSON(&refreshRequest)
-	token, err := ar.u.Refresh(ctx, refreshRequest.RefreshToken)
+	accessToken, refreshToken, err := ar.u.Refresh(ctx, refreshRequest.RefreshToken)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - refresh error")
+
 		return
 	}
+	res := dto.RefreshResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
 
-	ctx.JSON(http.StatusOK, token)
+	ctx.JSON(http.StatusOK, res)
 }
 
 // Confirm godoc
@@ -126,7 +135,7 @@ func (ar *authRoutes) Refresh(ctx *gin.Context) {
 // @Success 200 {string} string "User Confirmed"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/auth/confirm [post]
+// @Router /v1/auth/confirm [post].
 func (ar *authRoutes) Confirm(ctx *gin.Context) {
 	var confirmRequest dto.ConfirmRequest
 	err := ctx.ShouldBindJSON(&confirmRequest)
@@ -134,6 +143,7 @@ func (ar *authRoutes) Confirm(ctx *gin.Context) {
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - refresh error")
+
 		return
 	}
 

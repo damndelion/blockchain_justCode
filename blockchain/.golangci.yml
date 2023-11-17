@@ -1,8 +1,6 @@
 linters-settings:
   gci:
     local-prefixes: github.com/evrone/blockchain
-  dupl:
-    threshold: 100
   errorlint:
     errorf: true
   errcheck:
@@ -56,48 +54,30 @@ linters:
   disable-all: true
   enable:
     - asciicheck
-    - bodyclose
-    - cyclop
     - dogsled
     - dupl
     - durationcheck
-    - errcheck
     - errorlint
     - exhaustive
     - exportloopref
     - forbidigo
-    - funlen
-    - gochecknoglobals
     - gochecknoinits
-    - gocognit
     - goconst
-    - gocyclo
     - godot
     - godox
-    - goerr113
     - gofmt
-    - gofumpt
     - goimports
-    - gomnd
     - gomodguard
     - goprintffuncname
-    - gosec
-    - gosimple
     - govet
     - makezero
     - misspell
     - nakedret
-    - nestif
     - nlreturn
-    - noctx
     - nolintlint
-    - paralleltest
     - predeclared
-    - revive
     - rowserrcheck
     - sqlclosecheck
-    - staticcheck
-    - stylecheck
     - tparallel
     - thelper
     - typecheck

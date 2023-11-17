@@ -1,20 +1,21 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/docs/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
-	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 )
 
-func NewBlockchainRouter(handler *gin.Engine, l logger.Interface, c usecase.ChainUseCase, bc blockchain_logic.Blockchain, cfg *blockchain.Config) {
+func NewBlockchainRouter(handler *gin.Engine, l logger.Interface, c usecase.ChainUseCase, bc blockchainlogic.Blockchain, cfg *blockchain.Config) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())

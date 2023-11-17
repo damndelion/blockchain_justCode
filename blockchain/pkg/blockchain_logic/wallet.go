@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"bytes"
@@ -11,17 +11,19 @@ import (
 	"golang.org/x/crypto/ripemd160"
 )
 
-const version = byte(0x00)
-const walletFile = "pkg/blockchain_logic/wallet.dat"
-const addressChecksumLen = 4
+const (
+	version            = byte(0x00)
+	walletFile         = "pkg/blockchain_logic/wallet.dat"
+	addressChecksumLen = 4
+)
 
-// Wallet stores private and public keys
+// Wallet stores private and public keys.
 type Wallet struct {
 	PrivateKey *rsa.PrivateKey
 	PublicKey  []byte
 }
 
-// NewWallet creates and returns a Wallet
+// NewWallet creates and returns a Wallet.
 func NewWallet() *Wallet {
 	private, public := newKeyPair()
 	wallet := Wallet{private, public}
@@ -29,7 +31,7 @@ func NewWallet() *Wallet {
 	return &wallet
 }
 
-// GetAddress returns wallet address
+// GetAddress returns wallet address.
 func (w Wallet) GetAddress() []byte {
 	pubKeyHash := HashPubKey(w.PublicKey)
 
@@ -42,7 +44,7 @@ func (w Wallet) GetAddress() []byte {
 	return address
 }
 
-// HashPubKey hashes public key
+// HashPubKey hashes public key.
 func HashPubKey(pubKey []byte) []byte {
 	publicSHA256 := sha256.Sum256(pubKey)
 
@@ -56,7 +58,7 @@ func HashPubKey(pubKey []byte) []byte {
 	return publicRIPEMD160
 }
 
-// ValidateAddress check if address is valid
+// ValidateAddress check if address is valid.
 func ValidateAddress(address string) bool {
 	pubKeyHash := Base58Decode([]byte(address))
 	actualChecksum := pubKeyHash[len(pubKeyHash)-addressChecksumLen:]
@@ -67,7 +69,7 @@ func ValidateAddress(address string) bool {
 	return bytes.Compare(actualChecksum, targetChecksum) == 0
 }
 
-// Checksum generates a checksum for a public key
+// Checksum generates a checksum for a public key.
 func checksum(payload []byte) []byte {
 	firstSHA := sha256.Sum256(payload)
 	secondSHA := sha256.Sum256(firstSHA[:])
@@ -96,6 +98,7 @@ func ListAddresses() []string {
 		log.Panic(err)
 	}
 	addresses := wallets.GetAddresses()
+
 	return addresses
 }
 

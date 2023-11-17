@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/applicator"
-	"log"
 )
 
 // @title Blockchain service
@@ -20,7 +21,7 @@ import (
 
 // @host localhost:8081
 // @BasePath /
-// @schemes http
+// @schemes http.
 func main() {
 	cfg, err := blockchain.NewConfig()
 	if err != nil {
@@ -28,5 +29,4 @@ func main() {
 	}
 
 	applicator.Run(cfg)
-
 }

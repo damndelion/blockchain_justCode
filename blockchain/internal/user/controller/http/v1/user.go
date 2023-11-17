@@ -2,6 +2,8 @@ package v1
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/evrone/go-clean-template/config/user"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
@@ -10,7 +12,6 @@ import (
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type userRoutes struct {
@@ -32,7 +33,6 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 		userHandler.POST("/info", r.CreateUserDetailInfo)
 		userHandler.PUT("/info", r.SetUserDetailInfo)
 	}
-
 }
 
 // GetUser godoc
@@ -46,11 +46,10 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/user [get]
+// @Router /v1/user [get].
 func (ur *userRoutes) GetUser(ctx *gin.Context) {
-
 	authHeader := ctx.GetHeader("Authorization")
-	id, err := ur.u.GetIdFromToken(authHeader)
+	id, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		return
 	}
@@ -61,10 +60,11 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 	}
 
 	if resUser == nil {
-		resUser, err = ur.u.GetUserById(ctx, id)
+		resUser, err = ur.u.GetUserByID(ctx, id)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
+
 			return
 		}
 
@@ -89,22 +89,23 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/user/info [get]
+// @Router /v1/user/info [get].
 func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
-	id, err := ur.u.GetIdFromToken(authHeader)
+	id, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		return
 	}
 
-	userById, err := ur.u.GetUserInfoById(ctx, id)
+	userByID, err := ur.u.GetUserInfoByID(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+
 		return
 	}
 
-	ctx.JSON(http.StatusOK, userById)
+	ctx.JSON(http.StatusOK, userByID)
 }
 
 // GetUserDetailCred godoc
@@ -118,22 +119,23 @@ func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/user/cred [get]
+// @Router /v1/user/cred [get].
 func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
-	id, err := ur.u.GetIdFromToken(authHeader)
+	id, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		return
 	}
 
-	userById, err := ur.u.GetUserCredById(ctx, id)
+	userByID, err := ur.u.GetUserCredByID(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+
 		return
 	}
 
-	ctx.JSON(http.StatusOK, userById)
+	ctx.JSON(http.StatusOK, userByID)
 }
 
 // CreateUserDetailInfo godoc
@@ -148,13 +150,14 @@ func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/user/info [post]
+// @Router /v1/user/info [post].
 func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
-	userId, err := ur.u.GetIdFromToken(authHeader)
+	userID, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+
 		return
 	}
 	var userData dto.UserDetailRequest
@@ -163,12 +166,14 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+
 		return
 	}
-	err = ur.u.CreateUserDetailInfo(ctx, userData, userId)
+	err = ur.u.CreateUserDetailInfo(ctx, userData, userID)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+
 		return
 	}
 	ctx.JSON(http.StatusOK, "Success")
@@ -186,13 +191,14 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/user/info [put]
+// @Router /v1/user/info [put].
 func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
-	userId, err := ur.u.GetIdFromToken(authHeader)
+	userID, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+
 		return
 	}
 	var userData dto.UserDetailRequest
@@ -201,12 +207,14 @@ func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+
 		return
 	}
-	err = ur.u.SetUserDetailInfo(ctx, userData, userId)
+	err = ur.u.SetUserDetailInfo(ctx, userData, userID)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+
 		return
 	}
 	ctx.JSON(http.StatusOK, "Success")

@@ -3,25 +3,34 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
-	"github.com/evrone/go-clean-template/pkg/postgres"
 	"testing"
+
+	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	"github.com/evrone/go-clean-template/pkg/postgres"
 )
 
 func TestBlockchainRepo_GetWallet(t *testing.T) {
-	_, db, _ := postgres.New("postgres://postgres:postgres@localhost:5432/postgres")
-	defer db.Close()
-	address := blockchain_logic.CreateWallet()
+	_, db, err := postgres.New("postgres://postgres:postgres@localhost:5432/postgres")
+	if err != nil {
+		return
+	}
+	defer func(db *sql.DB) {
+		err = db.Close()
+		if err != nil {
+			return
+		}
+	}(db)
+	address := blockchainlogic.CreateWallet()
 
-	blockchain := blockchain_logic.CreateBlockchain(db, address)
+	blockchain := blockchainlogic.CreateBlockchain(db, address)
 
 	type fields struct {
 		DB    *sql.DB
-		chain *blockchain_logic.Blockchain
+		chain *blockchainlogic.Blockchain
 	}
 	type args struct {
 		ctx    context.Context
-		userId string
+		userID string
 	}
 	tests := []struct {
 		name       string
@@ -38,7 +47,7 @@ func TestBlockchainRepo_GetWallet(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.TODO(),
-				userId: "9",
+				userID: "9",
 			},
 			wantWallet: "1FwwR4SLCKBxRT7nMcAPsYfb5LgYLLPpTy",
 			wantErr:    false,
@@ -51,7 +60,7 @@ func TestBlockchainRepo_GetWallet(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.TODO(),
-				userId: "8",
+				userID: "8",
 			},
 			wantWallet: "13MAGqpqLKDCv96g9CHLFeL2rFLuCkTYHR",
 			wantErr:    false,
@@ -64,7 +73,7 @@ func TestBlockchainRepo_GetWallet(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.TODO(),
-				userId: "err",
+				userID: "err",
 			},
 			wantWallet: "",
 			wantErr:    true,
@@ -76,9 +85,10 @@ func TestBlockchainRepo_GetWallet(t *testing.T) {
 				DB:    tt.fields.DB,
 				chain: tt.fields.chain,
 			}
-			gotWallet, err := br.GetWallet(tt.args.ctx, tt.args.userId)
+			gotWallet, err := br.GetWallet(tt.args.ctx, tt.args.userID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetWallet() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if gotWallet != tt.wantWallet {
@@ -89,19 +99,24 @@ func TestBlockchainRepo_GetWallet(t *testing.T) {
 }
 
 func TestBlockchainRepo_GetBalance(t *testing.T) {
-	_, db, _ := postgres.New("postgres://postgres:postgres@localhost:5432/postgres")
-	defer db.Close()
-	address := blockchain_logic.CreateWallet()
+	_, db, err := postgres.New("postgres://postgres:postgres@localhost:5432/postgres")
+	defer func(db *sql.DB) {
+		err = db.Close()
+		if err != nil {
+			return
+		}
+	}(db)
+	address := blockchainlogic.CreateWallet()
 
-	blockchain := blockchain_logic.CreateBlockchain(db, address)
+	blockchain := blockchainlogic.CreateBlockchain(db, address)
 
 	type fields struct {
 		DB    *sql.DB
-		chain *blockchain_logic.Blockchain
+		chain *blockchainlogic.Blockchain
 	}
 	type args struct {
 		ctx    context.Context
-		userId string
+		userID string
 	}
 	tests := []struct {
 		name        string
@@ -118,7 +133,7 @@ func TestBlockchainRepo_GetBalance(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.TODO(),
-				userId: "9",
+				userID: "9",
 			},
 			wantBalance: 0.20000000000000284,
 			wantErr:     false,
@@ -131,7 +146,7 @@ func TestBlockchainRepo_GetBalance(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.TODO(),
-				userId: "8",
+				userID: "8",
 			},
 			wantBalance: 999659.5999999996,
 			wantErr:     false,
@@ -144,7 +159,7 @@ func TestBlockchainRepo_GetBalance(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.TODO(),
-				userId: "err",
+				userID: "err",
 			},
 			wantBalance: 0,
 			wantErr:     true,
@@ -156,9 +171,10 @@ func TestBlockchainRepo_GetBalance(t *testing.T) {
 				DB:    tt.fields.DB,
 				chain: tt.fields.chain,
 			}
-			gotBalance, err := br.GetBalance(tt.args.ctx, tt.args.userId)
+			gotBalance, err := br.GetBalance(tt.args.ctx, tt.args.userID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetBalance() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if gotBalance != tt.wantBalance {

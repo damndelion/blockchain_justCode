@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
+	"time"
+
 	"github.com/evrone/go-clean-template/config/auth"
 	dtoConsumer "github.com/evrone/go-clean-template/internal/auth/consumer/dto"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
@@ -14,11 +17,9 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
-	"time"
 )
 
-var confirmationChannels = make(map[string]chan bool)
+var ConfirmationChannels = make(map[string]chan bool)
 
 type Auth struct {
 	repo                     AuthRepo
@@ -50,14 +51,14 @@ func (u *Auth) Register(ctx context.Context, name, email, password string) error
 	userIdentifier := email
 
 	confirmationChan := make(chan bool)
-	confirmationChannels[userIdentifier] = confirmationChan
+	ConfirmationChannels[userIdentifier] = confirmationChan
 
 	success := <-confirmationChan
 
-	delete(confirmationChannels, userIdentifier)
+	delete(ConfirmationChannels, userIdentifier)
 
 	if !success {
-		return errors.New("user registration confirmation failed")
+		return errors.New(fmt.Sprintf("user registration confirmation failed: %v", err))
 	}
 
 	if err != nil {
@@ -88,6 +89,9 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 		return nil, errors.New(fmt.Sprintf("passwords do not match %v", err))
 	}
 	accessToken, refreshToken, err := u.generateTokens(ctx, user)
+	if err != nil {
+		return nil, err
+	}
 
 	return &dto.LoginResponse{
 		Name:         user.Name,
@@ -98,37 +102,38 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	}, nil
 }
 
-func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, error) {
+func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
 	claims := &jwt.StandardClaims{}
 	token, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, errors.New(fmt.Sprintf("unexpected signing method: %v", token.Header["alg"]))
 		}
+
 		return []byte(u.cfg.SecretKey), nil
 	})
 
 	if err != nil || !token.Valid {
-		return "", fmt.Errorf("invalid refresh token: %v", err)
+		return "", "", errors.New(fmt.Sprintf("invalid refresh token: %v", err))
 	}
 
 	userEmail := claims.Subject
 
 	user, err := u.repo.GetUserByEmail(ctx, userEmail)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	accessToken, refreshToken, err := u.generateTokens(ctx, user)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return accessToken, nil
+	return accessToken, refreshToken, nil
 }
 
 func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (string, string, error) {
 	accessTokenClaims := jwt.MapClaims{
-		"user_id": user.Id,
+		"user_id": user.ID,
 		"email":   user.Email,
 		"name":    user.Name,
 		"role":    user.Role,
@@ -137,6 +142,9 @@ func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (strin
 
 	access := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
 	accessTokenString, err := access.SignedString([]byte(u.cfg.SecretKey))
+	if err != nil {
+		return "", "", err
+	}
 
 	refreshTokenClaims := jwt.MapClaims{
 		"user_email": user.Email,
@@ -150,7 +158,7 @@ func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (strin
 		return "", "", err
 	}
 	userToken := authEntity.Token{
-		UserID:       user.Id,
+		UserID:       user.ID,
 		UserEmail:    user.Email,
 		AccessToken:  accessTokenString,
 		RefreshToken: refreshTokenString,
@@ -172,16 +180,17 @@ func (u *Auth) ConfirmUserCode(ctx context.Context, email string, userCode int) 
 	}
 	if userCode == code {
 		userIdentifier := email
-		confirmationChan, exists := confirmationChannels[userIdentifier]
+		confirmationChan, exists := ConfirmationChannels[userIdentifier]
 
 		if exists {
 			confirmationChan <- true
-			delete(confirmationChannels, userIdentifier)
+			delete(ConfirmationChannels, userIdentifier)
+
 			return nil
-		} else {
-			return errors.New("confirmation channel not found")
 		}
+
+		return errors.New(fmt.Sprintf("confirmation channel not found"))
 	} else {
-		return errors.New("invalid user code")
+		return errors.New(fmt.Sprintf("invalid user code"))
 	}
 }

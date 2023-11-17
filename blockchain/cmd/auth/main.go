@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"github.com/evrone/go-clean-template/config/auth"
 	"github.com/evrone/go-clean-template/internal/auth/applicator"
-	"log"
 )
 
 // @title Authorization service
@@ -20,7 +21,7 @@ import (
 
 // @host localhost:8082
 // @BasePath /
-// @schemes http
+// @schemes http.
 func main() {
 	cfg, err := auth.NewConfig()
 	if err != nil {
@@ -28,5 +29,4 @@ func main() {
 	}
 
 	applicator.Run(cfg)
-
 }

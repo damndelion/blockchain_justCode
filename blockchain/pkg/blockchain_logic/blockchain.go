@@ -1,4 +1,4 @@
-package blockchain_logic
+package blockchainlogic
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second
 
 type Blockchain struct {
 	tip string
-	Db  *sql.DB
+	DB  *sql.DB
 	mu  *sync.Mutex
 }
 
@@ -38,6 +38,9 @@ func CreateBlockchain(db *sql.DB, address string) *Blockchain {
 		cbtx := NewCoinbaseTX(address, genesisCoinbaseData)
 		genesis := Genesis(cbtx)
 		jsonData, err := json.Marshal(genesis.Transactions)
+		if err != nil {
+			log.Fatal(err)
+		}
 		transactionsString := string(jsonData)
 
 		_, err = db.Exec("INSERT INTO blocks (hash, transactions, previous_hash, timestamp, nonce) VALUES ($1, $2, $3, $4, $5)",
@@ -49,12 +52,11 @@ func CreateBlockchain(db *sql.DB, address string) *Blockchain {
 		lastHash = genesis.Hash
 		mu := &sync.Mutex{}
 		chain := Blockchain{lastHash, db, mu}
-		return &chain
-	} else {
-		return NewBlockchain(db, address)
 
+		return &chain
 	}
 
+	return NewBlockchain(db, address)
 }
 
 func NewBlockchain(db *sql.DB, address string) *Blockchain {
@@ -81,20 +83,21 @@ func (bc *Blockchain) MineBlock(transactions []*Transaction) error {
 	var lastHash string
 
 	// Retrieve the hash of the latest block
-	err := bc.Db.QueryRow("SELECT hash FROM blocks ORDER BY id DESC LIMIT 1").Scan(&lastHash)
+	err := bc.DB.QueryRow("SELECT hash FROM blocks ORDER BY id DESC LIMIT 1").Scan(&lastHash)
 	if err != nil {
 		return err
 	}
 	newBlock := CreateBlock(transactions, lastHash)
 	transactionsJSON, err := json.Marshal(transactions)
+	if err != nil {
+		return err
+	}
 	// Insert the new block into the database
-	_, err = bc.Db.Exec("INSERT INTO blocks (hash, transactions, previous_hash, timestamp, nonce) VALUES ($1, $2, $3, $4, $5)",
+	_, err = bc.DB.Exec("INSERT INTO blocks (hash, transactions, previous_hash, timestamp, nonce) VALUES ($1, $2, $3, $4, $5)",
 		newBlock.Hash, string(transactionsJSON), newBlock.PrevHash, newBlock.Timestamp, newBlock.Nonce)
 
 	if err != nil {
-
 		log.Fatal(err)
-
 	}
 
 	bc.tip = newBlock.Hash
@@ -131,7 +134,7 @@ func (bc *Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 				}
 			}
 
-			if tx.IsCoinbase() == false {
+			if !tx.IsCoinbase() {
 				for _, in := range tx.Vin {
 					if in.UsesKey(pubKeyHash) {
 						inTxID := hex.EncodeToString(in.Txid)
@@ -149,9 +152,9 @@ func (bc *Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 	return unspentTXs
 }
 
-// Iterator returns a BlockchainIterat
+// Iterator returns a BlockchainIterat.
 func (bc *Blockchain) Iterator() *BlockchainIterator {
-	bci := &BlockchainIterator{bc.tip, bc.Db}
+	bci := &BlockchainIterator{bc.tip, bc.DB}
 
 	return bci
 }
@@ -212,7 +215,7 @@ func (bc *Blockchain) FindTransaction(ID []byte) (Transaction, error) {
 		}
 	}
 
-	return Transaction{}, errors.New("transaction is not found")
+	return Transaction{}, errors.New(fmt.Sprintf("transaction is not found"))
 }
 
 func (bc *Blockchain) VerifyTransaction(tx *Transaction) bool {
@@ -244,8 +247,7 @@ func (bc *Blockchain) SignTransaction(tx *Transaction, privKey *rsa.PrivateKey) 
 }
 
 func (bc *Blockchain) GetBalance(address string) float64 {
-
-	chain := NewBlockchain(bc.Db, address)
+	chain := NewBlockchain(bc.DB, address)
 
 	balance := 0.0
 	pubKeyHash := Base58Decode([]byte(address))
@@ -261,13 +263,13 @@ func (bc *Blockchain) GetBalance(address string) float64 {
 
 func (bc *Blockchain) Send(from, to string, amount float64) error {
 	if !ValidateAddress(from) {
-		return fmt.Errorf("ERROR: Sender address is not valid")
+		return errors.New(fmt.Sprintf("ERROR: Sender address is not valid"))
 	}
 	if !ValidateAddress(to) {
-		return fmt.Errorf("ERROR: Sender address is not valid")
+		return errors.New(fmt.Sprintf("ERROR: Sender address is not valid"))
 	}
 
-	NewBlockchain(bc.Db, from)
+	NewBlockchain(bc.DB, from)
 
 	tx, err := NewUTXOTransaction(from, to, amount, bc)
 	if err != nil {
@@ -279,7 +281,6 @@ func (bc *Blockchain) Send(from, to string, amount float64) error {
 	}
 
 	return nil
-
 }
 
 type CoinGeckoResponse struct {
@@ -296,7 +297,7 @@ func (bc *Blockchain) GetBalanceInUSD(address string) (float64, error) {
 		return -1, err
 	}
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
+		err = Body.Close()
 		if err != nil {
 			return
 		}

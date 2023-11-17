@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
 	"github.com/evrone/go-clean-template/pkg/logger"
@@ -26,11 +27,12 @@ func (s *Service) GetUserByID(ctx context.Context, request *pb.GetUserByIDReques
 	user, err := s.repo.GetUserByID(ctx, request.Id)
 	if err != nil {
 		s.logger.Error("failed to GetUserByID err: %v", err)
+
 		return nil, fmt.Errorf("GetUserById err: %w", err)
 	}
 
 	return &pb.User{
-		Id:       int32(user.Id),
+		Id:       int32(user.ID),
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
@@ -43,10 +45,12 @@ func (s *Service) GetUserByEmail(ctx context.Context, request *pb.GetUserByEmail
 	user, err := s.repo.GetUserByEmail(ctx, request.Email)
 	if err != nil {
 		s.logger.Error("failed to GetUserByEmail err: %v", err)
+
 		return nil, fmt.Errorf("GetUserByEmail err: %w", err)
 	}
+
 	return &pb.User{
-		Id:       int32(user.Id),
+		Id:       int32(user.ID),
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
@@ -60,6 +64,7 @@ func (s *Service) GetUserWallet(ctx context.Context, request *pb.GetUserWalletRe
 	wallet, err := s.repo.GetUserWallet(ctx, request.Id)
 	if err != nil {
 		s.logger.Error("failed to GetUserByLogin err: %v", err)
+
 		return nil, fmt.Errorf("GetUserByLogin err: %w", err)
 	}
 
@@ -82,6 +87,7 @@ func (s *Service) CreateUser(ctx context.Context, request *pb.CreateUserRequest)
 	id, err := s.repo.CreateUser(ctx, newUser)
 	if err != nil {
 		s.logger.Error("failed to CreateUser err: %v", err)
+
 		return nil, fmt.Errorf("CreateUser err: %w", err)
 	}
 
@@ -95,6 +101,7 @@ func (s *Service) SetUserWallet(ctx context.Context, request *pb.SetUserWalletRe
 		grpcErr := &pb.SetUserWalletResponse{
 			ErrorMessage: fmt.Sprintf("SetUserWallet err: %v", err),
 		}
+
 		return grpcErr, err
 	}
 

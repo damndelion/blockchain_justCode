@@ -24,9 +24,9 @@ func NewProducer(cfg *auth.Config) (*Producer, error) {
 
 func (p *Producer) ProduceMessage(message []byte) error {
 	err := p.conn.Publish(p.topic, message)
-
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -3,30 +3,33 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
-	"github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
 )
 
 type BlockchainRepo struct {
 	*sql.DB
-	chain             *blockchain_logic.Blockchain
+	chain             *blockchainlogic.Blockchain
 	userGrpcTransport *transport.UserGrpcTransport
 }
 
 func NewBlockchainRepo(db *sql.DB, address string, userGrpcTransport *transport.UserGrpcTransport) *BlockchainRepo {
-	chain := blockchain_logic.CreateBlockchain(db, address)
+	chain := blockchainlogic.CreateBlockchain(db, address)
+
 	return &BlockchainRepo{db, chain, userGrpcTransport}
 }
 
 func (br *BlockchainRepo) GetWallets(_ context.Context) (wallets []string, err error) {
-	res := blockchain_logic.ListAddresses()
+	res := blockchainlogic.ListAddresses()
 
 	return res, nil
 }
 
-func (br *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet string, err error) {
-	address, err := br.userGrpcTransport.GetUserWallet(ctx, userId)
+func (br *BlockchainRepo) GetWallet(ctx context.Context, userID string) (wallet string, err error) {
+	address, err := br.userGrpcTransport.GetUserWallet(ctx, userID)
 	if err != nil {
 		return "", err
 	}
@@ -34,21 +37,24 @@ func (br *BlockchainRepo) GetWallet(ctx context.Context, userId string) (wallet 
 	return address.Wallet, nil
 }
 
-func (br *BlockchainRepo) GetBalance(ctx context.Context, userId string) (balance float64, err error) {
-	address, err := br.GetWallet(ctx, userId)
+func (br *BlockchainRepo) GetBalance(ctx context.Context, userID string) (balance float64, err error) {
+	address, err := br.GetWallet(ctx, userID)
 	if err != nil {
 		return 0, err
 	}
 	res := br.chain.GetBalance(address)
-	return res, nil
-}
-func (br *BlockchainRepo) GetBalanceByAddress(_ context.Context, address string) (balance float64, err error) {
-	res := br.chain.GetBalance(address)
+
 	return res, nil
 }
 
-func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userId string) (balance float64, err error) {
-	address, err := br.GetWallet(ctx, userId)
+func (br *BlockchainRepo) GetBalanceByAddress(_ context.Context, address string) (balance float64, err error) {
+	res := br.chain.GetBalance(address)
+
+	return res, nil
+}
+
+func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userID string) (balance float64, err error) {
+	address, err := br.GetWallet(ctx, userID)
 	if err != nil {
 		return -1, err
 	}
@@ -56,29 +62,31 @@ func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userId string) (bal
 	if err != nil {
 		return -1, err
 	}
+
 	return res, nil
 }
 
 func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (string, error) {
 	wallet, err := br.GetWallet(ctx, userID)
 	if wallet != "" {
-		return "", fmt.Errorf("user wallet already exists")
+		return "", errors.New(fmt.Sprintf("user wallet already exists"))
 	}
 	user, err := br.userGrpcTransport.GetUserByID(ctx, userID)
-	if user.Valid == false {
-		return "", fmt.Errorf("user is not valid")
+	if !user.Valid {
+		return "", errors.New(fmt.Sprintf("user is not valid"))
 	}
 
-	address := blockchain_logic.CreateWallet()
+	address := blockchainlogic.CreateWallet()
 
 	_, err = br.userGrpcTransport.SetUserWallet(ctx, userID, address)
 	if err != nil {
 		return "", err
 	}
+
 	return address, nil
 }
 
-func (br *BlockchainRepo) Send(ctx context.Context, from string, to string, amount float64) error {
+func (br *BlockchainRepo) Send(ctx context.Context, from, to string, amount float64) error {
 	user, err := br.userGrpcTransport.GetUserByID(ctx, from)
 	if err != nil {
 		return err
@@ -87,10 +95,11 @@ func (br *BlockchainRepo) Send(ctx context.Context, from string, to string, amou
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func (br *BlockchainRepo) TopUp(ctx context.Context, from string, to string, amount float64) error {
+func (br *BlockchainRepo) TopUp(ctx context.Context, from, to string, amount float64) error {
 	user, err := br.userGrpcTransport.GetUserByID(ctx, to)
 	if err != nil {
 		return err
@@ -99,5 +108,6 @@ func (br *BlockchainRepo) TopUp(ctx context.Context, from string, to string, amo
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
