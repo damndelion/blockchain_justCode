@@ -24,5 +24,6 @@ type (
 		CreateUser(ctx context.Context, user *userEntity.User) (int, error)
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
 		ConfirmCode(ctx context.Context, email string) (int, error)
+		CheckForEmail(_ context.Context, email string) error
 	}
 )

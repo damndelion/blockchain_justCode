@@ -22,14 +22,13 @@ type (
 	}
 
 	ChainRepo interface {
-		GetWallets(ctx context.Context) ([]string, error)
-		GetWallet(ctx context.Context, userID string) (string, error)
-		GetBalance(ctx context.Context, address string) (float64, error)
-		GetBalanceUSD(ctx context.Context, address string) (float64, error)
+		GetWallets(_ context.Context) ([]string, error)
+		GetWallet(ctx context.Context, userID string) (wallet string, err error)
+		GetBalance(ctx context.Context, userID string) (balance float64, err error)
+		GetBalanceUSD(ctx context.Context, userID string) (balance float64, err error)
 		CreateWallet(ctx context.Context, userID string) (string, error)
 		Send(ctx context.Context, from, to string, amount float64) error
 		TopUp(ctx context.Context, from, to string, amount float64) error
-		SetUserWallet(ctx context.Context, userID, address string) (err error)
-		GetBalanceByAddress(ctx context.Context, address string) (balance float64, err error)
+		GetBalanceByAddress(_ context.Context, address string) (balance float64, err error)
 	}
 )

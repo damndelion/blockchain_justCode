@@ -5,9 +5,9 @@ import (
 )
 
 type response struct {
-	Error error `json:"error" example:"message"`
+	Error string `json:"error" example:"message"`
 }
 
-func errorResponse(c *gin.Context, code int, msg error) {
+func errorResponse(c *gin.Context, code int, msg string) {
 	c.AbortWithStatusJSON(code, response{msg})
 }

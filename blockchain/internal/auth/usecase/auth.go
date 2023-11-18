@@ -32,6 +32,10 @@ func NewAuth(repo AuthRepo, cfg *auth.Config, userVerificationProducer *nats.Pro
 }
 
 func (u *Auth) Register(ctx context.Context, name, email, password string) error {
+	err := u.repo.CheckForEmail(ctx, email)
+	if err != nil {
+		return err
+	}
 	randomFloat := rand.Float64()
 	randomNumber := int(randomFloat * 10000)
 	if randomNumber < 1000 {

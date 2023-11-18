@@ -3,6 +3,7 @@ package blockchainlogic
 import (
 	"bytes"
 	"crypto/rsa"
+	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
@@ -11,7 +12,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
+	"time"
 )
 
 const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
@@ -80,8 +83,9 @@ func NewBlockchain(db *sql.DB, address string) *Blockchain {
 }
 
 func (bc *Blockchain) MineBlock(transactions []*Transaction) error {
+	bc.mu.Lock()
+	defer bc.mu.Unlock()
 	var lastHash string
-
 	// Retrieve the hash of the latest block
 	err := bc.DB.QueryRow("SELECT hash FROM blocks ORDER BY id DESC LIMIT 1").Scan(&lastHash)
 	if err != nil {
@@ -152,7 +156,7 @@ func (bc *Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 	return unspentTXs
 }
 
-// Iterator returns a BlockchainIterat.
+// Iterator returns a BlockchainIterator.
 func (bc *Blockchain) Iterator() *BlockchainIterator {
 	bci := &BlockchainIterator{bc.tip, bc.DB}
 
@@ -262,6 +266,8 @@ func (bc *Blockchain) GetBalance(address string) float64 {
 }
 
 func (bc *Blockchain) Send(from, to string, amount float64) error {
+
+	key := generateTransactionKey(from, to, amount)
 	if !ValidateAddress(from) {
 		return errors.New(fmt.Sprintf("ERROR: Sender address is not valid"))
 	}
@@ -271,7 +277,7 @@ func (bc *Blockchain) Send(from, to string, amount float64) error {
 
 	NewBlockchain(bc.DB, from)
 
-	tx, err := NewUTXOTransaction(from, to, amount, bc)
+	tx, err := NewUTXOTransaction(from, to, amount, bc, key)
 	if err != nil {
 		return err
 	}
@@ -281,6 +287,24 @@ func (bc *Blockchain) Send(from, to string, amount float64) error {
 	}
 
 	return nil
+}
+
+func generateTransactionKey(from, to string, amount float64) string {
+	// Convert amount to string with fixed precision
+	amountStr := fmt.Sprintf("%.2f", amount)
+
+	// Get current timestamp in minutes
+	timestamp := time.Now().Unix() / 60
+
+	// Concatenate all values
+	data := from + to + amountStr + strconv.FormatInt(timestamp, 10)
+
+	// Hash the concatenated string using SHA256
+	hash := sha256.New()
+	hash.Write([]byte(data))
+	hashCode := fmt.Sprintf("%x", hash.Sum(nil))
+
+	return hashCode
 }
 
 type CoinGeckoResponse struct {

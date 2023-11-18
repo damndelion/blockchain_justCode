@@ -13,6 +13,7 @@ type (
 		PG         `yaml:"postgres"`
 		JWT        `yaml:"jwt"`
 		GrpcServer `yaml:"grpcServer"`
+		Redis      `yaml:"redis"`
 	}
 
 	// App -.
@@ -44,6 +45,9 @@ type (
 	}
 	GrpcServer struct {
 		Port string `yaml:"port"`
+	}
+	Redis struct {
+		Host string `env:"REDIS_URL"`
 	}
 )
 

@@ -2,7 +2,10 @@ package v1
 
 import (
 	"fmt"
+	"github.com/evrone/go-clean-template/pkg/cache"
+	"github.com/skip2/go-qrcode"
 	"net/http"
+	"time"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
@@ -11,17 +14,17 @@ import (
 	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"github.com/skip2/go-qrcode"
 )
 
 type chainRoutes struct {
-	c   usecase.ChainUseCase
-	l   logger.Interface
-	cfg *blockchain.Config
+	c          usecase.ChainUseCase
+	l          logger.Interface
+	cfg        *blockchain.Config
+	chainCache cache.Blockchain
 }
 
-func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l logger.Interface, _ blockchainlogic.Blockchain, cfg *blockchain.Config) {
-	r := &chainRoutes{c, l, cfg}
+func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l logger.Interface, _ blockchainlogic.Blockchain, cfg *blockchain.Config, chainCache cache.Blockchain) {
+	r := &chainRoutes{c, l, cfg, chainCache}
 
 	blockchainHandler := handler.Group("/blockchain/wallet")
 	{
@@ -53,7 +56,7 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 	wallets, err := bc.c.Wallets(ctx)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallets: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -79,7 +82,7 @@ func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
 	wallet, err := bc.c.Wallet(ctx, userID)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallet: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, "Wallet does not exist")
 
 		return
 	}
@@ -106,7 +109,7 @@ func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 	balance, err := bc.c.GetBalance(ctx, userID)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -132,7 +135,7 @@ func (bc *chainRoutes) GetBalanceByAddress(ctx *gin.Context) {
 	balance, err := bc.c.GetBalanceByAddress(ctx, address)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -159,7 +162,7 @@ func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
 	balance, err := bc.c.GetBalanceUSD(ctx, userID)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalanceUSD: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -185,14 +188,14 @@ func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
 	id, err := bc.c.GetIDFromToken(accessToken)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - createWallet: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
 	wallet, err := bc.c.CreateWallet(ctx, id)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - createWallet: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -217,7 +220,7 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&sendData)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusBadRequest, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -227,7 +230,7 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 	err = bc.c.Send(ctx, userID, sendData.To, sendData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, err)
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -252,7 +255,7 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&topupData)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - topup: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusBadRequest, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -261,7 +264,7 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 	id, err := bc.c.GetIDFromToken(authHeader)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - topup: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusBadRequest, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -269,7 +272,7 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 	err = bc.c.TopUp(ctx, id, topupData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}
@@ -291,19 +294,32 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 func (bc *chainRoutes) GetWalletQRCode(ctx *gin.Context) {
 	authHeader := ctx.GetHeader("Authorization")
 	userID, err := bc.c.GetIDFromToken(authHeader)
-
-	wallet, err := bc.c.Wallet(ctx, userID)
+	wallet, err := bc.chainCache.Get(ctx, userID)
 	if err != nil {
-		bc.l.Error(fmt.Errorf("http - v1 - blockchain - GetWalletQRCode: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("%w ", err))
-
 		return
+	}
+
+	if wallet == "" {
+		time.Sleep(1 * time.Second)
+		wallet, err = bc.c.Wallet(ctx, userID)
+		if err != nil {
+			bc.l.Error(fmt.Errorf("http - v1 - blockchain - GetWalletQRCode: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
+
+			return
+		}
+
+		err = bc.chainCache.Set(ctx, userID, wallet)
+		if err != nil {
+			bc.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersById cache error")
+		}
 	}
 
 	qrCode, err := qrcode.Encode(wallet, qrcode.Medium, 256)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("failed to generate QR code: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Errorf("failed to generate QR code: %w ", err))
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
 
 		return
 	}

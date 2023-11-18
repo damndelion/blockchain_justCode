@@ -18,6 +18,8 @@ import (
 
 const reward = 1000000
 
+var processedKeys = make(map[string]bool)
+
 type Transaction struct {
 	ID   []byte
 	Vin  []TXInput
@@ -156,7 +158,11 @@ func NewCoinbaseTX(to, data string) *Transaction {
 	return &tx
 }
 
-func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain) (*Transaction, error) {
+func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain, key string) (*Transaction, error) {
+
+	if _, exists := processedKeys[key]; exists {
+		return nil, fmt.Errorf("Transaction with idempotency key %s already processed.\n", key)
+	}
 	var inputs []TXInput
 	var outputs []TXOutput
 
@@ -194,6 +200,8 @@ func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain) (*Trans
 	tx := Transaction{nil, inputs, outputs}
 	tx.ID = tx.Hash()
 	bc.SignTransaction(&tx, wallet.PrivateKey)
+
+	processedKeys[key] = true
 
 	return &tx, nil
 }

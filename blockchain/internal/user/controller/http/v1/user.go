@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/evrone/go-clean-template/config/user"
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
@@ -60,10 +61,11 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 	}
 
 	if resUser == nil {
+		time.Sleep(1 * time.Second)
 		resUser, err = ur.u.GetUserByID(ctx, id)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 
 			return
 		}
@@ -71,7 +73,7 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 		err = ur.userCache.Set(ctx, id, resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersById cache error")
 		}
 	}
 
@@ -100,7 +102,7 @@ func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
 	userByID, err := ur.u.GetUserInfoByID(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 
 		return
 	}
@@ -130,7 +132,7 @@ func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
 	userByID, err := ur.u.GetUserCredByID(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 
 		return
 	}
@@ -156,7 +158,7 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 	userID, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
 
 		return
 	}
@@ -165,14 +167,14 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
 
 		return
 	}
 	err = ur.u.CreateUserDetailInfo(ctx, userData, userID)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - create user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
 
 		return
 	}
@@ -197,7 +199,7 @@ func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 	userID, err := ur.u.GetIDFromToken(authHeader)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -206,14 +208,14 @@ func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
 	err = ur.u.SetUserDetailInfo(ctx, userData, userID)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}

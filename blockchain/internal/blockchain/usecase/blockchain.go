@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
@@ -51,7 +52,14 @@ func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, e
 }
 
 func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) error {
-	err := b.repo.Send(ctx, from, to, amount)
+	var wg sync.WaitGroup
+	var err error
+	go func() {
+		wg.Add(1)
+		defer wg.Done()
+		err = b.repo.Send(ctx, from, to, amount)
+	}()
+	wg.Wait()
 	if err != nil {
 		return err
 	}

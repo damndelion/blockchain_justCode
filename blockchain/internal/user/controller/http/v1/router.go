@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 
 	"github.com/evrone/go-clean-template/config/user"
@@ -31,7 +32,7 @@ func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCas
 
 	// Prometheus metrics
 	handler.GET("/metrics", gin.WrapH(promhttp.Handler()))
-
+	prometheus.MustRegister()
 	// Routers
 	h := handler.Group("/v1")
 	{

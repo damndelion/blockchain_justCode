@@ -37,9 +37,10 @@ func Run(cfg *user.Config) {
 		}
 	}(sqlDB)
 
-	redisClient, err := cache.NewRedisClient()
+	redisClient, err := cache.NewRedisClient(cfg.Redis.Host)
+
 	if err != nil {
-		l.Error(err)
+		l.Fatal(err)
 	}
 
 	userCache := cache.NewUserCache(redisClient, 10*time.Minute)

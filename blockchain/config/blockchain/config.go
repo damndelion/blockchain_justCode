@@ -16,6 +16,7 @@ type (
 		JWT        `yaml:"jwt"`
 		Blockchain `yaml:"blockchain"`
 		Transport  `yaml:"transport"`
+		Redis      `yaml:"redis"`
 	}
 
 	// App -.
@@ -56,7 +57,10 @@ type (
 		Timeout time.Duration `yaml:"timeout"`
 	}
 	UserGrpcTransport struct {
-		Host string `yaml:"host"`
+		Host string `env:"USER_GRPC_URL"`
+	}
+	Redis struct {
+		Host string `env:"REDIS_URL"`
 	}
 )
 

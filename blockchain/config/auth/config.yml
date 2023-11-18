@@ -11,7 +11,6 @@ logger:
 
 postgres:
   pool_max: 2
-  url : 'postgres://postgres:postgres@localhost:5432/postgres'
 
 jwt:
   secret_key: 'superSecretKey'
@@ -31,7 +30,7 @@ transport:
     host: http://localhost:8080
     timeout: 5s
   userGrpc:
-    host: localhost:9090
+    host: localhost:9091
 
 jaeger:
   url: 'localhost:6831'

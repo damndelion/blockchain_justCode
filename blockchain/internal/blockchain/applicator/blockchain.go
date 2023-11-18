@@ -3,9 +3,11 @@ package applicator
 import (
 	"database/sql"
 	"fmt"
+	"github.com/evrone/go-clean-template/pkg/cache"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/config/blockchain"
@@ -47,9 +49,12 @@ func Run(cfg *blockchain.Config) {
 	// address to create genesis block
 	chain := blockchainlogic.CreateBlockchain(db, address)
 
+	redisClient, err := cache.NewRedisClient(cfg.Redis.Host)
+	blockchainCache := cache.NewBlockchainCache(redisClient, 10*time.Minute)
+
 	// HTTP Server
 	handler := gin.New()
-	v1.NewBlockchainRouter(handler, l, chainUseCase, *chain, cfg)
+	v1.NewBlockchainRouter(handler, l, chainUseCase, *chain, cfg, blockchainCache)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal

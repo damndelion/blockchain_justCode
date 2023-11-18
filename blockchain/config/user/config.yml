@@ -19,4 +19,4 @@ jwt:
   refresh_token_ttl: 3600
 
 grpcServer:
-  port: ":9090"
+  port: ":9091"

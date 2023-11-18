@@ -22,7 +22,7 @@ func NewBlockchainRepo(db *sql.DB, address string, userGrpcTransport *transport.
 	return &BlockchainRepo{db, chain, userGrpcTransport}
 }
 
-func (br *BlockchainRepo) GetWallets(_ context.Context) (wallets []string, err error) {
+func (br *BlockchainRepo) GetWallets(_ context.Context) ([]string, error) {
 	res := blockchainlogic.ListAddresses()
 
 	return res, nil
@@ -33,6 +33,9 @@ func (br *BlockchainRepo) GetWallet(ctx context.Context, userID string) (wallet 
 	if err != nil {
 		return "", err
 	}
+	if address.Wallet == "" {
+		return "", fmt.Errorf("user does not have a wallet")
+	}
 
 	return address.Wallet, nil
 }
@@ -42,6 +45,7 @@ func (br *BlockchainRepo) GetBalance(ctx context.Context, userID string) (balanc
 	if err != nil {
 		return 0, err
 	}
+
 	res := br.chain.GetBalance(address)
 
 	return res, nil

@@ -44,7 +44,7 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&registerRequest)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - auth - registration dto error")
+		errorResponse(ctx, http.StatusBadRequest, "Registration form is not correct")
 
 		return
 	}
@@ -52,7 +52,7 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 	err = ar.u.Register(ctx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - registration error")
+		errorResponse(ctx, http.StatusInternalServerError, "Registration error")
 
 		return
 	}
@@ -79,7 +79,7 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&loginRequest)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - login: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - auth - login dto error")
+		errorResponse(ctx, http.StatusBadRequest, "Login form error")
 
 		return
 	}
@@ -88,7 +88,7 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 	token, err := ar.u.Login(context, loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - login: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - login error")
+		errorResponse(ctx, http.StatusInternalServerError, "Login error")
 
 		return
 	}
@@ -113,7 +113,7 @@ func (ar *authRoutes) Refresh(ctx *gin.Context) {
 	accessToken, refreshToken, err := ar.u.Refresh(ctx, refreshRequest.RefreshToken)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - refresh error")
+		errorResponse(ctx, http.StatusInternalServerError, "Refresh error")
 
 		return
 	}
@@ -142,7 +142,7 @@ func (ar *authRoutes) Confirm(ctx *gin.Context) {
 	err = ar.u.ConfirmUserCode(ctx, confirmRequest.Email, confirmRequest.Code)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - auth - refresh error")
+		errorResponse(ctx, http.StatusInternalServerError, "Confirm error")
 
 		return
 	}

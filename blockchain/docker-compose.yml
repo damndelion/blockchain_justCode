@@ -93,7 +93,7 @@ services:
 
 
   redis:
-    image: redis:latest
+    image: redis
     ports:
       - "6379:6379"
 
@@ -103,6 +103,10 @@ services:
     image: auth
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
+      NATS_URL: 'nats://nats:4222'
+      JAEGER_URL: 'localhost:6831'
+      USER_TRANSPORT_URL: 'http://127.0.0.1:8080'
+      USER_GRPC_URL: 'user:9091'
     ports:
       - 8082:8082
     depends_on:
@@ -112,12 +116,17 @@ services:
 
 
 
+
   blockchain:
     build: .
     container_name: blockchain
     image: blockchain
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
+      NATS_URL: 'nats://localhost:4222'
+      JAEGER_URL: 'localhost:6831'
+      USER_TRANSPORT_URL: 'http://127.0.0.1:8080'
+      USER_GRPC_URL: 'user:9091'
     ports:
       - 8081:8081
     depends_on:
@@ -130,6 +139,11 @@ services:
     image: user
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
+      NATS_URL: 'nats://localhost:4222'
+      JAEGER_URL: 'localhost:6831'
+      USER_TRANSPORT_URL: 'http://127.0.0.1:8080'
+      USER_GRPC_URL: 'user:9091'
+      REDIS_URL: '172.21.0.1:6379'
     ports:
       - 8080:8080
 

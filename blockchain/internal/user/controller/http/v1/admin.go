@@ -76,7 +76,7 @@ func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 		users, err = ur.u.Users(ctx)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 			return
 		}
@@ -86,7 +86,7 @@ func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -119,7 +119,7 @@ func (ur *adminRoutes) GetUserByID(ctx *gin.Context) {
 		resUser, err = ur.u.GetUserByID(ctx, id)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 
 			return
 		}
@@ -127,7 +127,7 @@ func (ur *adminRoutes) GetUserByID(ctx *gin.Context) {
 		err = ur.userCache.Set(ctx, id, resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersById cache error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersById cache error")
 		}
 	}
 
@@ -158,7 +158,7 @@ func (ur *adminRoutes) GetUserByEmail(ctx *gin.Context) {
 		resUser, err = ur.u.GetUserByEmail(ctx, email)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersByEmail error")
 
 			return
 		}
@@ -166,7 +166,7 @@ func (ur *adminRoutes) GetUserByEmail(ctx *gin.Context) {
 		err = ur.userCache.Set(ctx, email, resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsersByEmail cache error")
+			errorResponse(ctx, http.StatusInternalServerError, "getUsersByEmail cache error")
 		}
 	}
 
@@ -193,7 +193,7 @@ func (ur *adminRoutes) GetUsersWithSort(ctx *gin.Context) {
 	users, err := ur.u.UsersWithSort(ctx, sortParam, methodParam)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -219,7 +219,7 @@ func (ur *adminRoutes) GetUsersWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -246,16 +246,16 @@ func (ur *adminRoutes) UpdateUser(ctx *gin.Context) {
 	var userData dto.UserUpdateRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
 
 	err = ur.u.UpdateUser(ctx, userData, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -312,8 +312,8 @@ func (ur *adminRoutes) DeleteUser(ctx *gin.Context) {
 
 	err := ur.u.DeleteUser(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -340,8 +340,8 @@ func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 	if len(ctx.Request.URL.Query()) == 0 {
 		usersInfo, err = ur.u.UsersInfo(ctx)
 		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+			ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 			return
 		}
@@ -350,8 +350,8 @@ func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -377,8 +377,8 @@ func (ur *adminRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
 	methodParam := ctx.Query("method")
 	users, err := ur.u.UsersInfoWithSort(ctx, sortParam, methodParam)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -402,8 +402,8 @@ func (ur *adminRoutes) GetUsersInfoWithSort(ctx *gin.Context) {
 func (ur *adminRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersInfoWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -427,8 +427,8 @@ func (ur *adminRoutes) GetUserDetailInfoByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	userByID, err := ur.u.GetUserInfoByID(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 
 		return
 	}
@@ -454,16 +454,16 @@ func (ur *adminRoutes) UpdateUserInfo(ctx *gin.Context) {
 	var userData dto.UserInfoRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "Update error")
 
 		return
 	}
 
 	err = ur.u.UpdateUserInfo(ctx, userData, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "Update error")
 
 		return
 	}
@@ -488,16 +488,16 @@ func (ur *adminRoutes) CreateUserInfo(ctx *gin.Context) {
 	var userData dto.UserInfoRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
 
 	err = ur.u.CreateUserInfo(ctx, userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -521,8 +521,8 @@ func (ur *adminRoutes) DeleteUserInfo(ctx *gin.Context) {
 
 	err := ur.u.DeleteUserInfo(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -549,8 +549,8 @@ func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	if len(ctx.Request.URL.Query()) == 0 {
 		usersCred, err = ur.u.UsersCred(ctx)
 		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+			ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+			errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 			return
 		}
@@ -559,8 +559,8 @@ func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -586,8 +586,8 @@ func (ur *adminRoutes) GetUsersCredWithSort(ctx *gin.Context) {
 	methodParam := ctx.Query("method")
 	users, err := ur.u.UsersCredWithSort(ctx, sortParam, methodParam)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -611,8 +611,8 @@ func (ur *adminRoutes) GetUsersCredWithSort(ctx *gin.Context) {
 func (ur *adminRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
 	users, err := ur.u.UsersCredWithSearch(ctx, ctx.Request.URL.Query())
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - getUsers: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - user - getUsers error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsers: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsers error")
 
 		return
 	}
@@ -636,8 +636,8 @@ func (ur *adminRoutes) GetUserDetailCredByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	userByID, err := ur.u.GetUserCredByID(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "http - v1 - userById - getUsersById error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 
 		return
 	}
@@ -663,16 +663,16 @@ func (ur *adminRoutes) UpdateUserCred(ctx *gin.Context) {
 	var userData dto.UserCredRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
 
 	err = ur.u.UpdateUserCredentials(ctx, userData, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -697,16 +697,16 @@ func (ur *adminRoutes) CreateUserCred(ctx *gin.Context) {
 	var userData dto.UserCredRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
 
 	err = ur.u.CreateUserCred(ctx, userData)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}
@@ -730,8 +730,8 @@ func (ur *adminRoutes) DeleteUserCred(ctx *gin.Context) {
 
 	err := ur.u.DeleteUserCred(ctx, id)
 	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "http - v1 - user - set user detail info error")
+		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
+		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
 
 		return
 	}

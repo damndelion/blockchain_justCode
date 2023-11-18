@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/evrone/go-clean-template/pkg/cache"
 	"net/http"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
@@ -15,7 +16,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewBlockchainRouter(handler *gin.Engine, l logger.Interface, c usecase.ChainUseCase, bc blockchainlogic.Blockchain, cfg *blockchain.Config) {
+func NewBlockchainRouter(handler *gin.Engine, l logger.Interface, c usecase.ChainUseCase, bc blockchainlogic.Blockchain, cfg *blockchain.Config, cache cache.Blockchain) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -34,6 +35,6 @@ func NewBlockchainRouter(handler *gin.Engine, l logger.Interface, c usecase.Chai
 	// Routers
 	h := handler.Group("/v1")
 	{
-		newBlockchainRoutes(h, c, l, bc, cfg)
+		newBlockchainRoutes(h, c, l, bc, cfg, cache)
 	}
 }

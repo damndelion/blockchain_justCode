@@ -3,7 +3,7 @@
 .vscode
 
 # Config
-.env
+config/auth/example.env
 
 # Binaries for programs and plugins
 *.exe
