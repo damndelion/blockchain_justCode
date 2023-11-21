@@ -16,8 +16,6 @@ type (
 		CreateWallet(ctx context.Context, userID string) (string, error)
 		Send(ctx context.Context, from, to string, amount float64) error
 		TopUp(ctx context.Context, to string, amount float64) error
-		CheckForIDInAccessToken(urlUserID, accessToken string) bool
-		GetIDFromToken(accessToken string) (string, error)
 		GetBalanceByAddress(ctx context.Context, address string) (float64, error)
 	}
 

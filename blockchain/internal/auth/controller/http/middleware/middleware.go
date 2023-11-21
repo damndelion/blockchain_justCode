@@ -25,7 +25,9 @@ func JwtVerify(SecretKey string) gin.HandlerFunc {
 
 			return []byte(SecretKey), nil
 		})
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		var claims jwt.MapClaims
+		var ok bool
+		if claims, ok = token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if exp, ok := claims["exp"].(float64); ok {
 				expirationTime := time.Unix(int64(exp), 0)
 				if time.Now().After(expirationTime) {
@@ -48,6 +50,8 @@ func JwtVerify(SecretKey string) gin.HandlerFunc {
 
 			return
 		}
+		id := fmt.Sprintf("%v", claims["user_id"])
+		ctx.Set("user_id", id)
 
 		ctx.Next()
 	}

@@ -266,7 +266,6 @@ func (bc *Blockchain) GetBalance(address string) float64 {
 }
 
 func (bc *Blockchain) Send(from, to string, amount float64) error {
-
 	key := generateTransactionKey(from, to, amount)
 	if !ValidateAddress(from) {
 		return errors.New(fmt.Sprintf("ERROR: Sender address is not valid"))

@@ -3,11 +3,12 @@ package applicator
 import (
 	"database/sql"
 	"fmt"
-	"github.com/evrone/go-clean-template/pkg/cache"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/evrone/go-clean-template/pkg/cache"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/config/blockchain"

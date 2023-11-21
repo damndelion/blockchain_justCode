@@ -159,7 +159,6 @@ func NewCoinbaseTX(to, data string) *Transaction {
 }
 
 func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain, key string) (*Transaction, error) {
-
 	if _, exists := processedKeys[key]; exists {
 		return nil, fmt.Errorf("Transaction with idempotency key %s already processed.\n", key)
 	}

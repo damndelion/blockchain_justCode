@@ -1,8 +1,9 @@
 package v1
 
 import (
-	"github.com/evrone/go-clean-template/pkg/cache"
 	"net/http"
+
+	"github.com/evrone/go-clean-template/pkg/cache"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
 	_ "github.com/evrone/go-clean-template/docs/blockchain"

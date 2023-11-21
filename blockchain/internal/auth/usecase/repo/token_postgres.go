@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"fmt"
+
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
 	"github.com/evrone/go-clean-template/internal/auth/transport"
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
@@ -72,5 +73,6 @@ func (t *AuthRepo) CheckForEmail(_ context.Context, email string) error {
 	if exists {
 		return fmt.Errorf("user with this email alraedy exists")
 	}
+
 	return nil
 }

@@ -49,20 +49,16 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user [get].
 func (ur *userRoutes) GetUser(ctx *gin.Context) {
-	authHeader := ctx.GetHeader("Authorization")
-	id, err := ur.u.GetIDFromToken(authHeader)
-	if err != nil {
-		return
-	}
+	userID, _ := ctx.Get("user_id")
 
-	resUser, err := ur.userCache.Get(ctx, id)
+	resUser, err := ur.userCache.Get(ctx, userID.(string))
 	if err != nil {
 		return
 	}
 
 	if resUser == nil {
 		time.Sleep(1 * time.Second)
-		resUser, err = ur.u.GetUserByID(ctx, id)
+		resUser, err = ur.u.GetUserByID(ctx, userID.(string))
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -70,7 +66,7 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 			return
 		}
 
-		err = ur.userCache.Set(ctx, id, resUser)
+		err = ur.userCache.Set(ctx, userID.(string), resUser)
 		if err != nil {
 			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, "getUsersById cache error")
@@ -93,13 +89,9 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/info [get].
 func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
-	authHeader := ctx.GetHeader("Authorization")
-	id, err := ur.u.GetIDFromToken(authHeader)
-	if err != nil {
-		return
-	}
+	userID, _ := ctx.Get("user_id")
 
-	userByID, err := ur.u.GetUserInfoByID(ctx, id)
+	userByID, err := ur.u.GetUserInfoByID(ctx, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -123,13 +115,9 @@ func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/cred [get].
 func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
-	authHeader := ctx.GetHeader("Authorization")
-	id, err := ur.u.GetIDFromToken(authHeader)
-	if err != nil {
-		return
-	}
+	userID, _ := ctx.Get("user_id")
 
-	userByID, err := ur.u.GetUserCredByID(ctx, id)
+	userByID, err := ur.u.GetUserCredByID(ctx, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -154,16 +142,10 @@ func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/info [post].
 func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
-	authHeader := ctx.GetHeader("Authorization")
-	userID, err := ur.u.GetIDFromToken(authHeader)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
+	userID, _ := ctx.Get("user_id")
 
-		return
-	}
 	var userData dto.UserDetailRequest
-	err = ctx.ShouldBindJSON(&userData)
+	err := ctx.ShouldBindJSON(&userData)
 
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
@@ -171,7 +153,7 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-	err = ur.u.CreateUserDetailInfo(ctx, userData, userID)
+	err = ur.u.CreateUserDetailInfo(ctx, userData, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
@@ -195,16 +177,10 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/info [put].
 func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
-	authHeader := ctx.GetHeader("Authorization")
-	userID, err := ur.u.GetIDFromToken(authHeader)
-	if err != nil {
-		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
-		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
+	userID, _ := ctx.Get("user_id")
 
-		return
-	}
 	var userData dto.UserDetailRequest
-	err = ctx.ShouldBindJSON(&userData)
+	err := ctx.ShouldBindJSON(&userData)
 
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - set user detail: %w", err))
@@ -212,7 +188,7 @@ func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-	err = ur.u.SetUserDetailInfo(ctx, userData, userID)
+	err = ur.u.SetUserDetailInfo(ctx, userData, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")

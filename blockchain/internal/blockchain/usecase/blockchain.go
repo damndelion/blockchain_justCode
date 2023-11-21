@@ -2,14 +2,11 @@ package usecase
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 	"sync"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
-	"github.com/golang-jwt/jwt"
 )
 
 type Blockchain struct {
@@ -74,46 +71,4 @@ func (b *Blockchain) TopUp(ctx context.Context, to string, amount float64) error
 	}
 
 	return nil
-}
-
-func (b *Blockchain) CheckForIDInAccessToken(urlUserID, accessToken string) bool {
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(b.cfg.SecretKey), nil
-	})
-	claims := token.Claims.(jwt.MapClaims)
-
-	if err != nil || !token.Valid {
-		return false
-	}
-	urlUserIDFormat, err := strconv.ParseFloat(urlUserID, 32)
-	if err != nil {
-		return false
-	}
-	if claims["user_id"] != urlUserIDFormat {
-		return false
-	}
-
-	return true
-}
-
-func (b *Blockchain) GetIDFromToken(accessToken string) (string, error) {
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(b.cfg.SecretKey), nil
-	})
-	claims := token.Claims.(jwt.MapClaims)
-
-	if err != nil || !token.Valid {
-		return "", err
-	}
-	id := fmt.Sprintf("%v", claims["user_id"])
-
-	return id, nil
 }

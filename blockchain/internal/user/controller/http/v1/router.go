@@ -1,8 +1,9 @@
 package v1
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/evrone/go-clean-template/config/user"
 	_ "github.com/evrone/go-clean-template/docs/user"
