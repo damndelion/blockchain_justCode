@@ -1,52 +1,6 @@
-#version: '3.9'
-#services:
-#
-#  postgres:
-#    container_name: postgres
-#    image: postgres
-#    volumes:
-#      - pg-data:/var/lib/postgresql/data
-#    environment:
-#      POSTGRES_USER: 'postgres'
-#      POSTGRES_PASSWORD: 'postgres'
-#      POSTGRES_DB: 'postgres'
-#    ports:
-#      - 5432:5432
-#
-#  jaeger:
-#    container_name: jaeger
-#    image: jaegertracing/all-in-one:1.45
-#    environment:
-#      - COLLECTOR_ZIPKIN_HTTP_PORT=:9411
-#      - COLLECTOR_OTLP_ENABLED=true
-#    ports:
-#      - 6831:6831/udp
-#      - 6832:6832/udp
-#      - 5778:5778
-#      - 16686:16686
-#      - 14268:14268
-#      - 14269:14269
-#      - 14250:14250
-#      - 9411:9411
-#      - 4317:4317
-#      - 4318:4318
-#
-#  app:
-#    build: .
-#    container_name: user
-#    image: app
-#    environment:
-#      PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
-#    ports:
-#      - 8081:8081
-#    depends_on:
-#      - postgres
-
 version: "3"
 
 services:
-
-
   postgres:
     image: postgres:latest
     environment:
@@ -54,58 +8,20 @@ services:
     ports:
       - "5432:5432"
 
-  nats:
-    image: nats:latest
-    ports:
-      - "4222:4222"
-
-
-
-  nats-streaming:
-    image: nats-streaming:latest
-    ports:
-      - "8222:8222" # NATS Streaming HTTP monitoring interface
-
-
-
-  jaeger:
-      container_name: jaeger
-      image: jaegertracing/all-in-one:1.45
-      environment:
-        - USER_TRANSPORT_URL=172.21.0.1:8080
-        - USER_GRPC_URL=172.21.0.1:9090
-        - JAEGER_URL=172.21.0.1:6831
-        - COLLECTOR_ZIPKIN_HTTP_PORT=:9411
-        - COLLECTOR_OTLP_ENABLED=true
-      ports:
-        - 6831:6831/udp
-        - 6832:6832/udp
-        - 5778:5778
-        - 16686:16686
-        - 14268:14268
-        - 14269:14269
-        - 14250:14250
-        - 9411:9411
-        - 4317:4317
-        - 4318:4318
-
-
-
-
   redis:
     image: redis
     ports:
       - "6379:6379"
 
   auth:
-    build: .
+    build: ..
     container_name: auth
     image: auth
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
       NATS_URL: 'nats://nats:4222'
       JAEGER_URL: 'localhost:6831'
-      USER_TRANSPORT_URL: 'http://127.0.0.1:8080'
+      USER_TRANSPORT_URL: 'http://user:8080'
       USER_GRPC_URL: 'user:9091'
     ports:
       - 8082:8082
@@ -118,15 +34,16 @@ services:
 
 
   blockchain:
-    build: .
+    build: ..
     container_name: blockchain
     image: blockchain
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
       NATS_URL: 'nats://localhost:4222'
       JAEGER_URL: 'localhost:6831'
-      USER_TRANSPORT_URL: 'http://127.0.0.1:8080'
+      USER_TRANSPORT_URL: 'http://user:8080'
       USER_GRPC_URL: 'user:9091'
+      REDIS_URL: 'redis:6379'
     ports:
       - 8081:8081
     depends_on:
@@ -134,18 +51,68 @@ services:
       - jaeger
 
   user:
-    build: .
+    build: ..
     container_name: user
     image: user
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
       NATS_URL: 'nats://localhost:4222'
       JAEGER_URL: 'localhost:6831'
-      USER_TRANSPORT_URL: 'http://127.0.0.1:8080'
       USER_GRPC_URL: 'user:9091'
-      REDIS_URL: '172.21.0.1:6379'
+      REDIS_URL: 'redis:6379'
     ports:
       - 8080:8080
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.45
+    environment:
+      - USER_TRANSPORT_URL=172.21.0.1:8080
+      - USER_GRPC_URL=172.21.0.1:9090
+      - JAEGER_URL=172.21.0.1:6831
+      - COLLECTOR_ZIPKIN_HTTP_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 14269:14269
+      - 14250:14250
+      - 9411:9411
+      - 4317:4317
+      - 4318:4318
+
+
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+
+
+
+  nats-streaming:
+    image: nats-streaming:latest
+    ports:
+      - "8222:8222"
+
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
 
 
 volumes:

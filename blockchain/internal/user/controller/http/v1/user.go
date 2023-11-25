@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/evrone/go-clean-template/config/user"
-	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
+	authMiddlware "github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	_ "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
@@ -26,7 +26,7 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 
 	userHandler := handler.Group("user")
 	{
-		userHandler.Use(middleware.JwtVerify(cfg.SecretKey))
+		userHandler.Use(authMiddlware.JwtVerify(cfg.SecretKey))
 
 		userHandler.GET("/", r.GetUser)
 		userHandler.GET("/info", r.GetUserDetailInfo)
@@ -50,7 +50,6 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 // @Router /v1/user [get].
 func (ur *userRoutes) GetUser(ctx *gin.Context) {
 	userID, _ := ctx.Get("user_id")
-
 	resUser, err := ur.userCache.Get(ctx, userID.(string))
 	if err != nil {
 		return

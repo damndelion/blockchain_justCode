@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"math/rand"
+	"net/http"
 	"time"
 
 	"github.com/evrone/go-clean-template/config/auth"
@@ -106,22 +108,44 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	}, nil
 }
 
-func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
-	claims := &jwt.StandardClaims{}
-	token, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+func (u *Auth) Refresh(ctx *gin.Context, refreshToken string) (string, string, error) {
+	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New(fmt.Sprintf("unexpected signing method: %v", token.Header["alg"]))
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		return []byte(u.cfg.SecretKey), nil
 	})
+	var claims jwt.MapClaims
+	var ok bool
+	if claims, ok = token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if exp, ok := claims["exp"].(float64); ok {
+			expirationTime := time.Unix(int64(exp), 0)
+			if time.Now().After(expirationTime) {
+				ctx.AbortWithStatus(http.StatusUnauthorized)
 
+				return "", "", err
+			}
+		} else {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+
+			return "", "", err
+
+		}
+	} else {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+
+		return "", "", err
+
+	}
 	if err != nil || !token.Valid {
-		return "", "", errors.New(fmt.Sprintf("invalid refresh token: %v", err))
+		ctx.AbortWithStatus(http.StatusForbidden)
+
+		return "", "", err
+
 	}
 
-	userEmail := claims.Subject
-
+	userEmail := fmt.Sprintf("%v", claims["email"])
 	user, err := u.repo.GetUserByEmail(ctx, userEmail)
 	if err != nil {
 		return "", "", err
@@ -151,8 +175,8 @@ func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (strin
 	}
 
 	refreshTokenClaims := jwt.MapClaims{
-		"user_email": user.Email,
-		"ExpiresAt":  time.Now().Add(time.Duration(u.cfg.RefreshTokenTTL) * time.Second).Unix(),
+		"email": user.Email,
+		"exp":   time.Now().Add(time.Duration(u.cfg.RefreshTokenTTL) * time.Second).Unix(),
 	}
 
 	refreshToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), refreshTokenClaims)

@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"github.com/evrone/go-clean-template/internal/user/controller/http/middleware"
+	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 
 	_ "github.com/evrone/go-clean-template/docs/auth"
@@ -30,6 +32,8 @@ func NewAuthRouter(handler *gin.Engine, l logger.Interface, u usecase.AuthUseCas
 
 	// Prometheus metrics
 	handler.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	handler.Use(middleware.MetricsHandler())
+	prometheus.MustRegister()
 
 	// Routers
 	h := handler.Group("/v1")

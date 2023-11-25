@@ -360,11 +360,20 @@ func (ur *UserRepo) GetUsersWithSort(_ context.Context, sort, method string) (us
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersWithSearch(_ context.Context, param, value string) (users []*userEntity.User, err error) {
-	res := ur.DB.Where(fmt.Sprintf("%s ILIKE ?", param), "%"+value+"%").
-		Or(fmt.Sprintf("%s ILIKE ?", param), value+"%").
-		Or(fmt.Sprintf("%s ILIKE ?", param), "%"+value).
-		Find(&users)
+func (ur *UserRepo) GetUsersWithSearch(_ context.Context, param string, value interface{}) (users []*userEntity.User, err error) {
+	var condition string
+	switch v := value.(type) {
+	case string:
+		condition = fmt.Sprintf("%s ILIKE ?", param)
+		value = "%" + v + "%"
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		condition = fmt.Sprintf("%s = ?", param)
+	default:
+		return nil, fmt.Errorf("unsupported type for search value: %T", value)
+	}
+
+	// Execute the query
+	res := ur.DB.Where(condition, value).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -381,11 +390,18 @@ func (ur *UserRepo) GetUsersInfoWithSort(_ context.Context, sort, method string)
 	return users, nil
 }
 
-func (ur *UserRepo) GetUsersInfoWithSearch(_ context.Context, param, value string) (users []*userEntity.UserInfo, err error) {
-	res := ur.DB.Where(fmt.Sprintf("%s ILIKE ?", param), "%"+value+"%").
-		Or(fmt.Sprintf("%s ILIKE ?", param), value+"%").
-		Or(fmt.Sprintf("%s ILIKE ?", param), "%"+value).
-		Find(&users)
+func (ur *UserRepo) GetUsersInfoWithSearch(_ context.Context, param string, value interface{}) (users []*userEntity.UserInfo, err error) {
+	var condition string
+	switch v := value.(type) {
+	case string:
+		condition = fmt.Sprintf("%s ILIKE ?", param)
+		value = "%" + v + "%"
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		condition = fmt.Sprintf("%s = ?", param)
+	default:
+		return nil, fmt.Errorf("unsupported type for search value: %T", value)
+	}
+	res := ur.DB.Where(condition, value).Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 
 	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
 	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
@@ -14,7 +15,7 @@ type (
 	AuthUseCase interface {
 		Register(ctx context.Context, name, email, password string) error
 		Login(ctx context.Context, email, password string) (*dto.LoginResponse, error)
-		Refresh(ctx context.Context, refreshToken string) (string, string, error)
+		Refresh(ctx *gin.Context, refreshToken string) (string, string, error)
 		ConfirmUserCode(ctx context.Context, email string, userCode int) error
 	}
 

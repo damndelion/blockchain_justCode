@@ -9,7 +9,7 @@ COPY go.mod .
 
 RUN go mod download
 
-COPY .. .
+COPY ../../.. .
 EXPOSE 8082
 RUN go build ./cmd/auth/main.go
 

@@ -73,7 +73,7 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash)
 
       - name: Integration tests
-        run: "docker-compose up \
+        run: "build-compose up \
           --build \
           --abort-on-container-exit \
           --exit-code-from integration"

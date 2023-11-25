@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"github.com/evrone/go-clean-template/internal/user/controller/http/middleware"
+	"github.com/prometheus/client_golang/prometheus"
 	"net/http"
 
 	"github.com/evrone/go-clean-template/pkg/cache"
@@ -32,6 +34,8 @@ func NewBlockchainRouter(handler *gin.Engine, l logger.Interface, c usecase.Chai
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 	// Prometheus metrics
 	handler.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	handler.Use(middleware.MetricsHandler())
+	prometheus.MustRegister()
 
 	// Routers
 	h := handler.Group("/v1")

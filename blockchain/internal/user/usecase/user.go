@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strconv"
 
 	"github.com/evrone/go-clean-template/config/user"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
@@ -183,7 +184,20 @@ func (u *User) UsersWithFilter(ctx context.Context, params url.Values) ([]*userE
 }
 
 func (u *User) UsersWithSearch(ctx context.Context, params url.Values) ([]*userEntity.User, error) {
-	users, err := u.repo.GetUsersWithSearch(ctx, params.Get("search"), params.Get("value"))
+	searchParam := params.Get("search")
+	searchValueStr := params.Get("value")
+
+	var searchValue interface{}
+	var err error
+
+	// Try to convert the search value to an integer
+	searchValue, err = strconv.Atoi(searchValueStr)
+	if err != nil {
+		// Conversion failed, assume it's a string
+		searchValue = searchValueStr
+	}
+
+	users, err := u.repo.GetUsersWithSearch(ctx, searchParam, searchValue)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +215,20 @@ func (u *User) UsersWithSort(ctx context.Context, sort, method string) ([]*userE
 }
 
 func (u *User) UsersInfoWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserInfo, error) {
-	usersInfo, err := u.repo.GetUsersInfoWithSearch(ctx, params.Get("search"), params.Get("value"))
+
+	searchParam := params.Get("search")
+	searchValueStr := params.Get("value")
+
+	var searchValue interface{}
+	var err error
+
+	// Try to convert the search value to an integer
+	searchValue, err = strconv.Atoi(searchValueStr)
+	if err != nil {
+		// Conversion failed, assume it's a string
+		searchValue = searchValueStr
+	}
+	usersInfo, err := u.repo.GetUsersInfoWithSearch(ctx, searchParam, searchValue)
 	if err != nil {
 		return nil, err
 	}

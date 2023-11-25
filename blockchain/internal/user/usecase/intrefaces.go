@@ -54,7 +54,7 @@ type (
 		GetUsers(ctx context.Context) ([]*userEntity.User, error)
 		GetUsersWithFilter(ctx context.Context, param, value string) (users []*userEntity.User, err error)
 		GetUsersWithSort(ctx context.Context, param, method string) (users []*userEntity.User, err error)
-		GetUsersWithSearch(ctx context.Context, param, value string) (users []*userEntity.User, err error)
+		GetUsersWithSearch(ctx context.Context, param string, value interface{}) (users []*userEntity.User, err error)
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
 		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
 		GetUserRole(ctx context.Context, id int) (string, error)
@@ -66,7 +66,7 @@ type (
 		GetUsersDetailsInfo(ctx context.Context) (usersInfo []*userEntity.UserInfo, err error)
 		GetUsersInfoWithFilter(ctx context.Context, param, value string) (users []*userEntity.UserInfo, err error)
 		GetUsersInfoWithSort(ctx context.Context, param, method string) (users []*userEntity.UserInfo, err error)
-		GetUsersInfoWithSearch(ctx context.Context, param, value string) (users []*userEntity.UserInfo, err error)
+		GetUsersInfoWithSearch(ctx context.Context, param string, value interface{}) (users []*userEntity.UserInfo, err error)
 		GetUserInfoByID(ctx context.Context, id string) (userInfo *userEntity.UserInfo, err error)
 		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
 		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
