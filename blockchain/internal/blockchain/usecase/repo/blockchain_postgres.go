@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
 	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
@@ -90,7 +91,8 @@ func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (stri
 	return address, nil
 }
 
-func (br *BlockchainRepo) Send(ctx context.Context, from, to string, amount float64) error {
+func (br *BlockchainRepo) Send(ctx context.Context, from, to string, amount float64, wg *sync.WaitGroup) error {
+	defer wg.Done()
 	user, err := br.userGrpcTransport.GetUserByID(ctx, from)
 	if err != nil {
 		return err
@@ -103,7 +105,8 @@ func (br *BlockchainRepo) Send(ctx context.Context, from, to string, amount floa
 	return nil
 }
 
-func (br *BlockchainRepo) TopUp(ctx context.Context, from, to string, amount float64) error {
+func (br *BlockchainRepo) TopUp(ctx context.Context, from, to string, amount float64, wg *sync.WaitGroup) error {
+	defer wg.Done()
 	user, err := br.userGrpcTransport.GetUserByID(ctx, to)
 	if err != nil {
 		return err

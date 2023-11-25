@@ -3,6 +3,7 @@ package usecase
 
 import (
 	"context"
+	"sync"
 )
 
 //go:generate mockgen -source=interfaces.go -destination=./mocks_test.go -package=usecase_test
@@ -25,8 +26,8 @@ type (
 		GetBalance(ctx context.Context, userID string) (balance float64, err error)
 		GetBalanceUSD(ctx context.Context, userID string) (balance float64, err error)
 		CreateWallet(ctx context.Context, userID string) (string, error)
-		Send(ctx context.Context, from, to string, amount float64) error
-		TopUp(ctx context.Context, from, to string, amount float64) error
+		Send(ctx context.Context, from, to string, amount float64, wg sync.WaitGroup) error
+		TopUp(ctx context.Context, from, to string, amount float64, wg sync.WaitGroup) error
 		GetBalanceByAddress(_ context.Context, address string) (balance float64, err error)
 	}
 )

@@ -2,7 +2,9 @@ package v1
 
 import (
 	"fmt"
+	"github.com/evrone/go-clean-template/internal/blockchain/metrics"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/evrone/go-clean-template/pkg/cache"
@@ -209,6 +211,7 @@ func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
 func (bc *chainRoutes) Send(ctx *gin.Context) {
 	var sendData dto.SendRequest
 	err := ctx.ShouldBindJSON(&sendData)
+
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, fmt.Sprintf("%v ", err))
@@ -224,6 +227,7 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 
 		return
 	}
+	metrics.TransactionRequestsTotalCollector.WithLabelValues(fmt.Sprintf("%v", ctx.Request.URL), strconv.Itoa(0), ctx.Request.Method).Inc()
 	ctx.JSON(http.StatusOK, "Success ")
 }
 
@@ -258,6 +262,7 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 
 		return
 	}
+	metrics.TransactionRequestsTotalCollector.WithLabelValues(fmt.Sprintf("%v", ctx.Request.URL), strconv.Itoa(0), ctx.Request.Method).Inc()
 	ctx.JSON(http.StatusOK, "Success ")
 }
 

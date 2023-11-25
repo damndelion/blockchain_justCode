@@ -35,3 +35,14 @@ func newCounterVec(name, help string, labelValues ...string) *prometheus.Counter
 		labelValues,
 	)
 }
+
+func newTransactionCounterVec(name, help string, labelValues ...string) *prometheus.CounterVec {
+	return prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "blockchain_service",
+			Name:      name,
+			Help:      help,
+		},
+		labelValues,
+	)
+}

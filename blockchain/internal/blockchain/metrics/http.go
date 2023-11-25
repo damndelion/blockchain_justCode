@@ -19,9 +19,14 @@ var (
 		"Counter of HTTP requests for any HTTP-based requests",
 		httpHandlerLabel, httpCodeLabel, httpMethodLabel,
 	)
+	TransactionRequestsTotalCollector = newTransactionCounterVec(
+		"transaction_requests_total",
+		"Counter of HTTP requests for any HTTP-based requests",
+		httpHandlerLabel, httpCodeLabel, httpMethodLabel,
+	)
 )
 
 // nolint: gochecknoinits
 func init() {
-	mustRegister(HttpResponseTime, HttpRequestsTotalCollector)
+	mustRegister(HttpResponseTime, HttpRequestsTotalCollector, TransactionRequestsTotalCollector)
 }

@@ -51,10 +51,9 @@ func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, e
 func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) error {
 	var wg sync.WaitGroup
 	var err error
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
-		defer wg.Done()
-		err = b.repo.Send(ctx, from, to, amount)
+		err = b.repo.Send(ctx, from, to, amount, &wg)
 	}()
 	wg.Wait()
 	if err != nil {
@@ -65,7 +64,13 @@ func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) 
 }
 
 func (b *Blockchain) TopUp(ctx context.Context, to string, amount float64) error {
-	err := b.repo.TopUp(ctx, b.cfg.GenesisAddress, to, amount)
+	var wg sync.WaitGroup
+	var err error
+	wg.Add(1)
+	go func() {
+		err = b.repo.TopUp(ctx, b.cfg.GenesisAddress, to, amount, &wg)
+	}()
+	wg.Wait()
 	if err != nil {
 		return err
 	}
