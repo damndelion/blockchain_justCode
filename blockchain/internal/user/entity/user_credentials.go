@@ -1,9 +1,6 @@
 package userentity
 
-import "gorm.io/gorm"
-
 type UserCredentials struct {
-	gorm.Model
 	ID      int    `json:"id"`
 	UserID  string `json:"user_id"`
 	CardNum string `json:"card_num"`

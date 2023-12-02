@@ -29,7 +29,9 @@ func (t *AuthRepo) CreateUserToken(_ context.Context, userToken authEntity.Token
 }
 
 func (t *AuthRepo) CreateUser(ctx context.Context, user *userEntity.User) (int, error) {
-	grpcUser, err := t.userGrpcTransport.CreateUser(ctx, user)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "create user repo")
+	defer span.Finish()
+	grpcUser, err := t.userGrpcTransport.CreateUser(spanCtx, user)
 	if err != nil {
 		return 0, err
 	}
@@ -57,7 +59,9 @@ func (t *AuthRepo) GetUserByEmail(ctx context.Context, email string) (*userEntit
 	return user, nil
 }
 
-func (t *AuthRepo) ConfirmCode(_ context.Context, email string) (int, error) {
+func (t *AuthRepo) ConfirmCode(ctx context.Context, email string) (int, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "confirm code repo")
+	defer span.Finish()
 	var code int
 	res := t.DB.Model(&authEntity.UserCode{}).Where("email = ?", email).Pluck("code", &code)
 	if res.Error != nil {

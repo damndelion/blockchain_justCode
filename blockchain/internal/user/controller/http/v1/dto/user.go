@@ -26,6 +26,7 @@ type UserUpdateRequest struct {
 	Password string `json:"password" binding:"required"`
 	Wallet   string `json:"wallet" binding:"required"`
 	Valid    bool   `json:"valid,omitempty" default:"false"`
+	Role     string `json:"role,omitempty" default:"user"`
 }
 
 type UserCredRequest struct {

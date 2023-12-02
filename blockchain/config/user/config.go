@@ -14,6 +14,7 @@ type (
 		JWT        `yaml:"jwt"`
 		GrpcServer `yaml:"grpcServer"`
 		Redis      `yaml:"redis"`
+		Jaeger     `yaml:"jaeger"`
 	}
 
 	// App -.
@@ -48,6 +49,9 @@ type (
 	}
 	Redis struct {
 		Host string `env:"REDIS_URL"`
+	}
+	Jaeger struct {
+		URL string `env-required:"true" yaml:"url"   env:"JAEGER_URL"`
 	}
 )
 

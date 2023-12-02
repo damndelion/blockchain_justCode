@@ -40,16 +40,19 @@ func newAuthRoutes(handler *gin.RouterGroup, u usecase.AuthUseCase, l logger.Int
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/auth/register [post].
 func (ar *authRoutes) Register(ctx *gin.Context) {
+	span := opentracing.StartSpan("register handler")
+	defer span.Finish()
 	var registerRequest dto.RegisterRequest
 	err := ctx.ShouldBindJSON(&registerRequest)
+
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "Registration form is not correct")
 
 		return
 	}
-
-	err = ar.u.Register(ctx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
+	err = ar.u.Register(spanCtx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "Registration error")
@@ -83,9 +86,9 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 
 		return
 	}
-	context := opentracing.ContextWithSpan(ctx.Request.Context(), span)
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 
-	token, err := ar.u.Login(context, loginRequest.Email, loginRequest.Password)
+	token, err := ar.u.Login(spanCtx, loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - login: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "Login error")
@@ -108,9 +111,12 @@ func (ar *authRoutes) Login(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/auth/refresh [post].
 func (ar *authRoutes) Refresh(ctx *gin.Context) {
+	span := opentracing.StartSpan("refresh handler")
+	defer span.Finish()
 	var refreshRequest dto.RefreshRequest
 	err := ctx.ShouldBindJSON(&refreshRequest)
-	accessToken, refreshToken, err := ar.u.Refresh(ctx, refreshRequest.RefreshToken)
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
+	accessToken, refreshToken, err := ar.u.Refresh(spanCtx, refreshRequest.RefreshToken)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "Refresh error")
@@ -137,9 +143,12 @@ func (ar *authRoutes) Refresh(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/auth/confirm [post].
 func (ar *authRoutes) Confirm(ctx *gin.Context) {
+	span := opentracing.StartSpan("confirm handler")
+	defer span.Finish()
 	var confirmRequest dto.ConfirmRequest
 	err := ctx.ShouldBindJSON(&confirmRequest)
-	err = ar.u.ConfirmUserCode(ctx, confirmRequest.Email, confirmRequest.Code)
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
+	err = ar.u.ConfirmUserCode(spanCtx, confirmRequest.Email, confirmRequest.Code)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - refresh: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "Confirm error")

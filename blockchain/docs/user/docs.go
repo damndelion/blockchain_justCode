@@ -1572,6 +1572,12 @@ const docTemplate = `{
     "definitions": {
         "dto.UserCredRequest": {
             "type": "object",
+            "required": [
+                "card_num",
+                "cvv",
+                "type",
+                "userID"
+            ],
             "properties": {
                 "card_num": {
                     "type": "string"
@@ -1589,12 +1595,24 @@ const docTemplate = `{
         },
         "dto.UserDetailRequest": {
             "type": "object",
+            "required": [
+                "address",
+                "age",
+                "card_num",
+                "card_type",
+                "city",
+                "country",
+                "cvv",
+                "phone"
+            ],
             "properties": {
                 "address": {
                     "type": "string"
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 120,
+                    "minimum": 1
                 },
                 "card_num": {
                     "type": "string"
@@ -1618,12 +1636,22 @@ const docTemplate = `{
         },
         "dto.UserInfoRequest": {
             "type": "object",
+            "required": [
+                "address",
+                "age",
+                "city",
+                "country",
+                "phone",
+                "userID"
+            ],
             "properties": {
                 "address": {
                     "type": "string"
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 120,
+                    "minimum": 1
                 },
                 "city": {
                     "type": "string"
@@ -1641,6 +1669,12 @@ const docTemplate = `{
         },
         "dto.UserUpdateRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "wallet"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -1650,6 +1684,10 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "default": "user"
                 },
                 "valid": {
                     "type": "boolean",
@@ -1668,7 +1706,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"http."},
 	Title:            "User service",
 	Description:      "Service that does CRUD operations on user",
 	InfoInstanceName: "swagger",

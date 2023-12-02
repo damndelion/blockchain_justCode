@@ -2,16 +2,18 @@ package v1
 
 import (
 	"fmt"
-	"github.com/evrone/go-clean-template/internal/blockchain/metrics"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/evrone/go-clean-template/internal/blockchain/metrics"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/skip2/go-qrcode"
 
 	"github.com/evrone/go-clean-template/config/blockchain"
-	"github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
+	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/middleware"
 	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1/dto"
 	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
 	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
@@ -56,7 +58,10 @@ func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l log
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/all [get].
 func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
-	wallets, err := bc.c.Wallets(ctx)
+	span := opentracing.StartSpan("get wallets handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
+	wallets, err := bc.c.Wallets(spanCtx)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallets: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -80,9 +85,11 @@ func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet [get].
 func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
-	//authHeader := ctx.GetHeader("Authorization")
+	span := opentracing.StartSpan("get wallet handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
-	wallet, err := bc.c.Wallet(ctx, userID.(string))
+	wallet, err := bc.c.Wallet(spanCtx, userID.(string))
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallet: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "Wallet does not exist")
@@ -106,8 +113,11 @@ func (bc *chainRoutes) GetWallet(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/balance [get].
 func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
+	span := opentracing.StartSpan("get balance handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
-	balance, err := bc.c.GetBalance(ctx, userID.(string))
+	balance, err := bc.c.GetBalance(spanCtx, userID.(string))
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -132,8 +142,11 @@ func (bc *chainRoutes) GetBalance(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/balance/address [get].
 func (bc *chainRoutes) GetBalanceByAddress(ctx *gin.Context) {
+	span := opentracing.StartSpan("get balance by address handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	address := ctx.Query("address")
-	balance, err := bc.c.GetBalanceByAddress(ctx, address)
+	balance, err := bc.c.GetBalanceByAddress(spanCtx, address)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalance: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -157,9 +170,12 @@ func (bc *chainRoutes) GetBalanceByAddress(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/usd/balance [get].
 func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
+	span := opentracing.StartSpan("get balance is usd handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	balance, err := bc.c.GetBalanceUSD(ctx, userID.(string))
+	balance, err := bc.c.GetBalanceUSD(spanCtx, userID.(string))
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getBalanceUSD: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -183,9 +199,12 @@ func (bc *chainRoutes) GetBalanceUSD(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/create [post].
 func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
+	span := opentracing.StartSpan("create wallet handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	wallet, err := bc.c.CreateWallet(ctx, userID.(string))
+	wallet, err := bc.c.CreateWallet(spanCtx, userID.(string))
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - createWallet: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -209,6 +228,9 @@ func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/send [post].
 func (bc *chainRoutes) Send(ctx *gin.Context) {
+	span := opentracing.StartSpan("send handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	var sendData dto.SendRequest
 	err := ctx.ShouldBindJSON(&sendData)
 
@@ -220,7 +242,7 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 	}
 	userID, _ := ctx.Get("user_id")
 
-	err = bc.c.Send(ctx, userID.(string), sendData.To, sendData.Amount)
+	err = bc.c.Send(spanCtx, userID.(string), sendData.To, sendData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -238,14 +260,17 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "JWT Token"
-// @Param topUpRequest body dto.TopUpRequest true "Top up Request"
+// @Param topUpRequest body dto.TopupRequest true "Top up Request"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/topup [post].
 func (bc *chainRoutes) TopUp(ctx *gin.Context) {
-	var topupData dto.TopUpRequest
+	span := opentracing.StartSpan("top up handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
+	var topupData dto.TopupRequest
 	err := ctx.ShouldBindJSON(&topupData)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - topup: %w", err))
@@ -255,7 +280,7 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 	}
 	userID, _ := ctx.Get("user_id")
 
-	err = bc.c.TopUp(ctx, userID.(string), topupData.Amount)
+	err = bc.c.TopUp(spanCtx, userID.(string), topupData.Amount)
 	if err != nil {
 		bc.l.Error(fmt.Errorf("http - v1 - blockchain - send: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
@@ -279,6 +304,9 @@ func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/blockchain/wallet/qr [get].
 func (bc *chainRoutes) GetWalletQRCode(ctx *gin.Context) {
+	span := opentracing.StartSpan("get wallet qr code handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 	wallet, err := bc.chainCache.Get(ctx, userID.(string))
 	if err != nil {
@@ -287,7 +315,7 @@ func (bc *chainRoutes) GetWalletQRCode(ctx *gin.Context) {
 
 	if wallet == "" {
 		time.Sleep(1 * time.Second)
-		wallet, err = bc.c.Wallet(ctx, userID.(string))
+		wallet, err = bc.c.Wallet(spanCtx, userID.(string))
 		if err != nil {
 			bc.l.Error(fmt.Errorf("http - v1 - blockchain - GetWalletQRCode: %w", err))
 			errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))

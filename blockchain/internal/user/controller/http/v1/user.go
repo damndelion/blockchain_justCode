@@ -3,16 +3,16 @@ package v1
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/evrone/go-clean-template/config/user"
-	authMiddlware "github.com/evrone/go-clean-template/internal/auth/controller/http/middleware"
+	authMiddlware "github.com/evrone/go-clean-template/internal/user/controller/http/middleware"
 	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
 	_ "github.com/evrone/go-clean-template/internal/user/entity"
 	"github.com/evrone/go-clean-template/internal/user/usecase"
 	"github.com/evrone/go-clean-template/pkg/cache"
 	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 )
 
 type userRoutes struct {
@@ -49,27 +49,17 @@ func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Int
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user [get].
 func (ur *userRoutes) GetUser(ctx *gin.Context) {
+	span := opentracing.StartSpan("get user handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
-	resUser, err := ur.userCache.Get(ctx, userID.(string))
+
+	resUser, err := ur.u.GetUserByID(spanCtx, userID.(string))
 	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
+
 		return
-	}
-
-	if resUser == nil {
-		time.Sleep(1 * time.Second)
-		resUser, err = ur.u.GetUserByID(ctx, userID.(string))
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
-
-			return
-		}
-
-		err = ur.userCache.Set(ctx, userID.(string), resUser)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "getUsersById cache error")
-		}
 	}
 
 	ctx.JSON(http.StatusOK, resUser)
@@ -88,9 +78,12 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/info [get].
 func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
+	span := opentracing.StartSpan("get user detail information handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	userByID, err := ur.u.GetUserInfoByID(ctx, userID.(string))
+	userByID, err := ur.u.GetUserInfoByID(spanCtx, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -114,9 +107,12 @@ func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/cred [get].
 func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
+	span := opentracing.StartSpan("get user credentials handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	userByID, err := ur.u.GetUserCredByID(ctx, userID.(string))
+	userByID, err := ur.u.GetUserCredByID(spanCtx, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -141,6 +137,9 @@ func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/info [post].
 func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
+	span := opentracing.StartSpan("create user detail information handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
 	var userData dto.UserDetailRequest
@@ -152,7 +151,7 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-	err = ur.u.CreateUserDetailInfo(ctx, userData, userID.(string))
+	err = ur.u.CreateUserDetailInfo(spanCtx, userData, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
@@ -176,6 +175,9 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/user/info [put].
 func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
+	span := opentracing.StartSpan("set user detail information handler")
+	defer span.Finish()
+	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
 	var userData dto.UserDetailRequest
@@ -187,7 +189,7 @@ func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-	err = ur.u.SetUserDetailInfo(ctx, userData, userID.(string))
+	err = ur.u.SetUserDetailInfo(spanCtx, userData, userID.(string))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")

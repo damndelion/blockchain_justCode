@@ -7,7 +7,6 @@ var (
 
 	// TimeBucketsMedium suits for most of GO APIs, where response time is between 50ms..500ms.
 	// Works for wide range of systems because provides near-logarithmic buckets distribution.
-	//nolint:lll
 	TimeBucketsMedium = []float64{0.001, 0.005, 0.015, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3.5, 5, 10, 15, 20, 30, 40, 50, 60}
 
 	// TimeBucketsSlow suits for relatively slow services, where expected response time is > 500ms.

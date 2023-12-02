@@ -6,11 +6,16 @@ definitions:
         type: number
       to:
         type: string
+    required:
+    - amount
+    - to
     type: object
-  dto.TopUpRequest:
+  dto.TopupRequest:
     properties:
       amount:
         type: number
+    required:
+    - amount
     type: object
 host: localhost:8081
 info:
@@ -284,7 +289,7 @@ paths:
         name: topUpRequest
         required: true
         schema:
-          $ref: '#/definitions/dto.TopUpRequest'
+          $ref: '#/definitions/dto.TopupRequest'
       produces:
       - application/json
       responses:
@@ -341,5 +346,5 @@ paths:
       tags:
       - Blockchain
 schemes:
-- http
+- http.
 swagger: "2.0"

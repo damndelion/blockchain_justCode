@@ -20,3 +20,6 @@ jwt:
 
 grpcServer:
   port: ":9091"
+
+jaeger:
+  url: 'localhost:6831'

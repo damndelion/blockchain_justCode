@@ -212,6 +212,10 @@ const docTemplate = `{
     "definitions": {
         "dto.ConfirmRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "email"
+            ],
             "properties": {
                 "code": {
                     "type": "integer"
@@ -223,6 +227,10 @@ const docTemplate = `{
         },
         "dto.LoginRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -234,6 +242,9 @@ const docTemplate = `{
         },
         "dto.RefreshRequest": {
             "type": "object",
+            "required": [
+                "refresh_token"
+            ],
             "properties": {
                 "refresh_token": {
                     "type": "string"
@@ -242,6 +253,11 @@ const docTemplate = `{
         },
         "dto.RegisterRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -262,7 +278,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8082",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"http."},
 	Title:            "Authorization service",
 	Description:      "Service that handles authorization and authentication and generates jwt token",
 	InfoInstanceName: "swagger",

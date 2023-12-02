@@ -10,12 +10,19 @@ definitions:
         type: string
       userID:
         type: string
+    required:
+    - card_num
+    - cvv
+    - type
+    - userID
     type: object
   dto.UserDetailRequest:
     properties:
       address:
         type: string
       age:
+        maximum: 120
+        minimum: 1
         type: integer
       card_num:
         type: string
@@ -29,12 +36,23 @@ definitions:
         type: string
       phone:
         type: string
+    required:
+    - address
+    - age
+    - card_num
+    - card_type
+    - city
+    - country
+    - cvv
+    - phone
     type: object
   dto.UserInfoRequest:
     properties:
       address:
         type: string
       age:
+        maximum: 120
+        minimum: 1
         type: integer
       city:
         type: string
@@ -44,6 +62,13 @@ definitions:
         type: string
       userID:
         type: string
+    required:
+    - address
+    - age
+    - city
+    - country
+    - phone
+    - userID
     type: object
   dto.UserUpdateRequest:
     properties:
@@ -53,11 +78,19 @@ definitions:
         type: string
       password:
         type: string
+      role:
+        default: user
+        type: string
       valid:
         default: false
         type: boolean
       wallet:
         type: string
+    required:
+    - email
+    - name
+    - password
+    - wallet
     type: object
 host: localhost:8080
 info:
@@ -1105,5 +1138,5 @@ paths:
       tags:
       - Users Information
 schemes:
-- http
+- http.
 swagger: "2.0"

@@ -38,6 +38,7 @@ func (s *Service) GetUserByID(ctx context.Context, request *pb.GetUserByIDReques
 		Password: user.Password,
 		Wallet:   user.Wallet,
 		Valid:    user.Valid,
+		Role:     user.Role,
 	}, nil
 }
 

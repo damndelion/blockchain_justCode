@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"math/rand"
-	"net/http"
 	"time"
 
 	"github.com/evrone/go-clean-template/config/auth"
@@ -34,6 +32,8 @@ func NewAuth(repo AuthRepo, cfg *auth.Config, userVerificationProducer *nats.Pro
 }
 
 func (u *Auth) Register(ctx context.Context, name, email, password string) error {
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "register use case")
+	defer span.Finish()
 	err := u.repo.CheckForEmail(ctx, email)
 	if err != nil {
 		return err
@@ -59,18 +59,19 @@ func (u *Auth) Register(ctx context.Context, name, email, password string) error
 	confirmationChan := make(chan bool)
 	ConfirmationChannels[userIdentifier] = confirmationChan
 
-	success := <-confirmationChan
+	timeout := time.After(60 * time.Second)
 
-	delete(ConfirmationChannels, userIdentifier)
-
-	if !success {
-		return errors.New(fmt.Sprintf("user registration confirmation failed: %v", err))
+	select {
+	case success := <-confirmationChan:
+		delete(ConfirmationChannels, userIdentifier)
+		if !success {
+			return errors.New(fmt.Sprintf("user registration confirmation failed"))
+		}
+	case <-timeout:
+		return errors.New("user registration timed out")
 	}
 
-	if err != nil {
-		return err
-	}
-	_, err = u.repo.CreateUser(ctx, &userEntity.User{
+	_, err = u.repo.CreateUser(spanCtx, &userEntity.User{
 		Name:     name,
 		Email:    email,
 		Password: password,
@@ -94,7 +95,7 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("passwords do not match %v", err))
 	}
-	accessToken, refreshToken, err := u.generateTokens(ctx, user)
+	accessToken, refreshToken, err := u.generateTokens(spanCtx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +109,9 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	}, nil
 }
 
-func (u *Auth) Refresh(ctx *gin.Context, refreshToken string) (string, string, error) {
+func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "refresh use case")
+	defer span.Finish()
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -122,36 +125,25 @@ func (u *Auth) Refresh(ctx *gin.Context, refreshToken string) (string, string, e
 		if exp, ok := claims["exp"].(float64); ok {
 			expirationTime := time.Unix(int64(exp), 0)
 			if time.Now().After(expirationTime) {
-				ctx.AbortWithStatus(http.StatusUnauthorized)
-
 				return "", "", err
 			}
 		} else {
-			ctx.AbortWithStatus(http.StatusUnauthorized)
-
 			return "", "", err
-
 		}
 	} else {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-
 		return "", "", err
-
 	}
 	if err != nil || !token.Valid {
-		ctx.AbortWithStatus(http.StatusForbidden)
-
 		return "", "", err
-
 	}
 
 	userEmail := fmt.Sprintf("%v", claims["email"])
-	user, err := u.repo.GetUserByEmail(ctx, userEmail)
+	user, err := u.repo.GetUserByEmail(spanCtx, userEmail)
 	if err != nil {
 		return "", "", err
 	}
 
-	accessToken, refreshToken, err := u.generateTokens(ctx, user)
+	accessToken, refreshToken, err := u.generateTokens(spanCtx, user)
 	if err != nil {
 		return "", "", err
 	}
@@ -160,6 +152,8 @@ func (u *Auth) Refresh(ctx *gin.Context, refreshToken string) (string, string, e
 }
 
 func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (string, string, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "generate token")
+	defer span.Finish()
 	accessTokenClaims := jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
@@ -202,7 +196,9 @@ func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (strin
 }
 
 func (u *Auth) ConfirmUserCode(ctx context.Context, email string, userCode int) error {
-	code, err := u.repo.ConfirmCode(ctx, email)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "confirm user code usecase")
+	defer span.Finish()
+	code, err := u.repo.ConfirmCode(spanCtx, email)
 	if err != nil {
 		return err
 	}

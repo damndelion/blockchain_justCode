@@ -1,9 +1,10 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/evrone/go-clean-template/internal/user/controller/http/middleware"
 	"github.com/prometheus/client_golang/prometheus"
-	"net/http"
 
 	"github.com/evrone/go-clean-template/pkg/cache"
 

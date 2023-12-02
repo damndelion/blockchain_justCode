@@ -417,7 +417,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.TopUpRequest"
+                            "$ref": "#/definitions/dto.TopupRequest"
                         }
                     }
                 ],
@@ -503,6 +503,10 @@ const docTemplate = `{
     "definitions": {
         "dto.SendRequest": {
             "type": "object",
+            "required": [
+                "amount",
+                "to"
+            ],
             "properties": {
                 "amount": {
                     "type": "number"
@@ -512,8 +516,11 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.TopUpRequest": {
+        "dto.TopupRequest": {
             "type": "object",
+            "required": [
+                "amount"
+            ],
             "properties": {
                 "amount": {
                     "type": "number"
@@ -528,7 +535,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8081",
 	BasePath:         "/",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"http."},
 	Title:            "Blockchain service",
 	Description:      "Service that handles all blockchain request",
 	InfoInstanceName: "swagger",

@@ -1,6 +1,6 @@
 {
     "schemes": [
-        "http"
+        "http."
     ],
     "swagger": "2.0",
     "info": {
@@ -209,6 +209,10 @@
     "definitions": {
         "dto.ConfirmRequest": {
             "type": "object",
+            "required": [
+                "code",
+                "email"
+            ],
             "properties": {
                 "code": {
                     "type": "integer"
@@ -220,6 +224,10 @@
         },
         "dto.LoginRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -231,6 +239,9 @@
         },
         "dto.RefreshRequest": {
             "type": "object",
+            "required": [
+                "refresh_token"
+            ],
             "properties": {
                 "refresh_token": {
                     "type": "string"
@@ -239,6 +250,11 @@
         },
         "dto.RegisterRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"

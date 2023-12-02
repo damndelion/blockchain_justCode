@@ -6,6 +6,9 @@ definitions:
         type: integer
       email:
         type: string
+    required:
+    - code
+    - email
     type: object
   dto.LoginRequest:
     properties:
@@ -13,11 +16,16 @@ definitions:
         type: string
       password:
         type: string
+    required:
+    - email
+    - password
     type: object
   dto.RefreshRequest:
     properties:
       refresh_token:
         type: string
+    required:
+    - refresh_token
     type: object
   dto.RegisterRequest:
     properties:
@@ -27,6 +35,10 @@ definitions:
         type: string
       password:
         type: string
+    required:
+    - email
+    - name
+    - password
     type: object
 host: localhost:8082
 info:
@@ -164,5 +176,5 @@ paths:
       tags:
       - Auth
 schemes:
-- http
+- http.
 swagger: "2.0"

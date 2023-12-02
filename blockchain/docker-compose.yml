@@ -20,7 +20,7 @@ services:
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
       NATS_URL: 'nats://nats:4222'
-      JAEGER_URL: 'localhost:6831'
+      JAEGER_URL: 'jaeger:6831'
       USER_TRANSPORT_URL: 'http://user:8080'
       USER_GRPC_URL: 'user:9091'
     ports:
@@ -40,7 +40,7 @@ services:
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
       NATS_URL: 'nats://localhost:4222'
-      JAEGER_URL: 'localhost:6831'
+      JAEGER_URL: 'jaeger:6831'
       USER_TRANSPORT_URL: 'http://user:8080'
       USER_GRPC_URL: 'user:9091'
       REDIS_URL: 'redis:6379'
@@ -57,7 +57,7 @@ services:
     environment:
       PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
       NATS_URL: 'nats://localhost:4222'
-      JAEGER_URL: 'localhost:6831'
+      JAEGER_URL: 'jaeger:6831'
       USER_GRPC_URL: 'user:9091'
       REDIS_URL: 'redis:6379'
     ports:

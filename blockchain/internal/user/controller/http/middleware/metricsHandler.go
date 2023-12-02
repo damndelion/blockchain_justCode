@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"time"
+
 	"github.com/evrone/go-clean-template/internal/user/metrics"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 func MetricsHandler() gin.HandlerFunc {

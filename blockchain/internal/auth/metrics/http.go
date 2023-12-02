@@ -21,7 +21,7 @@ var (
 	)
 )
 
-// nolint: gochecknoinits
+//nolint:gochecknoinits // correct function
 func init() {
 	mustRegister(HttpResponseTime, HttpRequestsTotalCollector)
 }

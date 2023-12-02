@@ -29,7 +29,7 @@ import (
 func Run(cfg *auth.Config) {
 	l := logger.New(cfg.Log.Level)
 
-	tracer, closer, err := jaeger.InitJaeger(cfg.Jaeger.URL)
+	tracer, closer, err := jaeger.InitJaeger("auth-service", cfg.Jaeger.URL)
 	if err != nil {
 		l.Error(fmt.Errorf("auth - Run - jaeger.InitJaeger: %w", err))
 	}

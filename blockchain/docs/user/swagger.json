@@ -1,6 +1,6 @@
 {
     "schemes": [
-        "http"
+        "http."
     ],
     "swagger": "2.0",
     "info": {
@@ -1569,6 +1569,12 @@
     "definitions": {
         "dto.UserCredRequest": {
             "type": "object",
+            "required": [
+                "card_num",
+                "cvv",
+                "type",
+                "userID"
+            ],
             "properties": {
                 "card_num": {
                     "type": "string"
@@ -1586,12 +1592,24 @@
         },
         "dto.UserDetailRequest": {
             "type": "object",
+            "required": [
+                "address",
+                "age",
+                "card_num",
+                "card_type",
+                "city",
+                "country",
+                "cvv",
+                "phone"
+            ],
             "properties": {
                 "address": {
                     "type": "string"
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 120,
+                    "minimum": 1
                 },
                 "card_num": {
                     "type": "string"
@@ -1615,12 +1633,22 @@
         },
         "dto.UserInfoRequest": {
             "type": "object",
+            "required": [
+                "address",
+                "age",
+                "city",
+                "country",
+                "phone",
+                "userID"
+            ],
             "properties": {
                 "address": {
                     "type": "string"
                 },
                 "age": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 120,
+                    "minimum": 1
                 },
                 "city": {
                     "type": "string"
@@ -1638,6 +1666,12 @@
         },
         "dto.UserUpdateRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "wallet"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -1647,6 +1681,10 @@
                 },
                 "password": {
                     "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "default": "user"
                 },
                 "valid": {
                     "type": "boolean",

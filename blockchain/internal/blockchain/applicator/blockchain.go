@@ -3,10 +3,14 @@ package applicator
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/evrone/go-clean-template/pkg/jaeger"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/evrone/go-clean-template/pkg/cache"
 
@@ -39,13 +43,24 @@ func Run(cfg *blockchain.Config) {
 		}
 	}(db)
 
+	tracer, closer, err := jaeger.InitJaeger("blockchain-service", cfg.Jaeger.URL)
+	if err != nil {
+		l.Error(fmt.Errorf("blockchain - Run - jaeger.InitJaeger: %w", err))
+	}
+	defer func(closer io.Closer) {
+		err = closer.Close()
+		if err != nil {
+			l.Error("Failed to close Jaeger: %v", err)
+		}
+	}(closer)
+	opentracing.SetGlobalTracer(tracer)
+
 	address := blockchainlogic.CreateWallet()
 
 	userGrpcTransport := transport.NewUserGrpcTransport(cfg.Transport.UserGrpc)
 
 	// Use case
 	chainUseCase := usecase.NewBlockchain(repo.NewBlockchainRepo(db, address, userGrpcTransport), cfg, userGrpcTransport)
-
 	blockchainlogic.ListAddresses()
 	// address to create genesis block
 	chain := blockchainlogic.CreateBlockchain(db, address)

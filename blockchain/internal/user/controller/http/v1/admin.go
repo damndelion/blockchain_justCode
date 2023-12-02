@@ -33,7 +33,7 @@ func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.In
 		adminHandler.GET("/email", r.GetUserByEmail)
 		adminHandler.GET("/all/sort", r.GetUsersWithSort)
 		adminHandler.GET("/all/search", r.GetUsersWithSearch)
-		adminHandler.POST("/user/:id", r.UpdateUser)
+		adminHandler.POST("/user", r.UpdateUser)
 		adminHandler.PUT("/user", r.CreateUser)
 		adminHandler.DELETE("/user/:id", r.DeleteUser)
 
@@ -71,6 +71,7 @@ func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.In
 // @Router /v1/admin/all [get].
 func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 	var users []*userEntity.User
+	var res interface{}
 	var err error
 	if len(ctx.Request.URL.Query()) == 0 {
 		users, err = ur.u.Users(ctx)
@@ -80,8 +81,11 @@ func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 
 			return
 		}
+		ctx.JSON(http.StatusOK, users)
 	} else {
-		users, err = ur.u.UsersWithFilter(ctx, ctx.Request.URL.Query())
+		res, err = ur.u.UsersWithFilter(ctx, ctx.Request.URL.Query())
+
+		ctx.JSON(http.StatusOK, res)
 	}
 
 	if err != nil {
@@ -91,7 +95,6 @@ func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, users)
 }
 
 // GetUserByID godoc
@@ -242,7 +245,6 @@ func (ur *adminRoutes) GetUsersWithSearch(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user/{id} [post].
 func (ur *adminRoutes) UpdateUser(ctx *gin.Context) {
-	id := ctx.Param("id")
 	var userData dto.UserUpdateRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
@@ -251,8 +253,7 @@ func (ur *adminRoutes) UpdateUser(ctx *gin.Context) {
 
 		return
 	}
-
-	err = ur.u.UpdateUser(ctx, userData, id)
+	err = ur.u.UpdateUser(ctx, userData, userData.Email)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
@@ -336,6 +337,7 @@ func (ur *adminRoutes) DeleteUser(ctx *gin.Context) {
 // @Router /v1/admin/info [get].
 func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 	var usersInfo []*userEntity.UserInfo
+	var res interface{}
 	var err error
 	if len(ctx.Request.URL.Query()) == 0 {
 		usersInfo, err = ur.u.UsersInfo(ctx)
@@ -345,8 +347,10 @@ func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 
 			return
 		}
+		ctx.JSON(http.StatusOK, usersInfo)
 	} else {
-		usersInfo, err = ur.u.UsersInfoWithFilter(ctx, ctx.Request.URL.Query())
+		res, err = ur.u.UsersInfoWithFilter(ctx, ctx.Request.URL.Query())
+		ctx.JSON(http.StatusOK, res)
 	}
 
 	if err != nil {
@@ -356,7 +360,6 @@ func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, usersInfo)
 }
 
 // GetUsersInfoWithSort godoc
@@ -545,6 +548,7 @@ func (ur *adminRoutes) DeleteUserInfo(ctx *gin.Context) {
 // @Router /v1/admin/cred [get].
 func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	var usersCred []*userEntity.UserCredentials
+	var res interface{}
 	var err error
 	if len(ctx.Request.URL.Query()) == 0 {
 		usersCred, err = ur.u.UsersCred(ctx)
@@ -554,8 +558,12 @@ func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 
 			return
 		}
+		ctx.JSON(http.StatusOK, usersCred)
+
 	} else {
-		usersCred, err = ur.u.UsersCredWithFilter(ctx, ctx.Request.URL.Query())
+		res, err = ur.u.UsersCredWithFilter(ctx, ctx.Request.URL.Query())
+		ctx.JSON(http.StatusOK, res)
+
 	}
 
 	if err != nil {
@@ -565,7 +573,6 @@ func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, usersCred)
 }
 
 // GetUsersCredWithSort godoc

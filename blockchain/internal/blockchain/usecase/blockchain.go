@@ -4,43 +4,61 @@ import (
 	"context"
 	"sync"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/evrone/go-clean-template/config/blockchain"
 	"github.com/evrone/go-clean-template/internal/blockchain/transport"
-	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
 )
 
 type Blockchain struct {
-	repo              repo.BlockchainRepo
+	repo              ChainRepo
 	cfg               *blockchain.Config
 	userGrpcTransport *transport.UserGrpcTransport
 }
 
-func NewBlockchain(repo *repo.BlockchainRepo, cfg *blockchain.Config, userGrpcTransport *transport.UserGrpcTransport) *Blockchain {
-	return &Blockchain{*repo, cfg, userGrpcTransport}
+func NewBlockchain(repo ChainRepo, cfg *blockchain.Config, userGrpcTransport *transport.UserGrpcTransport) *Blockchain {
+	return &Blockchain{repo, cfg, userGrpcTransport}
 }
 
 func (b *Blockchain) Wallets(ctx context.Context) ([]string, error) {
-	return b.repo.GetWallets(ctx)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "wallets use case")
+	defer span.Finish()
+
+	return b.repo.GetWallets(spanCtx)
 }
 
 func (b *Blockchain) Wallet(ctx context.Context, userID string) (string, error) {
-	return b.repo.GetWallet(ctx, userID)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "wallet use case")
+	defer span.Finish()
+
+	return b.repo.GetWallet(spanCtx, userID)
 }
 
 func (b *Blockchain) GetBalance(ctx context.Context, userID string) (float64, error) {
-	return b.repo.GetBalance(ctx, userID)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "get balance use case")
+	defer span.Finish()
+
+	return b.repo.GetBalance(spanCtx, userID)
 }
 
 func (b *Blockchain) GetBalanceByAddress(ctx context.Context, address string) (float64, error) {
-	return b.repo.GetBalanceByAddress(ctx, address)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "get balance by address use case")
+	defer span.Finish()
+
+	return b.repo.GetBalanceByAddress(spanCtx, address)
 }
 
 func (b *Blockchain) GetBalanceUSD(ctx context.Context, userID string) (float64, error) {
-	return b.repo.GetBalanceUSD(ctx, userID)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "get balance is usd use case")
+	defer span.Finish()
+
+	return b.repo.GetBalanceUSD(spanCtx, userID)
 }
 
 func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, error) {
-	wallet, err := b.repo.CreateWallet(ctx, userID)
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "create wallet use case")
+	defer span.Finish()
+	wallet, err := b.repo.CreateWallet(spanCtx, userID)
 	if err != nil {
 		return "", err
 	}
@@ -49,11 +67,13 @@ func (b *Blockchain) CreateWallet(ctx context.Context, userID string) (string, e
 }
 
 func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) error {
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "send use case")
+	defer span.Finish()
 	var wg sync.WaitGroup
 	var err error
 	wg.Add(1)
 	go func() {
-		err = b.repo.Send(ctx, from, to, amount, &wg)
+		err = b.repo.Send(spanCtx, from, to, amount, &wg)
 	}()
 	wg.Wait()
 	if err != nil {
@@ -64,11 +84,18 @@ func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) 
 }
 
 func (b *Blockchain) TopUp(ctx context.Context, to string, amount float64) error {
+	span, spanCtx := opentracing.StartSpanFromContext(ctx, "top up use case")
+	defer span.Finish()
 	var wg sync.WaitGroup
 	var err error
 	wg.Add(1)
-	go func() {
-		err = b.repo.TopUp(ctx, b.cfg.GenesisAddress, to, amount, &wg)
+	go func() error {
+		err = b.repo.TopUp(spanCtx, b.cfg.GenesisAddress, to, amount, &wg)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}()
 	wg.Wait()
 	if err != nil {

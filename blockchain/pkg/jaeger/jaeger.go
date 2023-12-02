@@ -12,20 +12,20 @@ import (
 
 var Tracer opentracing.Tracer
 
-func InitJaeger(_ string) (opentracing.Tracer, io.Closer, error) {
+func InitJaeger(serviceName string, url string) (opentracing.Tracer, io.Closer, error) {
 	cfg := config.Configuration{
 		Sampler: &config.SamplerConfig{
 			Type:  jaeger.SamplerTypeRateLimiting,
 			Param: 100, // 100 traces per second
 		},
 		Reporter: &config.ReporterConfig{
-			LocalAgentHostPort: "localhost:6831",
+			LocalAgentHostPort: url,
 		},
 	}
 
 	var err error
 	var closer io.Closer
-	Tracer, closer, err = cfg.New("auth-service")
+	Tracer, closer, err = cfg.New(serviceName)
 
 	return Tracer, closer, err
 }

@@ -15,6 +15,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1/dto"
 )
 
 const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
@@ -306,12 +308,6 @@ func generateTransactionKey(from, to string, amount float64) string {
 	return hashCode
 }
 
-type CoinGeckoResponse struct {
-	Bitcoin struct {
-		USD float64 `json:"usd"`
-	} `json:"bitcoin"`
-}
-
 func (bc *Blockchain) GetBalanceInUSD(address string) (float64, error) {
 	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
 
@@ -326,7 +322,7 @@ func (bc *Blockchain) GetBalanceInUSD(address string) (float64, error) {
 		}
 	}(response.Body)
 
-	var data CoinGeckoResponse
+	var data dto.CoinGeckoResponse
 
 	if err := json.NewDecoder(response.Body).Decode(&data); err != nil {
 		return -1, err

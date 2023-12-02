@@ -9,8 +9,6 @@ import (
 	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
 )
 
-//go:generate mockgen -source=interfaces.go -destination=./mocks_test.go -package=usecase_test
-
 type (
 
 	// UserUseCase -.
@@ -20,9 +18,8 @@ type (
 		UsersWithSort(ctx context.Context, sort, method string) ([]*userEntity.User, error)
 		UsersWithSearch(ctx context.Context, params url.Values) ([]*userEntity.User, error)
 		CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error)
-		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, id string) error
+		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, email string) error
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
-		GetUserRole(ctx context.Context, id int) (string, error)
 		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
 		DeleteUser(ctx context.Context, id string) error
 
@@ -41,12 +38,10 @@ type (
 		UsersCredWithFilter(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error)
 		UsersCredWithSort(ctx context.Context, sort, method string) ([]*userEntity.UserCredentials, error)
 		UsersCredWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error)
-		GetUserCredByID(ctx context.Context, id string) (*userEntity.UserCredentials, error)
+		GetUserCredByID(ctx context.Context, id string) (*userEntity.UserCredentials, error) //
 		CreateUserCred(ctx context.Context, userData dto.UserCredRequest) error
 		UpdateUserCredentials(ctx context.Context, userData dto.UserCredRequest, id string) error
 		DeleteUserCred(ctx context.Context, id string) error
-
-		GetIDFromToken(accessToken string) (string, error)
 	}
 
 	// UserRepo -.
@@ -54,12 +49,12 @@ type (
 		GetUsers(ctx context.Context) ([]*userEntity.User, error)
 		GetUsersWithFilter(ctx context.Context, param, value string) (users []*userEntity.User, err error)
 		GetUsersWithSort(ctx context.Context, param, method string) (users []*userEntity.User, err error)
-		GetUsersWithSearch(ctx context.Context, param string, value interface{}) (users []*userEntity.User, err error)
+		GetUsersWithSearch(ctx context.Context, param string, value string) (users []*userEntity.User, err error)
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
 		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
 		GetUserRole(ctx context.Context, id int) (string, error)
 		CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error)
-		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, id string) error
+		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, email string) error
 		SetUserWallet(ctx context.Context, userID, address string) error
 		DeleteUser(ctx context.Context, id string) error
 

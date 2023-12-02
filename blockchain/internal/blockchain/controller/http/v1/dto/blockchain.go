@@ -8,7 +8,15 @@ type SendRequest struct {
 type TopUpRequest struct {
 	Amount float64 `json:"amount" binding:"required"`
 }
-
+type TopupRequest struct {
+	Amount float64 `json:"amount" binding:"required"`
+}
 type AddressRequest struct {
 	Address string `json:"address" binding:"required"`
+}
+
+type CoinGeckoResponse struct {
+	Bitcoin struct {
+		USD float64 `json:"usd"`
+	} `json:"bitcoin"`
 }

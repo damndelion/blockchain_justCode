@@ -55,6 +55,7 @@ func (t *UserGrpcTransport) CreateUser(ctx context.Context, user *userEntity.Use
 			Password: user.Password,
 			Wallet:   user.Wallet,
 			Valid:    user.Valid,
+			Role:     user.Role,
 		},
 	}
 	resp, err := t.client.CreateUser(ctx, grpcUser)

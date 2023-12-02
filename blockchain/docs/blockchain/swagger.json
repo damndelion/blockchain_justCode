@@ -1,6 +1,6 @@
 {
     "schemes": [
-        "http"
+        "http."
     ],
     "swagger": "2.0",
     "info": {
@@ -414,7 +414,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.TopUpRequest"
+                            "$ref": "#/definitions/dto.TopupRequest"
                         }
                     }
                 ],
@@ -500,6 +500,10 @@
     "definitions": {
         "dto.SendRequest": {
             "type": "object",
+            "required": [
+                "amount",
+                "to"
+            ],
             "properties": {
                 "amount": {
                     "type": "number"
@@ -509,8 +513,11 @@
                 }
             }
         },
-        "dto.TopUpRequest": {
+        "dto.TopupRequest": {
             "type": "object",
+            "required": [
+                "amount"
+            ],
             "properties": {
                 "amount": {
                     "type": "number"

@@ -3,10 +3,14 @@ package applicator
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/evrone/go-clean-template/pkg/jaeger"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/evrone/go-clean-template/config/user"
 	"github.com/evrone/go-clean-template/internal/user/controller/grpc"
@@ -36,6 +40,18 @@ func Run(cfg *user.Config) {
 			l.Fatal(err)
 		}
 	}(sqlDB)
+
+	tracer, closer, err := jaeger.InitJaeger("user-service", cfg.Jaeger.URL)
+	if err != nil {
+		l.Error(fmt.Errorf("blockchain - Run - jaeger.InitJaeger: %w", err))
+	}
+	defer func(closer io.Closer) {
+		err = closer.Close()
+		if err != nil {
+			l.Error("Failed to close Jaeger: %v", err)
+		}
+	}(closer)
+	opentracing.SetGlobalTracer(tracer)
 
 	redisClient, err := cache.NewRedisClient(cfg.Redis.Host)
 

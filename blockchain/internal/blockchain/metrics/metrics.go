@@ -4,11 +4,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-const (
-	statusError = "error"
-	statusOk    = "ok"
-)
-
 func mustRegister(collectors ...prometheus.Collector) {
 	prometheus.DefaultRegisterer.MustRegister(collectors...)
 }
