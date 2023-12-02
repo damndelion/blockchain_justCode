@@ -1,9 +1,9 @@
 package nats
 
 import (
-	"github.com/evrone/go-clean-template/config/auth"
-	consumer "github.com/evrone/go-clean-template/internal/auth/consumer"
-	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/config/auth"
+	consumer "github.com/damndelion/blockchain_justCode/internal/auth/consumer"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/nats-io/nats.go"
 )
 

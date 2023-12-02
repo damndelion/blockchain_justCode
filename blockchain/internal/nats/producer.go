@@ -1,7 +1,7 @@
 package nats
 
 import (
-	"github.com/evrone/go-clean-template/config/auth"
+	"github.com/damndelion/blockchain_justCode/config/auth"
 	"github.com/nats-io/nats.go"
 )
 

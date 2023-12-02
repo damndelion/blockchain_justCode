@@ -3,9 +3,9 @@ package usecase
 import (
 	"context"
 
-	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
-	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/damndelion/blockchain_justCode/internal/auth/controller/http/v1/dto"
+	authEntity "github.com/damndelion/blockchain_justCode/internal/auth/entity"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 )
 
 type (

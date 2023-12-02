@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1/dto"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

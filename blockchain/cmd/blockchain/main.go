@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	"github.com/evrone/go-clean-template/internal/blockchain/applicator"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/applicator"
 )
 
 // @title Blockchain service

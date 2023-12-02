@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/evrone/go-clean-template/config/auth"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
-	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
+	"github.com/damndelion/blockchain_justCode/config/auth"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
+	pb "github.com/damndelion/blockchain_justCode/pkg/protobuf/userService/gw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

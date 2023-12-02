@@ -6,8 +6,8 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	"github.com/evrone/go-clean-template/internal/blockchain/transport"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/transport"
 )
 
 type Blockchain struct {

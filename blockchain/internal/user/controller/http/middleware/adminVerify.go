@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/user/usecase"
+	"github.com/damndelion/blockchain_justCode/internal/user/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )

@@ -3,9 +3,9 @@ package nats
 import (
 	"encoding/json"
 
-	"github.com/evrone/go-clean-template/internal/auth/consumer/dto"
-	"github.com/evrone/go-clean-template/internal/auth/transport"
-	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/internal/auth/consumer/dto"
+	"github.com/damndelion/blockchain_justCode/internal/auth/transport"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/nats-io/nats.go"
 	"gorm.io/gorm"
 )

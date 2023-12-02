@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	"github.com/redis/go-redis/v9"
 )
 

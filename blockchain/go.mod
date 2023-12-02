@@ -1,4 +1,4 @@
-module github.com/evrone/go-clean-template
+module github.com/damndelion/blockchain_justCode
 
 go 1.21.4
 

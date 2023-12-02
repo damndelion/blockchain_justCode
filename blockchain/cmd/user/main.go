@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/evrone/go-clean-template/config/user"
-	"github.com/evrone/go-clean-template/internal/user/applicator"
+	"github.com/damndelion/blockchain_justCode/config/user"
+	"github.com/damndelion/blockchain_justCode/internal/user/applicator"
 )
 
 // @title User service

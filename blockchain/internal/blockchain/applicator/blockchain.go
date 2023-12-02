@@ -9,21 +9,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/evrone/go-clean-template/pkg/jaeger"
+	"github.com/damndelion/blockchain_justCode/pkg/jaeger"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/evrone/go-clean-template/pkg/cache"
+	"github.com/damndelion/blockchain_justCode/pkg/cache"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	_ "github.com/evrone/go-clean-template/config/blockchain"
-	v1 "github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1"
-	"github.com/evrone/go-clean-template/internal/blockchain/transport"
-	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
-	"github.com/evrone/go-clean-template/internal/blockchain/usecase/repo"
-	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
-	"github.com/evrone/go-clean-template/pkg/httpserver"
-	"github.com/evrone/go-clean-template/pkg/logger"
-	"github.com/evrone/go-clean-template/pkg/postgres"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	_ "github.com/damndelion/blockchain_justCode/config/blockchain"
+	v1 "github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/v1"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/transport"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/usecase"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/usecase/repo"
+	blockchainlogic "github.com/damndelion/blockchain_justCode/pkg/blockchain_logic"
+	"github.com/damndelion/blockchain_justCode/pkg/httpserver"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/pkg/postgres"
 	"github.com/gin-gonic/gin"
 )
 

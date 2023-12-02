@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/evrone/go-clean-template/internal/auth/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/auth/usecase"
-	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/internal/auth/controller/http/v1/dto"
+	"github.com/damndelion/blockchain_justCode/internal/auth/usecase"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 )

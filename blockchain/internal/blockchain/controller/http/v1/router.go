@@ -3,16 +3,16 @@ package v1
 import (
 	"net/http"
 
-	"github.com/evrone/go-clean-template/internal/user/controller/http/middleware"
+	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/evrone/go-clean-template/pkg/cache"
+	"github.com/damndelion/blockchain_justCode/pkg/cache"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	_ "github.com/evrone/go-clean-template/docs/blockchain"
-	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
-	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
-	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	_ "github.com/damndelion/blockchain_justCode/docs/blockchain"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/usecase"
+	blockchainlogic "github.com/damndelion/blockchain_justCode/pkg/blockchain_logic"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

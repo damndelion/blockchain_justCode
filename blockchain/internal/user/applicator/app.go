@@ -9,20 +9,20 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/evrone/go-clean-template/pkg/jaeger"
+	"github.com/damndelion/blockchain_justCode/pkg/jaeger"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/evrone/go-clean-template/config/user"
-	"github.com/evrone/go-clean-template/internal/user/controller/grpc"
-	v1 "github.com/evrone/go-clean-template/internal/user/controller/http/v1"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
-	"github.com/evrone/go-clean-template/internal/user/usecase"
-	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
-	"github.com/evrone/go-clean-template/pkg/cache"
+	"github.com/damndelion/blockchain_justCode/config/user"
+	"github.com/damndelion/blockchain_justCode/internal/user/controller/grpc"
+	v1 "github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
+	"github.com/damndelion/blockchain_justCode/internal/user/usecase"
+	"github.com/damndelion/blockchain_justCode/internal/user/usecase/repo"
+	"github.com/damndelion/blockchain_justCode/pkg/cache"
 
-	"github.com/evrone/go-clean-template/pkg/httpserver"
-	"github.com/evrone/go-clean-template/pkg/logger"
-	"github.com/evrone/go-clean-template/pkg/postgres"
+	"github.com/damndelion/blockchain_justCode/pkg/httpserver"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/pkg/postgres"
 	"github.com/gin-gonic/gin"
 )
 

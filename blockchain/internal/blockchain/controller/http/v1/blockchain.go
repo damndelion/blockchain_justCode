@@ -6,18 +6,18 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/blockchain/metrics"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/metrics"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/evrone/go-clean-template/pkg/cache"
+	"github.com/damndelion/blockchain_justCode/pkg/cache"
 	"github.com/skip2/go-qrcode"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/middleware"
-	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/blockchain/usecase"
-	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
-	"github.com/evrone/go-clean-template/pkg/logger"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/middleware"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/v1/dto"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/usecase"
+	blockchainlogic "github.com/damndelion/blockchain_justCode/pkg/blockchain_logic"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 

@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1/dto"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/v1/dto"
 )
 
 const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"

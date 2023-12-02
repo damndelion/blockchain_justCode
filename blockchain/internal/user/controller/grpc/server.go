@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
+	pb "github.com/damndelion/blockchain_justCode/pkg/protobuf/userService/gw"
 	"google.golang.org/grpc"
 )
 

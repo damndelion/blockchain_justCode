@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	blockchainlogic "github.com/damndelion/blockchain_justCode/pkg/blockchain_logic"
 )
 
 type WalletBuilder struct {

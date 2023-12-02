@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/evrone/go-clean-template/config/user"
-	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	"github.com/damndelion/blockchain_justCode/config/user"
+	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1/dto"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 )
 
 type User struct {

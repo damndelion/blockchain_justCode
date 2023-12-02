@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/evrone/go-clean-template/config/auth"
-	"github.com/evrone/go-clean-template/internal/auth/applicator"
+	"github.com/damndelion/blockchain_justCode/config/auth"
+	"github.com/damndelion/blockchain_justCode/internal/auth/applicator"
 )
 
 // @title Authorization service

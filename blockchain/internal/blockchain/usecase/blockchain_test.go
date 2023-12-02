@@ -6,9 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	"github.com/evrone/go-clean-template/internal/blockchain/mocks"
-	"github.com/evrone/go-clean-template/internal/blockchain/transport"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/mocks"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/transport"
 )
 
 //nolint:dupl  // not duplicate

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/evrone/go-clean-template/internal/user/controller/http/v1/dto"
-	"github.com/evrone/go-clean-template/internal/user/usecase/repo"
-	"github.com/evrone/go-clean-template/pkg/logger"
-	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
+	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1/dto"
+	"github.com/damndelion/blockchain_justCode/internal/user/usecase/repo"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
+	pb "github.com/damndelion/blockchain_justCode/pkg/protobuf/userService/gw"
 )
 
 type Service struct {

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/evrone/go-clean-template/config/blockchain"
-	pb "github.com/evrone/go-clean-template/pkg/protobuf/userService/gw"
+	"github.com/damndelion/blockchain_justCode/config/blockchain"
+	pb "github.com/damndelion/blockchain_justCode/pkg/protobuf/userService/gw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

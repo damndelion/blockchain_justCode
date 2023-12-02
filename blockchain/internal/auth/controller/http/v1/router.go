@@ -3,12 +3,12 @@ package v1
 import (
 	"net/http"
 
-	"github.com/evrone/go-clean-template/internal/user/controller/http/middleware"
+	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 
-	_ "github.com/evrone/go-clean-template/docs/auth"
-	"github.com/evrone/go-clean-template/internal/auth/usecase"
-	"github.com/evrone/go-clean-template/pkg/logger"
+	_ "github.com/damndelion/blockchain_justCode/docs/auth"
+	"github.com/damndelion/blockchain_justCode/internal/auth/usecase"
+	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

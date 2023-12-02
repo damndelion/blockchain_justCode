@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/blockchain/controller/http/v1/dto"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/v1/dto"
 	"github.com/opentracing/opentracing-go"
 
-	"github.com/evrone/go-clean-template/internal/blockchain/transport"
-	blockchainlogic "github.com/evrone/go-clean-template/pkg/blockchain_logic"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/transport"
+	blockchainlogic "github.com/damndelion/blockchain_justCode/pkg/blockchain_logic"
 )
 
 type BlockchainRepo struct {

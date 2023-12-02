@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	authEntity "github.com/evrone/go-clean-template/internal/auth/entity"
-	"github.com/evrone/go-clean-template/internal/auth/transport"
-	userEntity "github.com/evrone/go-clean-template/internal/user/entity"
+	authEntity "github.com/damndelion/blockchain_justCode/internal/auth/entity"
+	"github.com/damndelion/blockchain_justCode/internal/auth/transport"
+	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	"github.com/opentracing/opentracing-go"
 	"gorm.io/gorm"
 )
