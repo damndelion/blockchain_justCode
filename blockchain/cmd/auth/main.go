@@ -21,7 +21,7 @@ import (
 
 // @host localhost:8082
 // @BasePath /
-// @schemes http.
+// @schemes http
 func main() {
 	cfg, err := auth.NewConfig()
 	if err != nil {

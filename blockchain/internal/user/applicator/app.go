@@ -3,12 +3,13 @@ package applicator
 import (
 	"database/sql"
 	"fmt"
-	"github.com/damndelion/blockchain_justCode/pkg/jaeger"
-	"github.com/opentracing/opentracing-go"
 	"io"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/damndelion/blockchain_justCode/pkg/jaeger"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/damndelion/blockchain_justCode/config/user"
 	"github.com/damndelion/blockchain_justCode/internal/user/controller/grpc"

@@ -55,6 +55,36 @@ info:
   title: Authorization service
   version: "1.0"
 paths:
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user in the system
+      parameters:
+      - description: User registration request
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully registered
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - Auth
   /v1/auth/confirm:
     post:
       consumes:
@@ -145,36 +175,6 @@ paths:
       summary: User refresh token
       tags:
       - Auth
-  /v1/auth/register:
-    post:
-      consumes:
-      - application/json
-      description: Register a new user in the system
-      parameters:
-      - description: User registration request
-        in: body
-        name: registerRequest
-        required: true
-        schema:
-          $ref: '#/definitions/dto.RegisterRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User successfully registered
-          schema:
-            type: string
-        "400":
-          description: Invalid input
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Register a new user
-      tags:
-      - Auth
 schemes:
-- http.
+- http
 swagger: "2.0"

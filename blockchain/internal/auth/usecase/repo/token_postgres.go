@@ -73,7 +73,6 @@ func (t *AuthRepo) ConfirmCode(ctx context.Context, email string) (int, error) {
 
 func (t *AuthRepo) CheckForEmail(ctx context.Context, email string) error {
 	grpcUser, _ := t.userGrpcTransport.GetUserByEmail(ctx, email)
-	fmt.Println(grpcUser)
 	if grpcUser.Id != 0 {
 		return fmt.Errorf("user with this email alraedy exists")
 	}

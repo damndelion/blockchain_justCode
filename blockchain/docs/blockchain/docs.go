@@ -483,7 +483,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8081",
 	BasePath:         "/",
-	Schemes:          []string{"http."},
+	Schemes:          []string{"http"},
 	Title:            "Blockchain service",
 	Description:      "Service that handles all blockchain request",
 	InfoInstanceName: "swagger",

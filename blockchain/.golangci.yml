@@ -63,7 +63,6 @@ linters:
     - forbidigo
     - gochecknoinits
     - goconst
-    - godot
     - godox
     - gofmt
     - goimports

@@ -298,7 +298,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UserCredRequest"
+                            "$ref": "#/definitions/dto.UserCreateCredRequest"
                         }
                     }
                 ],
@@ -535,7 +535,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UserCredRequest"
+                            "$ref": "#/definitions/dto.UserUpdateCredRequest"
                         }
                     }
                 ],
@@ -757,7 +757,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UserInfoRequest"
+                            "$ref": "#/definitions/dto.UserCreateInfoRequest"
                         }
                     }
                 ],
@@ -994,7 +994,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UserInfoRequest"
+                            "$ref": "#/definitions/dto.UserUpdateInfoRequest"
                         }
                     }
                 ],
@@ -1102,7 +1102,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UserUpdateRequest"
+                            "$ref": "#/definitions/dto.UserCreateRequest"
                         }
                     }
                 ],
@@ -1570,7 +1570,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.UserCredRequest": {
+        "dto.UserCreateCredRequest": {
             "type": "object",
             "required": [
                 "card_num",
@@ -1589,6 +1589,69 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserCreateInfoRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "age",
+                "city",
+                "country",
+                "phone",
+                "userID"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer",
+                    "maximum": 120,
+                    "minimum": 1
+                },
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UserCreateRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "default": "user"
+                },
+                "valid": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "wallet": {
                     "type": "string"
                 }
             }
@@ -1634,15 +1697,33 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UserInfoRequest": {
+        "dto.UserUpdateCredRequest": {
+            "type": "object",
+            "required": [
+                "card_num",
+                "cvv",
+                "type"
+            ],
+            "properties": {
+                "card_num": {
+                    "type": "string"
+                },
+                "cvv": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserUpdateInfoRequest": {
             "type": "object",
             "required": [
                 "address",
                 "age",
                 "city",
                 "country",
-                "phone",
-                "userID"
+                "phone"
             ],
             "properties": {
                 "address": {
@@ -1660,9 +1741,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
-                    "type": "string"
-                },
-                "userID": {
                     "type": "string"
                 }
             }
@@ -1706,7 +1784,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
 	BasePath:         "/",
-	Schemes:          []string{"http."},
+	Schemes:          []string{"http"},
 	Title:            "User service",
 	Description:      "Service that does CRUD operations on user",
 	InfoInstanceName: "swagger",

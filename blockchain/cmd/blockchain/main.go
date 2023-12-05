@@ -21,7 +21,7 @@ import (
 
 // @host localhost:8081
 // @BasePath /
-// @schemes http.
+// @schemes http
 func main() {
 	cfg, err := blockchain.NewConfig()
 	if err != nil {

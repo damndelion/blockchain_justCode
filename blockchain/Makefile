@@ -22,7 +22,7 @@ swag-v1-auth: ### swag init for auth service
 .PHONY: swag-v1-auth
 
 swag-v1-user: ### swag init for user service
-	 cd internal/user/controller/http/v1 && swag init -g ../../../../../cmd/app/main.go -o  ../../../../../docs/user
+	 cd internal/user/controller/http/v1 && swag init -g ../../../../../cmd/user/main.go -o  ../../../../../docs/user
 .PHONY: swag-v1-user
 
 swag-v1-blockchain: ### swag init for blockchain service

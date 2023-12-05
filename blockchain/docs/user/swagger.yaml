@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  dto.UserCredRequest:
+  dto.UserCreateCredRequest:
     properties:
       card_num:
         type: string
@@ -9,12 +9,57 @@ definitions:
       type:
         type: string
       userID:
-        type: string
+        type: integer
     required:
     - card_num
     - cvv
     - type
     - userID
+    type: object
+  dto.UserCreateInfoRequest:
+    properties:
+      address:
+        type: string
+      age:
+        maximum: 120
+        minimum: 1
+        type: integer
+      city:
+        type: string
+      country:
+        type: string
+      phone:
+        type: string
+      userID:
+        type: integer
+    required:
+    - address
+    - age
+    - city
+    - country
+    - phone
+    - userID
+    type: object
+  dto.UserCreateRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        default: user
+        type: string
+      valid:
+        default: false
+        type: boolean
+      wallet:
+        type: string
+    required:
+    - email
+    - name
+    - password
     type: object
   dto.UserDetailRequest:
     properties:
@@ -46,7 +91,20 @@ definitions:
     - cvv
     - phone
     type: object
-  dto.UserInfoRequest:
+  dto.UserUpdateCredRequest:
+    properties:
+      card_num:
+        type: string
+      cvv:
+        type: string
+      type:
+        type: string
+    required:
+    - card_num
+    - cvv
+    - type
+    type: object
+  dto.UserUpdateInfoRequest:
     properties:
       address:
         type: string
@@ -60,15 +118,12 @@ definitions:
         type: string
       phone:
         type: string
-      userID:
-        type: string
     required:
     - address
     - age
     - city
     - country
     - phone
-    - userID
     type: object
   dto.UserUpdateRequest:
     properties:
@@ -287,7 +342,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dto.UserCredRequest'
+          $ref: '#/definitions/dto.UserCreateCredRequest'
       produces:
       - application/json
       responses:
@@ -399,7 +454,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dto.UserCredRequest'
+          $ref: '#/definitions/dto.UserUpdateCredRequest'
       responses:
         "200":
           description: Success
@@ -594,7 +649,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dto.UserInfoRequest'
+          $ref: '#/definitions/dto.UserCreateInfoRequest'
       produces:
       - application/json
       responses:
@@ -706,7 +761,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dto.UserInfoRequest'
+          $ref: '#/definitions/dto.UserUpdateInfoRequest'
       responses:
         "200":
           description: Success
@@ -825,7 +880,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/dto.UserUpdateRequest'
+          $ref: '#/definitions/dto.UserCreateRequest'
       produces:
       - application/json
       responses:
@@ -1138,5 +1193,5 @@ paths:
       tags:
       - Users Information
 schemes:
-- http.
+- http
 swagger: "2.0"

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/damndelion/blockchain_justCode/config/user"

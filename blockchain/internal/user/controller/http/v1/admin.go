@@ -68,6 +68,8 @@ func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.In
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/all [get].
+//
+//nolint:dupl  // not duplicate
 func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 	var users []*userEntity.User
 	var res interface{}
@@ -93,7 +95,6 @@ func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 
 		return
 	}
-
 }
 
 // GetUserByID godoc
@@ -115,6 +116,7 @@ func (ur *adminRoutes) GetUserByID(ctx *gin.Context) {
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
+
 		return
 	}
 
@@ -307,6 +309,8 @@ func (ur *adminRoutes) DeleteUser(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info [get].
+//
+//nolint:dupl  // not duplicate
 func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 	var usersInfo []*userEntity.UserInfo
 	var res interface{}
@@ -331,7 +335,6 @@ func (ur *adminRoutes) GetUsersDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-
 }
 
 // GetUsersInfoWithSort godoc
@@ -419,7 +422,7 @@ func (ur *adminRoutes) GetUserDetailInfoByID(ctx *gin.Context) {
 // @Accept json
 // @Param authorization header string true "JWT token"
 // @Param id path int true "ID of the item"
-// @Param data body dto.UserInfoRequest true "JSON data"
+// @Param data body dto.UserUpdateInfoRequest true "JSON data"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
@@ -455,7 +458,7 @@ func (ur *adminRoutes) UpdateUserInfo(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "JWT token"
-// @Param data body dto.UserInfoRequest true "JSON data"
+// @Param data body dto.UserCreateInfoRequest true "JSON data"
 // @Success 200 {int} int id
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
@@ -520,6 +523,8 @@ func (ur *adminRoutes) DeleteUserInfo(ctx *gin.Context) {
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred [get].
+//
+//nolint:dupl  // not duplicate
 func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 	var usersCred []*userEntity.UserCredentials
 	var res interface{}
@@ -533,11 +538,9 @@ func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusOK, usersCred)
-
 	} else {
 		res, err = ur.u.UsersCredWithFilter(ctx, ctx.Request.URL.Query())
 		ctx.JSON(http.StatusOK, res)
-
 	}
 
 	if err != nil {
@@ -546,7 +549,6 @@ func (ur *adminRoutes) GetUsersDetailCred(ctx *gin.Context) {
 
 		return
 	}
-
 }
 
 // GetUsersCredWithSort godoc
@@ -634,7 +636,7 @@ func (ur *adminRoutes) GetUserDetailCredByID(ctx *gin.Context) {
 // @Accept json
 // @Param authorization header string true "JWT token"
 // @Param id path int true "ID of the item"
-// @Param data body dto.UserCredRequest true "JSON data"
+// @Param data body dto.UserUpdateCredRequest true "JSON data"
 // @Success 200 {string} string "Success"
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
@@ -670,7 +672,7 @@ func (ur *adminRoutes) UpdateUserCred(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "JWT token"
-// @Param data body dto.UserCredRequest true "JSON data"
+// @Param data body dto.UserCreateCredRequest true "JSON data"
 // @Success 200 {int} int id
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"

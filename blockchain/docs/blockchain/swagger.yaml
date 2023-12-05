@@ -312,5 +312,5 @@ paths:
       tags:
       - Blockchain
 schemes:
-- http.
+- http
 swagger: "2.0"

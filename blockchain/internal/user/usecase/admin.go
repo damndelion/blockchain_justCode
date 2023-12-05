@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"context"
+	"net/url"
+	"strconv"
+
 	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1/dto"
 	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	"github.com/opentracing/opentracing-go"
-	"net/url"
-	"strconv"
 )
 
 func (u *User) UsersInfo(ctx context.Context) ([]*userEntity.UserInfo, error) {
