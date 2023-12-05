@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1/dto"
 	"github.com/damndelion/blockchain_justCode/internal/user/usecase/repo"
@@ -24,7 +25,8 @@ func NewService(logger *logger.Logger, repo *repo.UserRepo) *Service {
 }
 
 func (s *Service) GetUserByID(ctx context.Context, request *pb.GetUserByIDRequest) (*pb.User, error) {
-	user, err := s.repo.GetUserByID(ctx, request.Id)
+	id, err := strconv.Atoi(request.Id)
+	user, err := s.repo.GetUserByID(ctx, id)
 	if err != nil {
 		s.logger.Error("failed to GetUserByID err: %v", err)
 
@@ -62,7 +64,8 @@ func (s *Service) GetUserByEmail(ctx context.Context, request *pb.GetUserByEmail
 }
 
 func (s *Service) GetUserWallet(ctx context.Context, request *pb.GetUserWalletRequest) (*pb.UserWalletResponse, error) {
-	wallet, err := s.repo.GetUserWallet(ctx, request.Id)
+	id, err := strconv.Atoi(request.Id)
+	wallet, err := s.repo.GetUserWallet(ctx, id)
 	if err != nil {
 		s.logger.Error("failed to GetUserByLogin err: %v", err)
 
@@ -77,7 +80,7 @@ func (s *Service) GetUserWallet(ctx context.Context, request *pb.GetUserWalletRe
 func (s *Service) CreateUser(ctx context.Context, request *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	user := request.GetUser()
 
-	newUser := dto.UserUpdateRequest{
+	newUser := dto.UserCreateRequest{
 		Name:     user.GetName(),
 		Email:    user.GetEmail(),
 		Password: user.GetPassword(),

@@ -18,7 +18,7 @@ services:
     container_name: auth
     image: auth
     environment:
-      PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
+      PG_URL: 'postgres://postgres:postgres@172.21.0.1/auth_service'
       NATS_URL: 'nats://nats:4222'
       JAEGER_URL: 'jaeger:6831'
       USER_TRANSPORT_URL: 'http://user:8080'
@@ -31,14 +31,12 @@ services:
       - jaeger
 
 
-
-
   blockchain:
     build: ..
     container_name: blockchain
     image: blockchain
     environment:
-      PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
+      PG_URL: 'postgres://postgres:postgres@172.21.0.1/blockchain_service'
       NATS_URL: 'nats://localhost:4222'
       JAEGER_URL: 'jaeger:6831'
       USER_TRANSPORT_URL: 'http://user:8080'
@@ -55,7 +53,7 @@ services:
     container_name: user
     image: user
     environment:
-      PG_URL: 'postgres://postgres:postgres@172.21.0.1/postgres'
+      PG_URL: 'postgres://postgres:postgres@172.21.0.1/user_service'
       NATS_URL: 'nats://localhost:4222'
       JAEGER_URL: 'jaeger:6831'
       USER_GRPC_URL: 'user:9091'

@@ -10,7 +10,6 @@ import (
 
 type (
 	ChainUseCase interface {
-		Wallets(ctx context.Context) ([]string, error)
 		Wallet(ctx context.Context, userID string) (string, error)
 		GetBalance(ctx context.Context, address string) (float64, error)
 		GetBalanceUSD(ctx context.Context, address string) (float64, error)
@@ -21,7 +20,6 @@ type (
 	}
 
 	ChainRepo interface {
-		GetWallets(_ context.Context) ([]string, error)
 		GetWallet(ctx context.Context, userID string) (string, error)
 		GetBalance(ctx context.Context, userID string) (float64, error)
 		GetBalanceUSD(ctx context.Context, userID string) (float64, error)

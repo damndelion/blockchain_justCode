@@ -22,7 +22,7 @@ func (u *User) Users(ctx context.Context) ([]*userEntity.User, error) {
 	return u.repo.GetUsers(ctx)
 }
 
-func (u *User) CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error) {
+func (u *User) CreateUser(ctx context.Context, user dto.UserCreateRequest) (int, error) {
 	return u.repo.CreateUser(ctx, user)
 }
 
@@ -35,7 +35,7 @@ func (u *User) UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, i
 	return nil
 }
 
-func (u *User) DeleteUser(ctx context.Context, id string) error {
+func (u *User) DeleteUser(ctx context.Context, id int) error {
 	err := u.repo.DeleteUser(ctx, id)
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (u *User) GetUserByEmail(ctx context.Context, email string) (*userEntity.Us
 	return u.repo.GetUserByEmail(ctx, email)
 }
 
-func (u *User) GetUserByID(ctx context.Context, id string) (*userEntity.User, error) {
+func (u *User) GetUserByID(ctx context.Context, id int) (*userEntity.User, error) {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "get user by id use case")
 	defer span.Finish()
 

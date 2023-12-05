@@ -9,20 +9,18 @@ import (
 	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/v1/dto"
 	_ "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	"github.com/damndelion/blockchain_justCode/internal/user/usecase"
-	"github.com/damndelion/blockchain_justCode/pkg/cache"
 	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 )
 
 type userRoutes struct {
-	u         usecase.UserUseCase
-	l         logger.Interface
-	userCache cache.User
+	u usecase.UserUseCase
+	l logger.Interface
 }
 
-func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User, cfg *user.Config) {
-	r := &userRoutes{u, l, uc}
+func newUserRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, cfg *user.Config) {
+	r := &userRoutes{u, l}
 
 	userHandler := handler.Group("user")
 	{
@@ -54,7 +52,7 @@ func (ur *userRoutes) GetUser(ctx *gin.Context) {
 	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	resUser, err := ur.u.GetUserByID(spanCtx, userID.(string))
+	resUser, err := ur.u.GetUserByID(spanCtx, userID.(int))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -83,7 +81,7 @@ func (ur *userRoutes) GetUserDetailInfo(ctx *gin.Context) {
 	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	userByID, err := ur.u.GetUserInfoByID(spanCtx, userID.(string))
+	userByID, err := ur.u.GetUserInfoByID(spanCtx, userID.(int))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -112,7 +110,7 @@ func (ur *userRoutes) GetUserDetailCred(ctx *gin.Context) {
 	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
 	userID, _ := ctx.Get("user_id")
 
-	userByID, err := ur.u.GetUserCredByID(spanCtx, userID.(string))
+	userByID, err := ur.u.GetUserCredByID(spanCtx, userID.(int))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - userById - getUsersById: %w", err))
 		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
@@ -151,7 +149,7 @@ func (ur *userRoutes) CreateUserDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-	err = ur.u.CreateUserDetailInfo(spanCtx, userData, userID.(string))
+	err = ur.u.CreateUserDetailInfo(spanCtx, userData, userID.(int))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - create user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "create user detail info error")
@@ -189,7 +187,7 @@ func (ur *userRoutes) SetUserDetailInfo(ctx *gin.Context) {
 
 		return
 	}
-	err = ur.u.SetUserDetailInfo(spanCtx, userData, userID.(string))
+	err = ur.u.SetUserDetailInfo(spanCtx, userData, userID.(int))
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - blockchain - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")

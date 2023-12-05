@@ -55,7 +55,7 @@ func (ar *authRoutes) Register(ctx *gin.Context) {
 	err = ar.u.Register(spanCtx, registerRequest.Name, registerRequest.Email, registerRequest.Password)
 	if err != nil {
 		ar.l.Error(fmt.Errorf("http - v1 - auth - register: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, "Registration error")
+		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("Error: %v", err))
 
 		return
 	}

@@ -28,65 +28,25 @@ func (ur *UserRepo) GetUsersCredentials(_ context.Context) (usersCred []*userEnt
 	return usersCred, nil
 }
 
-func (ur *UserRepo) CreateUserDetailInfo(_ context.Context, userData dto.UserDetailRequest, id string) error {
+func (ur *UserRepo) SetUserDetailInfo(_ context.Context, userData dto.UserDetailRequest, id int) error {
+	userInfo := userEntity.UserInfo{
+		UserID:  id,
+		Age:     userData.Age,
+		Phone:   userData.Phone,
+		Address: userData.Address,
+		Country: userData.Country,
+		City:    userData.City,
+	}
 	generatedCardNum, err := bcrypt.GenerateFromPassword([]byte(userData.CardNum), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	generatedCVV, err := bcrypt.GenerateFromPassword([]byte(userData.CVV), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	userInfo := userEntity.UserInfo{
-		UserID:  id,
-		Age:     userData.Age,
-		Phone:   userData.Phone,
-		Address: userData.Address,
-		Country: userData.Country,
-		City:    userData.City,
-	}
 	userCredentials := userEntity.UserCredentials{
 		UserID:  id,
 		CardNum: string(generatedCardNum),
 		Type:    userData.CardType,
 		CVV:     string(generatedCVV),
-	}
-	tx := ur.DB.Begin()
-	if err = tx.Create(&userCredentials).Error; err != nil {
-		tx.Rollback()
-
-		return err
-	}
-
-	if err = tx.Create(&userInfo).Error; err != nil {
-		tx.Rollback()
-
-		return err
-	}
-
-	tx.Commit()
-
-	if err = ur.DB.Model(&userEntity.User{}).Where("id = ?", id).Update("valid", true).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (ur *UserRepo) SetUserDetailInfo(_ context.Context, userData dto.UserDetailRequest, id string) error {
-	userInfo := userEntity.UserInfo{
-		UserID:  id,
-		Age:     userData.Age,
-		Phone:   userData.Phone,
-		Address: userData.Address,
-		Country: userData.Country,
-		City:    userData.City,
-	}
-	userCredentials := userEntity.UserCredentials{
-		UserID:  id,
-		CardNum: userData.CardNum,
-		Type:    userData.CardType,
-		CVV:     userData.CVV,
 	}
 	tx := ur.DB.Begin()
 	if err := tx.Model(&userCredentials).Where("user_id = ?", id).Updates(&userCredentials).Error; err != nil {
@@ -110,9 +70,8 @@ func (ur *UserRepo) SetUserDetailInfo(_ context.Context, userData dto.UserDetail
 	return nil
 }
 
-func (ur *UserRepo) UpdateUserInfo(_ context.Context, userData dto.UserInfoRequest, id string) error {
+func (ur *UserRepo) UpdateUserInfo(_ context.Context, userData dto.UserUpdateInfoRequest, id int) error {
 	userInfo := userEntity.UserInfo{
-		UserID:  id,
 		Age:     userData.Age,
 		Phone:   userData.Phone,
 		Address: userData.Address,
@@ -128,7 +87,7 @@ func (ur *UserRepo) UpdateUserInfo(_ context.Context, userData dto.UserInfoReque
 	return nil
 }
 
-func (ur *UserRepo) CreateUserInfo(_ context.Context, userData dto.UserInfoRequest) error {
+func (ur *UserRepo) CreateUserInfo(_ context.Context, userData dto.UserCreateInfoRequest) error {
 	userInfo := userEntity.UserInfo{
 		UserID:  userData.UserID,
 		Age:     userData.Age,
@@ -146,7 +105,7 @@ func (ur *UserRepo) CreateUserInfo(_ context.Context, userData dto.UserInfoReque
 	return nil
 }
 
-func (ur *UserRepo) CreateUserCred(_ context.Context, userData dto.UserCredRequest) error {
+func (ur *UserRepo) CreateUserCred(_ context.Context, userData dto.UserCreateCredRequest) error {
 	generatedCardNum, err := bcrypt.GenerateFromPassword([]byte(userData.CardNum), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -170,15 +129,23 @@ func (ur *UserRepo) CreateUserCred(_ context.Context, userData dto.UserCredReque
 	return nil
 }
 
-func (ur *UserRepo) UpdateUserCredentials(_ context.Context, userData dto.UserCredRequest, id string) error {
+func (ur *UserRepo) UpdateUserCredentials(_ context.Context, userData dto.UserUpdateCredRequest, id int) error {
+	generatedCardNum, err := bcrypt.GenerateFromPassword([]byte(userData.CardNum), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	generatedCVV, err := bcrypt.GenerateFromPassword([]byte(userData.CVV), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
 	userCredentials := userEntity.UserCredentials{
 		UserID:  id,
-		CardNum: userData.CardNum,
+		CardNum: string(generatedCardNum),
 		Type:    userData.CardType,
-		CVV:     userData.CVV,
+		CVV:     string(generatedCVV),
 	}
 
-	err := ur.DB.Model(&userCredentials).Where("user_id = ?", id).Updates(&userCredentials).Error
+	err = ur.DB.Model(&userCredentials).Where("user_id = ?", id).Updates(&userCredentials).Error
 	if err != nil {
 		return err
 	}
@@ -186,7 +153,7 @@ func (ur *UserRepo) UpdateUserCredentials(_ context.Context, userData dto.UserCr
 	return nil
 }
 
-func (ur *UserRepo) GetUserWallet(_ context.Context, id string) (string, error) {
+func (ur *UserRepo) GetUserWallet(_ context.Context, id int) (string, error) {
 	var user userEntity.User
 	if err := ur.DB.Model(&userEntity.User{}).Select("wallet").Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(gorm.ErrRecordNotFound, err) {
@@ -296,7 +263,7 @@ func (ur *UserRepo) GetUsersCredWithSearch(_ context.Context, param, value strin
 	return users, nil
 }
 
-func (ur *UserRepo) GetUserInfoByID(ctx context.Context, id string) (userInfo *userEntity.UserInfo, err error) {
+func (ur *UserRepo) GetUserInfoByID(ctx context.Context, id int) (userInfo *userEntity.UserInfo, err error) {
 	res := ur.DB.Where("user_id = ?", id).WithContext(ctx).Find(&userInfo)
 	if res.Error != nil {
 		return nil, res.Error
@@ -305,11 +272,80 @@ func (ur *UserRepo) GetUserInfoByID(ctx context.Context, id string) (userInfo *u
 	return userInfo, nil
 }
 
-func (ur *UserRepo) GetUserCredByID(ctx context.Context, id string) (userCred *userEntity.UserCredentials, err error) {
+func (ur *UserRepo) GetUserCredByID(ctx context.Context, id int) (userCred *userEntity.UserCredentials, err error) {
 	res := ur.DB.Where("user_id = ?", id).WithContext(ctx).Find(&userCred)
 	if res.Error != nil {
 		return nil, res.Error
 	}
 
 	return userCred, nil
+}
+
+func (ur *UserRepo) GetUserByEmail(ctx context.Context, email string) (user *userEntity.User, err error) {
+	res := ur.DB.Where("email = ?", email).WithContext(ctx).Find(&user)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return user, nil
+}
+
+func (ur *UserRepo) GetUserByID(ctx context.Context, id int) (user *userEntity.User, err error) {
+	res := ur.DB.Where("id = ?", id).WithContext(ctx).Find(&user)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return user, nil
+}
+
+func (ur *UserRepo) DeleteUser(ctx context.Context, id int) error {
+	err := ur.DB.Where("user_id = ?", id).Delete(&userEntity.UserCredentials{}).WithContext(ctx).Error
+	err = ur.DB.Where("user_id = ?", id).Delete(&userEntity.UserInfo{}).WithContext(ctx).Error
+	err = ur.DB.Where("id = ?", id).Delete(&userEntity.User{}).WithContext(ctx).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ur *UserRepo) DeleteUserInfo(ctx context.Context, id int) error {
+	err := ur.DB.Where("user_id = ?", id).Delete(&userEntity.UserInfo{}).WithContext(ctx).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ur *UserRepo) DeleteUserCred(ctx context.Context, id int) error {
+	err := ur.DB.Where("user_id = ?", id).Delete(&userEntity.UserCredentials{}).WithContext(ctx).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ur *UserRepo) UpdateUser(_ context.Context, userData dto.UserUpdateRequest, email string) error {
+	generatedHash, err := bcrypt.GenerateFromPassword([]byte(userData.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user := userEntity.User{
+		Name:     userData.Name,
+		Email:    userData.Email,
+		Password: string(generatedHash),
+		Wallet:   userData.Wallet,
+		Valid:    userData.Valid,
+		Role:     userData.Role,
+	}
+
+	err = ur.DB.Model(&user).Where("email = ?", email).Updates(&user).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

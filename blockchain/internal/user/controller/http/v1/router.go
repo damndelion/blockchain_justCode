@@ -10,7 +10,6 @@ import (
 	"github.com/damndelion/blockchain_justCode/config/user"
 	_ "github.com/damndelion/blockchain_justCode/docs/user"
 	"github.com/damndelion/blockchain_justCode/internal/user/usecase"
-	"github.com/damndelion/blockchain_justCode/pkg/cache"
 	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	_ "github.com/damndelion/blockchain_justCode/pkg/protobuf/userService/gw"
 	"github.com/gin-contrib/pprof"
@@ -20,7 +19,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCase, uc cache.User, cfg *user.Config) {
+func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCase, cfg *user.Config) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -40,7 +39,7 @@ func NewUserRouter(handler *gin.Engine, l logger.Interface, u usecase.UserUseCas
 	// Routers
 	h := handler.Group("/v1")
 	{
-		newUserRoutes(h, u, l, uc, cfg)
-		newAdminRoutes(h, u, l, uc, cfg)
+		newUserRoutes(h, u, l, cfg)
+		newAdminRoutes(h, u, l, cfg)
 	}
 }

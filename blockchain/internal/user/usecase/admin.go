@@ -25,41 +25,41 @@ func (u *User) UsersCred(ctx context.Context) ([]*userEntity.UserCredentials, er
 	return u.repo.GetUsersCredentials(ctx)
 }
 
-func (u *User) CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error {
+func (u *User) CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "create user detail information use case")
 	defer span.Finish()
 
 	return u.repo.CreateUserDetailInfo(spanCtx, userData, id)
 }
 
-func (u *User) SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error {
+func (u *User) SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "set user detail information use case")
 	defer span.Finish()
 
 	return u.repo.SetUserDetailInfo(spanCtx, userData, id)
 }
 
-func (u *User) DeleteUserInfo(ctx context.Context, id string) error {
+func (u *User) DeleteUserInfo(ctx context.Context, id int) error {
 	return u.repo.DeleteUserInfo(ctx, id)
 }
 
-func (u *User) UpdateUserInfo(ctx context.Context, userData dto.UserInfoRequest, id string) error {
+func (u *User) UpdateUserInfo(ctx context.Context, userData dto.UserUpdateInfoRequest, id int) error {
 	return u.repo.UpdateUserInfo(ctx, userData, id)
 }
 
-func (u *User) CreateUserInfo(ctx context.Context, userData dto.UserInfoRequest) error {
+func (u *User) CreateUserInfo(ctx context.Context, userData dto.UserCreateInfoRequest) error {
 	return u.repo.CreateUserInfo(ctx, userData)
 }
 
-func (u *User) CreateUserCred(ctx context.Context, userData dto.UserCredRequest) error {
+func (u *User) CreateUserCred(ctx context.Context, userData dto.UserCreateCredRequest) error {
 	return u.repo.CreateUserCred(ctx, userData)
 }
 
-func (u *User) UpdateUserCredentials(ctx context.Context, userData dto.UserCredRequest, id string) error {
+func (u *User) UpdateUserCredentials(ctx context.Context, userData dto.UserUpdateCredRequest, id int) error {
 	return u.repo.UpdateUserCredentials(ctx, userData, id)
 }
 
-func (u *User) DeleteUserCred(ctx context.Context, id string) error {
+func (u *User) DeleteUserCred(ctx context.Context, id int) error {
 	return u.repo.DeleteUserCred(ctx, id)
 }
 
@@ -105,14 +105,14 @@ func (u *User) UsersCredWithSort(ctx context.Context, sort, method string) ([]*u
 	return u.repo.GetUsersCredWithSort(ctx, sort, method)
 }
 
-func (u *User) GetUserInfoByID(ctx context.Context, id string) (*userEntity.UserInfo, error) {
+func (u *User) GetUserInfoByID(ctx context.Context, id int) (*userEntity.UserInfo, error) {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "get user detail information by id use case")
 	defer span.Finish()
 
 	return u.repo.GetUserInfoByID(spanCtx, id)
 }
 
-func (u *User) GetUserCredByID(ctx context.Context, id string) (*userEntity.UserCredentials, error) {
+func (u *User) GetUserCredByID(ctx context.Context, id int) (*userEntity.UserCredentials, error) {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "get user credentials by id use case")
 	defer span.Finish()
 

@@ -71,10 +71,10 @@ func (t *AuthRepo) ConfirmCode(ctx context.Context, email string) (int, error) {
 	return code, nil
 }
 
-func (t *AuthRepo) CheckForEmail(_ context.Context, email string) error {
-	var exists bool
-	t.DB.Model(userEntity.User{}).Where("email = ?", email).Find(&exists)
-	if exists {
+func (t *AuthRepo) CheckForEmail(ctx context.Context, email string) error {
+	grpcUser, _ := t.userGrpcTransport.GetUserByEmail(ctx, email)
+	fmt.Println(grpcUser)
+	if grpcUser.Id != 0 {
 		return fmt.Errorf("user with this email alraedy exists")
 	}
 

@@ -9,14 +9,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/v1/dto"
 )
 
 const genesisCoinbaseData = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
@@ -291,47 +287,15 @@ func (bc *Blockchain) Send(from, to string, amount float64) error {
 }
 
 func generateTransactionKey(from, to string, amount float64) string {
-	// Convert amount to string with fixed precision
 	amountStr := fmt.Sprintf("%.2f", amount)
 
-	// Get current timestamp in minutes
 	timestamp := time.Now().Unix() / 60
 
-	// Concatenate all values
 	data := from + to + amountStr + strconv.FormatInt(timestamp, 10)
 
-	// Hash the concatenated string using SHA256
 	hash := sha256.New()
 	hash.Write([]byte(data))
 	hashCode := fmt.Sprintf("%x", hash.Sum(nil))
 
 	return hashCode
-}
-
-func (bc *Blockchain) GetBalanceInUSD(address string) (float64, error) {
-	url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
-
-	response, err := http.Get(url)
-	if err != nil {
-		return -1, err
-	}
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-			return
-		}
-	}(response.Body)
-
-	var data dto.CoinGeckoResponse
-
-	if err := json.NewDecoder(response.Body).Decode(&data); err != nil {
-		return -1, err
-	}
-
-	bitcoinPriceUSD := data.Bitcoin.USD
-
-	bitcoinBalance := bc.GetBalance(address)
-	totalBalanceUSD := bitcoinBalance * bitcoinPriceUSD
-
-	return totalBalanceUSD, nil
 }

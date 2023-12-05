@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/damndelion/blockchain_justCode/config/user"
 	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/middleware"
@@ -10,19 +11,17 @@ import (
 	_ "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	userEntity "github.com/damndelion/blockchain_justCode/internal/user/entity"
 	"github.com/damndelion/blockchain_justCode/internal/user/usecase"
-	"github.com/damndelion/blockchain_justCode/pkg/cache"
 	"github.com/damndelion/blockchain_justCode/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 type adminRoutes struct {
-	u         usecase.UserUseCase
-	l         logger.Interface
-	userCache cache.User
+	u usecase.UserUseCase
+	l logger.Interface
 }
 
-func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, uc cache.User, cfg *user.Config) {
-	r := &adminRoutes{u, l, uc}
+func newAdminRoutes(handler *gin.RouterGroup, u usecase.UserUseCase, l logger.Interface, cfg *user.Config) {
+	r := &adminRoutes{u, l}
 
 	adminHandler := handler.Group("admin")
 	{
@@ -111,27 +110,12 @@ func (ur *adminRoutes) GetUsers(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user/{id} [get].
 func (ur *adminRoutes) GetUserByID(ctx *gin.Context) {
-	id := ctx.Param("id")
-
-	resUser, err := ur.userCache.Get(ctx, id)
+	id, err := strconv.Atoi(ctx.Param("id"))
+	resUser, err := ur.u.GetUserByID(ctx, id)
 	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
 		return
-	}
-
-	if resUser == nil {
-		resUser, err = ur.u.GetUserByID(ctx, id)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "getUsersById error")
-
-			return
-		}
-
-		err = ur.userCache.Set(ctx, id, resUser)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersById: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "getUsersById cache error")
-		}
 	}
 
 	ctx.JSON(http.StatusOK, resUser)
@@ -152,25 +136,13 @@ func (ur *adminRoutes) GetUserByID(ctx *gin.Context) {
 // @Router /v1/admin/email [get].
 func (ur *adminRoutes) GetUserByEmail(ctx *gin.Context) {
 	email := ctx.Query("email")
-	resUser, err := ur.userCache.Get(ctx, email)
+
+	resUser, err := ur.u.GetUserByEmail(ctx, email)
 	if err != nil {
+		ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
+		errorResponse(ctx, http.StatusInternalServerError, "getUsersByEmail error")
+
 		return
-	}
-
-	if resUser == nil {
-		resUser, err = ur.u.GetUserByEmail(ctx, email)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "getUsersByEmail error")
-
-			return
-		}
-
-		err = ur.userCache.Set(ctx, email, resUser)
-		if err != nil {
-			ur.l.Error(fmt.Errorf("http - v1 - user - getUsersByEmail: %w", err))
-			errorResponse(ctx, http.StatusInternalServerError, "getUsersByEmail cache error")
-		}
 	}
 
 	ctx.JSON(http.StatusOK, resUser)
@@ -271,14 +243,14 @@ func (ur *adminRoutes) UpdateUser(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "JWT token"
-// @Param data body dto.UserUpdateRequest true "JSON data"
+// @Param data body dto.UserCreateRequest true "JSON data"
 // @Success 200 {int} int id
 // @Failure 400 {string} Bad Request
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user [put].
 func (ur *adminRoutes) CreateUser(ctx *gin.Context) {
-	var userData dto.UserUpdateRequest
+	var userData dto.UserCreateRequest
 
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
@@ -309,9 +281,9 @@ func (ur *adminRoutes) CreateUser(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/user/{id} [delete].
 func (ur *adminRoutes) DeleteUser(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := strconv.Atoi(ctx.Param("id"))
 
-	err := ur.u.DeleteUser(ctx, id)
+	err = ur.u.DeleteUser(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
@@ -427,7 +399,8 @@ func (ur *adminRoutes) GetUsersInfoWithSearch(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/{id} [get].
 func (ur *adminRoutes) GetUserDetailInfoByID(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := strconv.Atoi(ctx.Param("id"))
+
 	userByID, err := ur.u.GetUserInfoByID(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsersById: %w", err))
@@ -453,9 +426,10 @@ func (ur *adminRoutes) GetUserDetailInfoByID(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/{id} [post].
 func (ur *adminRoutes) UpdateUserInfo(ctx *gin.Context) {
-	id := ctx.Param("id")
-	var userData dto.UserInfoRequest
-	err := ctx.ShouldBindJSON(&userData)
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	var userData dto.UserUpdateInfoRequest
+	err = ctx.ShouldBindJSON(&userData)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "Update error")
@@ -488,7 +462,7 @@ func (ur *adminRoutes) UpdateUserInfo(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info [put].
 func (ur *adminRoutes) CreateUserInfo(ctx *gin.Context) {
-	var userData dto.UserInfoRequest
+	var userData dto.UserCreateInfoRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
@@ -520,9 +494,9 @@ func (ur *adminRoutes) CreateUserInfo(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/info/{id} [delete].
 func (ur *adminRoutes) DeleteUserInfo(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := strconv.Atoi(ctx.Param("id"))
 
-	err := ur.u.DeleteUserInfo(ctx, id)
+	err = ur.u.DeleteUserInfo(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
 		errorResponse(ctx, http.StatusBadRequest, "set user detail info error")
@@ -640,7 +614,8 @@ func (ur *adminRoutes) GetUsersCredWithSearch(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/{id} [get].
 func (ur *adminRoutes) GetUserDetailCredByID(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := strconv.Atoi(ctx.Param("id"))
+
 	userByID, err := ur.u.GetUserCredByID(ctx, id)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - getUsersById: %w", err))
@@ -666,8 +641,9 @@ func (ur *adminRoutes) GetUserDetailCredByID(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/{id} [post].
 func (ur *adminRoutes) UpdateUserCred(ctx *gin.Context) {
-	id := ctx.Param("id")
-	var userData dto.UserCredRequest
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	var userData dto.UserUpdateCredRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
@@ -701,7 +677,7 @@ func (ur *adminRoutes) UpdateUserCred(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred [put].
 func (ur *adminRoutes) CreateUserCred(ctx *gin.Context) {
-	var userData dto.UserCredRequest
+	var userData dto.UserCreateCredRequest
 	err := ctx.ShouldBindJSON(&userData)
 	if err != nil {
 		ur.l.Error(fmt.Errorf("http - v1 - admin - set user detail: %w", err))
@@ -733,7 +709,7 @@ func (ur *adminRoutes) CreateUserCred(ctx *gin.Context) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /v1/admin/cred/{id} [delete].
 func (ur *adminRoutes) DeleteUserCred(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := ur.u.DeleteUserCred(ctx, id)
 	if err != nil {

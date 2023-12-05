@@ -48,7 +48,6 @@ func (u *Auth) Register(ctx context.Context, name, email, password string) error
 	if err != nil {
 		return err
 	}
-
 	err = u.userVerificationProducer.ProduceMessage(b)
 	if err != nil {
 		return err

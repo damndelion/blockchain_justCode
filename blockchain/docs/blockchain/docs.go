@@ -74,56 +74,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/blockchain/wallet/all": {
-            "get": {
-                "description": "Retrieve a list of wallets from the blockchain",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Blockchain"
-                ],
-                "summary": "Get a list of wallets",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "JWT Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of wallets",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/blockchain/wallet/balance": {
             "get": {
                 "description": "Retrieve the balance of a specific address on the blockchain",
@@ -331,9 +281,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/blockchain/wallet/send": {
-            "post": {
-                "description": "Send cryptocurrency from one address to another on the blockchain",
+        "/v1/blockchain/wallet/transactions": {
+            "put": {
+                "description": "TopUp top up of an account",
                 "consumes": [
                     "application/json"
                 ],
@@ -343,7 +293,7 @@ const docTemplate = `{
                 "tags": [
                     "Blockchain"
                 ],
-                "summary": "Send cryptocurrency to another address",
+                "summary": "TopUp top up of an account",
                 "parameters": [
                     {
                         "type": "string",
@@ -353,12 +303,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Send Request",
-                        "name": "sendRequest",
+                        "description": "Top up Request",
+                        "name": "topUpRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SendRequest"
+                            "$ref": "#/definitions/dto.TopupRequest"
                         }
                     }
                 ],
@@ -388,11 +338,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/v1/blockchain/wallet/topup": {
+            },
             "post": {
-                "description": "TopUp top up of an account",
+                "description": "Send cryptocurrency from one address to another on the blockchain",
                 "consumes": [
                     "application/json"
                 ],
@@ -402,7 +350,7 @@ const docTemplate = `{
                 "tags": [
                     "Blockchain"
                 ],
-                "summary": "TopUp top up of an account",
+                "summary": "Send cryptocurrency to another address",
                 "parameters": [
                     {
                         "type": "string",
@@ -412,12 +360,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Top up Request",
-                        "name": "topUpRequest",
+                        "description": "Send Request",
+                        "name": "sendRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.TopupRequest"
+                            "$ref": "#/definitions/dto.SendRequest"
                         }
                     }
                 ],

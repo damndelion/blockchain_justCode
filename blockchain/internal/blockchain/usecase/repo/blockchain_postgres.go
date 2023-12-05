@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,14 +29,6 @@ func NewBlockchainRepo(db *sql.DB, address string, userGrpcTransport *transport.
 	fetchBTCPriceAndStoreInChannel()
 
 	return &BlockchainRepo{db, chain, userGrpcTransport}
-}
-
-func (br *BlockchainRepo) GetWallets(ctx context.Context) ([]string, error) {
-	span, _ := opentracing.StartSpanFromContext(ctx, "get wallets repo")
-	defer span.Finish()
-	res := blockchainlogic.ListAddresses()
-
-	return res, nil
 }
 
 func (br *BlockchainRepo) GetWallet(ctx context.Context, userID string) (wallet string, err error) {
@@ -89,13 +82,23 @@ func (br *BlockchainRepo) GetBalanceUSD(ctx context.Context, userID string) (bal
 func (br *BlockchainRepo) CreateWallet(ctx context.Context, userID string) (string, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "create wallet repo")
 	defer span.Finish()
-	builder := NewWalletBuilder(br, ctx, userID)
-	err := builder.Build()
+	wallet, err := br.GetWallet(ctx, userID)
+	if wallet != "" {
+		return "", errors.New(fmt.Sprintf("user wallet already exists"))
+	}
+	user, err := br.userGrpcTransport.GetUserByID(ctx, userID)
+	if !user.Valid {
+		return "", errors.New(fmt.Sprintf("user is not valid"))
+	}
+
+	address := blockchainlogic.CreateWallet()
+
+	_, err = br.userGrpcTransport.SetUserWallet(ctx, userID, address)
 	if err != nil {
 		return "", err
 	}
 
-	return builder.address, nil
+	return address, nil
 }
 
 func (br *BlockchainRepo) Send(ctx context.Context, from, to string, amount float64, wg *sync.WaitGroup) error {

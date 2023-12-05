@@ -26,19 +26,6 @@ type Transaction struct {
 	Vout []TXOutput
 }
 
-func (tx *Transaction) SetID() {
-	var encoded bytes.Buffer
-	var hash [32]byte
-
-	enc := gob.NewEncoder(&encoded)
-	err := enc.Encode(tx)
-	if err != nil {
-		log.Panic(err)
-	}
-	hash = sha256.Sum256(encoded.Bytes())
-	tx.ID = hash[:]
-}
-
 func (tx Transaction) IsCoinbase() bool {
 	return len(tx.Vin) == 1 && len(tx.Vin[0].Txid) == 0 && tx.Vin[0].Vout == -1
 }
@@ -160,7 +147,7 @@ func NewCoinbaseTX(to, data string) *Transaction {
 
 func NewUTXOTransaction(from, to string, amount float64, bc *Blockchain, key string) (*Transaction, error) {
 	if _, exists := processedKeys[key]; exists {
-		return nil, fmt.Errorf("Transaction with idempotency key %s already processed.\n", key)
+		return nil, fmt.Errorf("Transaction with idempotency this key already processed.\n")
 	}
 	var inputs []TXInput
 	var outputs []TXOutput

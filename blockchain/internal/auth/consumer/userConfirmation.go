@@ -29,7 +29,7 @@ func (c *UserVerificationCallback) Callback(msg *nats.Msg) {
 		c.logger.Error("failed to unmarshal record value: %v", err)
 	} else {
 		c.logger.Info("user code: %s", userVerification.Code)
-
+		//send the code to user email
 		if err := c.db.Create(&userVerification).Error; err != nil {
 			c.logger.Error("failed to save user verification code: %v", err)
 		}

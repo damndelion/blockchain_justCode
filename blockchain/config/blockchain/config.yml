@@ -11,7 +11,7 @@ logger:
 
 postgres:
   pool_max: 2
-  url : 'postgres://postgres:postgres@localhost:5432/postgres'
+  url : 'postgres://postgres:postgres@localhost:5432/blockchain_service'
 
 jwt:
   secret_key: 'superSecretKey'

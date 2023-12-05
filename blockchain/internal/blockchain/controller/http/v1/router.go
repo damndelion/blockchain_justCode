@@ -3,7 +3,7 @@ package v1
 import (
 	"net/http"
 
-	"github.com/damndelion/blockchain_justCode/internal/user/controller/http/middleware"
+	"github.com/damndelion/blockchain_justCode/internal/blockchain/controller/http/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/damndelion/blockchain_justCode/pkg/cache"

@@ -20,13 +20,6 @@ func NewBlockchain(repo ChainRepo, cfg *blockchain.Config, userGrpcTransport *tr
 	return &Blockchain{repo, cfg, userGrpcTransport}
 }
 
-func (b *Blockchain) Wallets(ctx context.Context) ([]string, error) {
-	span, spanCtx := opentracing.StartSpanFromContext(ctx, "wallets use case")
-	defer span.Finish()
-
-	return b.repo.GetWallets(spanCtx)
-}
-
 func (b *Blockchain) Wallet(ctx context.Context, userID string) (string, error) {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "wallet use case")
 	defer span.Finish()
@@ -72,9 +65,9 @@ func (b *Blockchain) Send(ctx context.Context, from, to string, amount float64) 
 	var wg sync.WaitGroup
 	var err error
 	wg.Add(1)
-	go func() {
-		err = b.repo.Send(spanCtx, from, to, amount, &wg)
-	}()
+
+	err = b.repo.Send(spanCtx, from, to, amount, &wg)
+
 	wg.Wait()
 	if err != nil {
 		return err

@@ -77,8 +77,9 @@ func checksum(payload []byte) []byte {
 	return secondSHA[:addressChecksumLen]
 }
 
+// newKeyPair generates new private and public key pair.
 func newKeyPair() (*rsa.PrivateKey, []byte) {
-	private, err := rsa.GenerateKey(rand.Reader, 2048) // You can adjust the key size
+	private, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -92,6 +93,7 @@ func newKeyPair() (*rsa.PrivateKey, []byte) {
 	return private, pubKeyBytes
 }
 
+// ListAddresses lists all addresses in wallet.dat file.
 func ListAddresses() []string {
 	wallets, err := NewWallets()
 	if err != nil {
@@ -102,6 +104,7 @@ func ListAddresses() []string {
 	return addresses
 }
 
+// CreateWallet Create new wallet and returns address.
 func CreateWallet() string {
 	wallets, err := NewWallets()
 	if err != nil {

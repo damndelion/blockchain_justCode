@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e5bfccb6-f889-4bc6-b435-536e3f27b5ff" name="Changes" comment="add .gitattributes">
+      <change beforePath="$PROJECT_DIR$/blockchain/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/config/blockchain/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/config/blockchain/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/docs/blockchain/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/blockchain/docs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/consumer/userConfirmation.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/consumer/userConfirmation.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/controller/http/middleware/middleware.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/controller/http/v1/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/controller/http/v1/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/controller/http/v1/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/controller/http/v1/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/mocks/ChainRepo.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/mocks/ChainRepo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/blockchain.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/blockchain.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/intrefaces.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/intrefaces.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/builder.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/nats/consumer.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/nats/consumer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/applicator/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/applicator/app.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/grpc/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/grpc/service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/http/middleware/jwtVerify.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/http/middleware/jwtVerify.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/admin.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/dto/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/dto/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/entity/user_credentials.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/entity/user_credentials.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/entity/user_info.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/entity/user_info.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/admin.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/intrefaces.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/intrefaces.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/user_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/user_postgres.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/blockchain.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/blockchain.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/transaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/transaction.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.dat" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$USER_HOME$/go/go1.21.4" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;damndelion&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="baaca124-7f44-474f-9abd-2a544355e0f9" />
+        <option name="url" value="https://github.com/damndelion/blockchain_justCode.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/awesomeProject1/go-clean-template/internal/blockchain/usecase/repo/blockchain_postgres.go" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2WwkdqNRkwKr60Bb4dO6VbbEnuw" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.automatic.dependencies.download&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/daniar/GolandProjects/blockchain/blockchain/internal/auth/controller/http/middleware&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;go.sdk&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ],
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;DotEnv&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/blockchain/internal/auth/controller/http/middleware" />
+      <recent name="$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/middleware" />
+      <recent name="$PROJECT_DIR$/blockchain" />
+      <recent name="$PROJECT_DIR$/blockchain/internal/auth" />
+      <recent name="$PROJECT_DIR$/blockchain/internal/blockchain" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/blockchain/internal/blockchain" />
+      <recent name="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo" />
+      <recent name="$PROJECT_DIR$/blockchain/docker" />
+      <recent name="$PROJECT_DIR$/blockchain" />
+      <recent name="$PROJECT_DIR$/blockchain/docs" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user">
+    <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/auth" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/auth_service" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/damndelion/blockchain_justCode/cmd/auth" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/blockchain/cmd/auth/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/blockchain" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/blockchain_service" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/damndelion/blockchain_justCode/cmd/blockchain" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/blockchain/cmd/blockchain/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/user" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/user_service" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/damndelion/blockchain_justCode/cmd/user" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/blockchain/cmd/user/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/evrone/go-clean-template/cmd/auth" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/postgres" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/evrone/go-clean-template/cmd/auth" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/blockchain/cmd/auth/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/evrone/go-clean-template/cmd/blockchain" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/postgres" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/evrone/go-clean-template/cmd/blockchain" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/awesomeProject1/go-clean-template/cmd/blockchain/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/evrone/go-clean-template/cmd/user" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/postgres" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/evrone/go-clean-template/cmd/user" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/blockchain/cmd/user/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Go Build.go build github.com/evrone/go-clean-template/cmd/blockchain" />
+      <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/auth" />
+      <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/blockchain" />
+      <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user" />
+      <item itemvalue="Go Build.go build github.com/evrone/go-clean-template/cmd/user" />
+      <item itemvalue="Go Build.go build github.com/evrone/go-clean-template/cmd/auth" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user" />
+        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/auth" />
+        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/blockchain" />
+        <item itemvalue="Go Build.go build github.com/evrone/go-clean-template/cmd/user" />
+        <item itemvalue="Go Build.go build github.com/evrone/go-clean-template/cmd/auth" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Sending transactions asynchronously" />
+    <MESSAGE value="change the architecture" />
+    <MESSAGE value="changed the architecture + added jwt verification" />
+    <MESSAGE value="added pprof and fixed logger" />
+    <MESSAGE value="added grafana promethues and swagger" />
+    <MESSAGE value="refresh token added" />
+    <MESSAGE value="added missing functionally" />
+    <MESSAGE value="fix" />
+    <MESSAGE value="add missing functionality" />
+    <MESSAGE value="kafka" />
+    <MESSAGE value="nats" />
+    <MESSAGE value="grpc" />
+    <MESSAGE value="delete outer directory" />
+    <MESSAGE value="admin page endpoints for user" />
+    <MESSAGE value="change name of top direcotry to blockchain" />
+    <MESSAGE value="Swagger for admin" />
+    <MESSAGE value="Swagger for user grpc" />
+    <MESSAGE value="Added golangci-lint" />
+    <MESSAGE value=" golangci-lint fix" />
+    <MESSAGE value="docker compose fix" />
+    <MESSAGE value="Metrics prometheus" />
+    <MESSAGE value="Added wait group for blockchain service: topup,send" />
+    <MESSAGE value="Pre final version" />
+    <MESSAGE value="Upgraded module dependency" />
+    <MESSAGE value="add .gitattributes" />
+    <option name="LAST_COMMIT_MESSAGE" value="add .gitattributes" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/mocks/ChainRepo.go</url>
+          <line>176</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go</url>
+          <line>169</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go</url>
+          <line>196</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go</url>
+          <line>205</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go</url>
+          <line>138</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go</url>
+          <line>120</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/pkg/blockchain_logic/blockchain.go</url>
+          <line>266</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/pkg/blockchain_logic/blockchain.go</url>
+          <line>289</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go</url>
+          <line>278</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go</url>
+          <line>262</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/admin.go</url>
+          <line>252</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/user.go</url>
+          <line>49</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/user/controller/http/middleware/jwtVerify.go</url>
+          <line>52</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="DlvErrorBreakpoint" />
+      </default-breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="GoApplicationRunConfiguration">
+        <watch expression="*(*&quot;fmt.wrapError&quot;)(1374392988224)" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

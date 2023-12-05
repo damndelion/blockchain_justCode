@@ -34,7 +34,6 @@ func NewConsumer(
 
 func (c *Consumer) Start() {
 	for _, topic := range c.topics {
-		// Subscribe to NATS subjects here
 		_, err := c.nc.Subscribe(topic, c.callback.Callback)
 		if err != nil {
 			c.logger.Error("Failed to subscribe to subject %s: %v", topic, err)

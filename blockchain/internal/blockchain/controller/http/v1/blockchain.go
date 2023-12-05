@@ -34,42 +34,15 @@ func newBlockchainRoutes(handler *gin.RouterGroup, c usecase.ChainUseCase, l log
 	blockchainHandler := handler.Group("/blockchain/wallet")
 	{
 		blockchainHandler.Use(middleware.JwtVerify(cfg.SecretKey))
-		blockchainHandler.GET("/all", r.GetWallets)
 		blockchainHandler.GET("/", r.GetWallet)
 		blockchainHandler.GET("/balance", r.GetBalance)
-		blockchainHandler.GET("/balance/address", r.GetBalanceByAddress)
+		blockchainHandler.GET("/balance/address", r.GetBalanceByAddress) // util
 		blockchainHandler.GET("/usd/balance", r.GetBalanceUSD)
 		blockchainHandler.POST("/create", r.CreateWallet)
-		blockchainHandler.POST("/send", r.Send)
-		blockchainHandler.POST("/topup", r.TopUp)
+		blockchainHandler.POST("/transactions", r.Send)
+		blockchainHandler.PUT("/transactions", r.TopUp)
 		blockchainHandler.GET("/qr", r.GetWalletQRCode)
 	}
-}
-
-// GetWallets godoc
-// @Summary Get a list of wallets
-// @Description Retrieve a list of wallets from the blockchain
-// @Tags Blockchain
-// @Accept json
-// @Produce json
-// @Param Authorization header string true "JWT Token"
-// @Success 200 {array} []string "List of wallets"
-// @Failure 401 {string} string "Unauthorized"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/wallet/all [get].
-func (bc *chainRoutes) GetWallets(ctx *gin.Context) {
-	span := opentracing.StartSpan("get wallets handler")
-	defer span.Finish()
-	spanCtx := opentracing.ContextWithSpan(ctx.Request.Context(), span)
-	wallets, err := bc.c.Wallets(spanCtx)
-	if err != nil {
-		bc.l.Error(fmt.Errorf("http - v1 - blockchain - getWallets: %w", err))
-		errorResponse(ctx, http.StatusInternalServerError, fmt.Sprintf("%v ", err))
-
-		return
-	}
-
-	ctx.JSON(http.StatusOK, wallets)
 }
 
 // GetWallet godoc
@@ -226,7 +199,7 @@ func (bc *chainRoutes) CreateWallet(ctx *gin.Context) {
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/wallet/send [post].
+// @Router /v1/blockchain/wallet/transactions [post].
 func (bc *chainRoutes) Send(ctx *gin.Context) {
 	span := opentracing.StartSpan("send handler")
 	defer span.Finish()
@@ -265,7 +238,7 @@ func (bc *chainRoutes) Send(ctx *gin.Context) {
 // @Failure 400 {string} string "Invalid input"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /v1/blockchain/wallet/topup [post].
+// @Router /v1/blockchain/wallet/transactions [put].
 func (bc *chainRoutes) TopUp(ctx *gin.Context) {
 	span := opentracing.StartSpan("top up handler")
 	defer span.Finish()

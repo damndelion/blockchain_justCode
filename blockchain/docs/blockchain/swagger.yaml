@@ -64,39 +64,6 @@ paths:
       summary: Get a wallet by user ID
       tags:
       - Blockchain
-  /v1/blockchain/wallet/all:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a list of wallets from the blockchain
-      parameters:
-      - description: JWT Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of wallets
-          schema:
-            items:
-              items:
-                type: string
-              type: array
-            type: array
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Get a list of wallets
-      tags:
-      - Blockchain
   /v1/blockchain/wallet/balance:
     get:
       consumes:
@@ -234,7 +201,7 @@ paths:
       summary: Get a wallet QR code by user ID
       tags:
       - Blockchain
-  /v1/blockchain/wallet/send:
+  /v1/blockchain/wallet/transactions:
     post:
       consumes:
       - application/json
@@ -273,8 +240,7 @@ paths:
       summary: Send cryptocurrency to another address
       tags:
       - Blockchain
-  /v1/blockchain/wallet/topup:
-    post:
+    put:
       consumes:
       - application/json
       description: TopUp top up of an account

@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -50,7 +51,8 @@ func JwtVerify(SecretKey string) gin.HandlerFunc {
 
 			return
 		}
-		id := fmt.Sprintf("%v", claims["user_id"])
+
+		id, _ := strconv.Atoi(fmt.Sprintf("%v", claims["user_id"]))
 		ctx.Set("user_id", id)
 
 		ctx.Next()

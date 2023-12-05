@@ -17,31 +17,31 @@ type (
 		UsersWithFilter(ctx context.Context, params url.Values) ([]*userEntity.User, error)
 		UsersWithSort(ctx context.Context, sort, method string) ([]*userEntity.User, error)
 		UsersWithSearch(ctx context.Context, params url.Values) ([]*userEntity.User, error)
-		CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error)
+		CreateUser(ctx context.Context, user dto.UserCreateRequest) (int, error)
 		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, email string) error
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
-		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
-		DeleteUser(ctx context.Context, id string) error
+		GetUserByID(ctx context.Context, id int) (*userEntity.User, error)
+		DeleteUser(ctx context.Context, id int) error
 
 		UsersInfo(ctx context.Context) ([]*userEntity.UserInfo, error)
 		UsersInfoWithFilter(ctx context.Context, params url.Values) ([]*userEntity.UserInfo, error)
 		UsersInfoWithSort(ctx context.Context, sort, method string) ([]*userEntity.UserInfo, error)
 		UsersInfoWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserInfo, error)
-		GetUserInfoByID(ctx context.Context, id string) (*userEntity.UserInfo, error)
-		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
-		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
-		UpdateUserInfo(ctx context.Context, userData dto.UserInfoRequest, id string) error
-		CreateUserInfo(ctx context.Context, userData dto.UserInfoRequest) error
-		DeleteUserInfo(ctx context.Context, id string) error
+		GetUserInfoByID(ctx context.Context, id int) (*userEntity.UserInfo, error)
+		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		UpdateUserInfo(ctx context.Context, userData dto.UserUpdateInfoRequest, id int) error
+		CreateUserInfo(ctx context.Context, userData dto.UserCreateInfoRequest) error
+		DeleteUserInfo(ctx context.Context, id int) error
 
 		UsersCred(ctx context.Context) ([]*userEntity.UserCredentials, error)
 		UsersCredWithFilter(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error)
 		UsersCredWithSort(ctx context.Context, sort, method string) ([]*userEntity.UserCredentials, error)
 		UsersCredWithSearch(ctx context.Context, params url.Values) ([]*userEntity.UserCredentials, error)
-		GetUserCredByID(ctx context.Context, id string) (*userEntity.UserCredentials, error) //
-		CreateUserCred(ctx context.Context, userData dto.UserCredRequest) error
-		UpdateUserCredentials(ctx context.Context, userData dto.UserCredRequest, id string) error
-		DeleteUserCred(ctx context.Context, id string) error
+		GetUserCredByID(ctx context.Context, id int) (*userEntity.UserCredentials, error) //
+		CreateUserCred(ctx context.Context, userData dto.UserCreateCredRequest) error
+		UpdateUserCredentials(ctx context.Context, userData dto.UserUpdateCredRequest, id int) error
+		DeleteUserCred(ctx context.Context, id int) error
 	}
 
 	// UserRepo -.
@@ -51,31 +51,30 @@ type (
 		GetUsersWithSort(ctx context.Context, param, method string) (users []*userEntity.User, err error)
 		GetUsersWithSearch(ctx context.Context, param string, value string) (users []*userEntity.User, err error)
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
-		GetUserByID(ctx context.Context, id string) (*userEntity.User, error)
-		GetUserRole(ctx context.Context, id int) (string, error)
-		CreateUser(ctx context.Context, user dto.UserUpdateRequest) (int, error)
+		GetUserByID(ctx context.Context, id int) (*userEntity.User, error)
+		CreateUser(ctx context.Context, user dto.UserCreateRequest) (int, error)
 		UpdateUser(ctx context.Context, userData dto.UserUpdateRequest, email string) error
 		SetUserWallet(ctx context.Context, userID, address string) error
-		DeleteUser(ctx context.Context, id string) error
+		DeleteUser(ctx context.Context, id int) error
 
 		GetUsersDetailsInfo(ctx context.Context) (usersInfo []*userEntity.UserInfo, err error)
 		GetUsersInfoWithFilter(ctx context.Context, param, value string) (users []*userEntity.UserInfo, err error)
 		GetUsersInfoWithSort(ctx context.Context, param, method string) (users []*userEntity.UserInfo, err error)
 		GetUsersInfoWithSearch(ctx context.Context, param string, value interface{}) (users []*userEntity.UserInfo, err error)
-		GetUserInfoByID(ctx context.Context, id string) (userInfo *userEntity.UserInfo, err error)
-		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
-		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id string) error
-		CreateUserInfo(ctx context.Context, userData dto.UserInfoRequest) error
-		UpdateUserInfo(ctx context.Context, userData dto.UserInfoRequest, id string) error
-		DeleteUserInfo(ctx context.Context, id string) error
+		GetUserInfoByID(ctx context.Context, id int) (userInfo *userEntity.UserInfo, err error)
+		CreateUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		SetUserDetailInfo(ctx context.Context, userData dto.UserDetailRequest, id int) error
+		CreateUserInfo(ctx context.Context, userData dto.UserCreateInfoRequest) error
+		UpdateUserInfo(ctx context.Context, userData dto.UserUpdateInfoRequest, id int) error
+		DeleteUserInfo(ctx context.Context, id int) error
 
 		GetUsersCredentials(ctx context.Context) (usersInfo []*userEntity.UserCredentials, err error)
 		GetUsersCredWithFilter(ctx context.Context, param, value string) (users []*userEntity.UserCredentials, err error)
 		GetUsersCredWithSort(ctx context.Context, param, method string) (users []*userEntity.UserCredentials, err error)
 		GetUsersCredWithSearch(ctx context.Context, param, value string) (users []*userEntity.UserCredentials, err error)
-		GetUserCredByID(ctx context.Context, id string) (userCred *userEntity.UserCredentials, err error)
-		UpdateUserCredentials(ctx context.Context, userData dto.UserCredRequest, id string) error
-		CreateUserCred(ctx context.Context, userData dto.UserCredRequest) error
-		DeleteUserCred(ctx context.Context, id string) error
+		GetUserCredByID(ctx context.Context, id int) (userCred *userEntity.UserCredentials, err error)
+		UpdateUserCredentials(ctx context.Context, userData dto.UserUpdateCredRequest, id int) error
+		CreateUserCred(ctx context.Context, userData dto.UserCreateCredRequest) error
+		DeleteUserCred(ctx context.Context, id int) error
 	}
 )
