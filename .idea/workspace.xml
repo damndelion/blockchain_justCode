@@ -5,30 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e5bfccb6-f889-4bc6-b435-536e3f27b5ff" name="Changes" comment="linter fix">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2d73c08a-3a3c-45a9-9a84-95b367f27e0e.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/2d73c08a-3a3c-45a9-9a84-95b367f27e0e.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384/storage_v2/_src_/database/auth_service.HiO95g/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384/storage_v2/_src_/database/auth_service.HiO95g/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/.golangci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/.golangci.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/cmd/auth/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/cmd/auth/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/cmd/blockchain/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/cmd/blockchain/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/cmd/user/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/cmd/user/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/auth/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/auth/docs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/auth/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/auth/swagger.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/auth/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/auth/swagger.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/blockchain/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/blockchain/docs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/blockchain/swagger.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/user/docs.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/user/docs.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/user/swagger.json" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/user/swagger.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/docs/user/swagger.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/docs/user/swagger.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/config/auth/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/config/auth/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/entity/token.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/entity/token.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/intrefaces.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/intrefaces.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/blockchain_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/blockchain_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/applicator/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/applicator/app.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/controller/http/v1/admin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/admin.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/admin.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/user_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/repo/user_postgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/user/usecase/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/user/usecase/user.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.dat" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.dat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -125,8 +112,8 @@
       <recent name="$PROJECT_DIR$/blockchain/docs" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/evrone/go-clean-template/cmd/blockchain">
-    <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/auth" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/auth">
+    <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/auth" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="blockchain" />
       <working_directory value="$PROJECT_DIR$/blockchain" />
       <envs>
@@ -141,6 +128,23 @@
       <package value="github.com/damndelion/blockchain_justCode/cmd/auth" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/blockchain/cmd/auth/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/blockchain" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="blockchain" />
+      <working_directory value="$PROJECT_DIR$/blockchain" />
+      <envs>
+        <env name="JAEGER_URL" value="localhost:6831" />
+        <env name="NATS_URL" value="nats://localhost:4222" />
+        <env name="PG_URL" value="postgres://postgres:postgres@localhost:5432/blockchain_service" />
+        <env name="REDIS_URL" value="localhost:6379" />
+        <env name="USER_GRPC_URL" value="localhost:9091" />
+        <env name="USER_TRANSPORT_URL" value="http://127.0.0.1:8080" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/damndelion/blockchain_justCode/cmd/blockchain" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/blockchain/cmd/blockchain/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/user" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -251,6 +255,7 @@
     <list>
       <item itemvalue="Go Build.go build github.com/evrone/go-clean-template/cmd/blockchain" />
       <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/auth" />
+      <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/blockchain" />
       <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user" />
       <item itemvalue="Go Test.TestBlockchain_GetBalance/Error in github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
       <item itemvalue="Go Test.TestBlockchain_Send in github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
@@ -260,7 +265,7 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/auth" />
+        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/blockchain" />
         <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user" />
         <item itemvalue="Go Test.go test github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
         <item itemvalue="Go Test.TestBlockchain_Wallet in github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
@@ -381,6 +386,11 @@
           <url>file://$PROJECT_DIR$/blockchain/internal/user/controller/http/middleware/jwtVerify.go</url>
           <line>52</line>
           <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go</url>
+          <line>33</line>
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

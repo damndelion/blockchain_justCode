@@ -25,5 +25,7 @@ type (
 		GetUserByEmail(ctx context.Context, email string) (*userEntity.User, error)
 		ConfirmCode(ctx context.Context, email string) (int, error)
 		CheckForEmail(ctx context.Context, email string) error
+		UpdateRefreshToken(ctx context.Context, userID int, refreshToken string) error
+		GetRefreshToken(ctx context.Context, userID int) (string, error)
 	}
 )

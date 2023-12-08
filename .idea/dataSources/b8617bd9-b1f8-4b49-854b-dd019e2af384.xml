@@ -3,17 +3,9 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.49">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-4||-9223372036854775808|c|G
-4||10|c|G
-4||10|C|G
-4||10|T|G</Grants>
-      <IntrospectionStateNumber>1348</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1527</IntrospectionStateNumber>
       <ServerVersion>16.0</ServerVersion>
-      <StartupTime>1701546450</StartupTime>
+      <StartupTime>1701851990</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -1408,7 +1400,7 @@ false posixrules
 13212||10|C|G
 13212||-9223372036854775808|U|G
 13212||10|U|G</Grants>
-      <IntrospectionStateNumber>1348</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1527</IntrospectionStateNumber>
       <ObjectId>16512</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -1421,50 +1413,50 @@ false posixrules
       <ObjectId>16490</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
-    <role id="5" parent="1" name="pg_database_owner">
+    <role id="5" parent="1" name="pg_checkpoint">
+      <ObjectId>4544</ObjectId>
+    </role>
+    <role id="6" parent="1" name="pg_create_subscription">
+      <ObjectId>6304</ObjectId>
+    </role>
+    <role id="7" parent="1" name="pg_database_owner">
       <ObjectId>6171</ObjectId>
     </role>
-    <role id="6" parent="1" name="pg_read_all_data">
-      <ObjectId>6181</ObjectId>
+    <role id="8" parent="1" name="pg_execute_server_program">
+      <ObjectId>4571</ObjectId>
     </role>
-    <role id="7" parent="1" name="pg_write_all_data">
-      <ObjectId>6182</ObjectId>
-    </role>
-    <role id="8" parent="1" name="pg_monitor">
+    <role id="9" parent="1" name="pg_monitor">
       <ObjectId>3373</ObjectId>
       <RoleGrants>3374
 3375
 3377</RoleGrants>
     </role>
-    <role id="9" parent="1" name="pg_read_all_settings">
+    <role id="10" parent="1" name="pg_read_all_data">
+      <ObjectId>6181</ObjectId>
+    </role>
+    <role id="11" parent="1" name="pg_read_all_settings">
       <ObjectId>3374</ObjectId>
     </role>
-    <role id="10" parent="1" name="pg_read_all_stats">
+    <role id="12" parent="1" name="pg_read_all_stats">
       <ObjectId>3375</ObjectId>
     </role>
-    <role id="11" parent="1" name="pg_stat_scan_tables">
-      <ObjectId>3377</ObjectId>
-    </role>
-    <role id="12" parent="1" name="pg_read_server_files">
+    <role id="13" parent="1" name="pg_read_server_files">
       <ObjectId>4569</ObjectId>
     </role>
-    <role id="13" parent="1" name="pg_write_server_files">
-      <ObjectId>4570</ObjectId>
-    </role>
-    <role id="14" parent="1" name="pg_execute_server_program">
-      <ObjectId>4571</ObjectId>
-    </role>
-    <role id="15" parent="1" name="pg_signal_backend">
+    <role id="14" parent="1" name="pg_signal_backend">
       <ObjectId>4200</ObjectId>
     </role>
-    <role id="16" parent="1" name="pg_checkpoint">
-      <ObjectId>4544</ObjectId>
+    <role id="15" parent="1" name="pg_stat_scan_tables">
+      <ObjectId>3377</ObjectId>
     </role>
-    <role id="17" parent="1" name="pg_use_reserved_connections">
+    <role id="16" parent="1" name="pg_use_reserved_connections">
       <ObjectId>4550</ObjectId>
     </role>
-    <role id="18" parent="1" name="pg_create_subscription">
-      <ObjectId>6304</ObjectId>
+    <role id="17" parent="1" name="pg_write_all_data">
+      <ObjectId>6182</ObjectId>
+    </role>
+    <role id="18" parent="1" name="pg_write_server_files">
+      <ObjectId>4570</ObjectId>
     </role>
     <role id="19" parent="1" name="postgres">
       <BypassRls>1</BypassRls>
@@ -4836,9 +4828,9 @@ false posixrules
     <schema id="265" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>1348</IntrospectionStateNumber>
-      <IntrospectionTimestamp>2023-12-03.01:52:01.711</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2023-12-02.19:52:02</LocalIntrospectionTimestamp>
+      <IntrospectionStateNumber>1527</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2023-12-06.15:28:25.167</IntrospectionTimestamp>
+      <LocalIntrospectionTimestamp>2023-12-06.09:28:25</LocalIntrospectionTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -4846,7 +4838,7 @@ false posixrules
     <sequence id="266" parent="265" name="tokens_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>16513</ObjectId>
-      <SequenceIdentity>1(8)</SequenceIdentity>
+      <SequenceIdentity>1(40)</SequenceIdentity>
       <StartValue>1</StartValue>
       <StateNumber>1218</StateNumber>
       <OwnerName>postgres</OwnerName>
@@ -4854,7 +4846,7 @@ false posixrules
     <sequence id="267" parent="265" name="user_codes_id_seq">
       <DasType>bigint|0s</DasType>
       <ObjectId>16520</ObjectId>
-      <SequenceIdentity>1(11)</SequenceIdentity>
+      <SequenceIdentity>1(20)</SequenceIdentity>
       <StartValue>1</StartValue>
       <StateNumber>1229</StateNumber>
       <OwnerName>postgres</OwnerName>
@@ -4880,61 +4872,43 @@ false posixrules
       <SequenceId>16513</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="271" parent="268" name="created_at">
-      <DasType>timestamp with time zone|0s</DasType>
-      <Position>2</Position>
-      <StateNumber>1218</StateNumber>
-      <TypeId>1184</TypeId>
-    </column>
-    <column id="272" parent="268" name="updated_at">
-      <DasType>timestamp with time zone|0s</DasType>
-      <Position>3</Position>
-      <StateNumber>1218</StateNumber>
-      <TypeId>1184</TypeId>
-    </column>
-    <column id="273" parent="268" name="deleted_at">
-      <DasType>timestamp with time zone|0s</DasType>
-      <Position>4</Position>
-      <StateNumber>1218</StateNumber>
-      <TypeId>1184</TypeId>
-    </column>
-    <column id="274" parent="268" name="user_id">
+    <column id="271" parent="268" name="user_id">
       <DasType>bigint|0s</DasType>
       <Position>5</Position>
       <StateNumber>1218</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="275" parent="268" name="user_email">
-      <DasType>text|0s</DasType>
-      <Position>6</Position>
-      <StateNumber>1218</StateNumber>
-      <TypeId>25</TypeId>
-    </column>
-    <column id="276" parent="268" name="access_token">
-      <DasType>text|0s</DasType>
-      <Position>7</Position>
-      <StateNumber>1218</StateNumber>
-      <TypeId>25</TypeId>
-    </column>
-    <column id="277" parent="268" name="refresh_token">
+    <column id="272" parent="268" name="refresh_token">
       <DasType>text|0s</DasType>
       <Position>8</Position>
       <StateNumber>1218</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="278" parent="269" name="email">
+    <index id="273" parent="268" name="tokens_pk">
+      <ColNames>user_id</ColNames>
+      <ObjectId>16567</ObjectId>
+      <StateNumber>1526</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="274" parent="268" name="tokens_pk">
+      <ObjectId>16568</ObjectId>
+      <StateNumber>1526</StateNumber>
+      <UnderlyingIndexId>16567</UnderlyingIndexId>
+    </key>
+    <column id="275" parent="269" name="email">
       <DasType>text|0s</DasType>
       <Position>1</Position>
       <StateNumber>1229</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="279" parent="269" name="code">
+    <column id="276" parent="269" name="code">
       <DasType>text|0s</DasType>
       <Position>2</Position>
       <StateNumber>1229</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <column id="280" parent="269" name="id">
+    <column id="277" parent="269" name="id">
       <DasType>bigint|0s</DasType>
       <DefaultExpression>nextval(&apos;user_codes_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -4943,13 +4917,13 @@ false posixrules
       <SequenceId>16520</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="281" parent="269" name="test">
+    <column id="278" parent="269" name="test">
       <DasType>text|0s</DasType>
       <Position>4</Position>
       <StateNumber>1229</StateNumber>
       <TypeId>25</TypeId>
     </column>
-    <index id="282" parent="269" name="user_codes_pk">
+    <index id="279" parent="269" name="user_codes_pk">
       <ColNames>id</ColNames>
       <ObjectId>16531</ObjectId>
       <Primary>1</Primary>
@@ -4957,7 +4931,7 @@ false posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="283" parent="269" name="user_codes_pk">
+    <key id="280" parent="269" name="user_codes_pk">
       <ObjectId>16532</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1250</StateNumber>

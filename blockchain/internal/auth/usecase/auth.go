@@ -108,9 +108,53 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	}, nil
 }
 
+//func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
+//	span, spanCtx := opentracing.StartSpanFromContext(ctx, "refresh use case")
+//	defer span.Finish()
+//	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
+//		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+//			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+//		}
+//
+//		return []byte(u.cfg.SecretKey), nil
+//	})
+//	var claims jwt.MapClaims
+//	var ok bool
+//	if claims, ok = token.Claims.(jwt.MapClaims); ok && token.Valid {
+//		if exp, ok := claims["exp"].(float64); ok {
+//			expirationTime := time.Unix(int64(exp), 0)
+//			if time.Now().After(expirationTime) {
+//				return "", "", err
+//			}
+//		} else {
+//			return "", "", err
+//		}
+//	} else {
+//		return "", "", err
+//	}
+//	if err != nil || !token.Valid {
+//		return "", "", err
+//	}
+//
+//	userEmail := fmt.Sprintf("%v", claims["email"])
+//	user, err := u.repo.GetUserByEmail(spanCtx, userEmail)
+//	if err != nil {
+//		return "", "", err
+//	}
+//
+//	accessToken, _, err := u.generateTokens(spanCtx, user)
+//	if err != nil {
+//		return "", "", err
+//	}
+//
+//	return accessToken, refreshToken, nil
+//}
+
 func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "refresh use case")
 	defer span.Finish()
+
+	// Parse the refresh token
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -118,36 +162,53 @@ func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string
 
 		return []byte(u.cfg.SecretKey), nil
 	})
+
+	// Verify the token's claims
 	var claims jwt.MapClaims
 	var ok bool
 	if claims, ok = token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if exp, ok := claims["exp"].(float64); ok {
 			expirationTime := time.Unix(int64(exp), 0)
 			if time.Now().After(expirationTime) {
-				return "", "", err
+				return "", "", fmt.Errorf("refresh token expired")
 			}
 		} else {
-			return "", "", err
+			return "", "", fmt.Errorf("invalid refresh token")
 		}
 	} else {
-		return "", "", err
-	}
-	if err != nil || !token.Valid {
-		return "", "", err
+		return "", "", fmt.Errorf("invalid refresh token")
 	}
 
+	// Retrieve the user associated with the refresh token
 	userEmail := fmt.Sprintf("%v", claims["email"])
 	user, err := u.repo.GetUserByEmail(spanCtx, userEmail)
 	if err != nil {
 		return "", "", err
 	}
 
-	accessToken, refreshToken, err := u.generateTokens(spanCtx, user)
+	// Check if the refresh token in the database matches the provided one
+	dbRefreshToken, err := u.repo.GetRefreshToken(spanCtx, user.ID)
 	if err != nil {
 		return "", "", err
 	}
 
-	return accessToken, refreshToken, nil
+	if dbRefreshToken != refreshToken {
+		return "", "", fmt.Errorf("invalid refresh token")
+	}
+
+	// Generate new access and refresh tokens
+	accessToken, newRefreshToken, err := u.generateTokens(spanCtx, user)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Update the refresh token in the database
+	err = u.repo.UpdateRefreshToken(spanCtx, user.ID, newRefreshToken)
+	if err != nil {
+		return "", "", err
+	}
+
+	return accessToken, newRefreshToken, nil
 }
 
 func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (string, string, error) {
@@ -180,8 +241,6 @@ func (u *Auth) generateTokens(ctx context.Context, user *userEntity.User) (strin
 	}
 	userToken := authEntity.Token{
 		UserID:       user.ID,
-		UserEmail:    user.Email,
-		AccessToken:  accessTokenString,
 		RefreshToken: refreshTokenString,
 	}
 
