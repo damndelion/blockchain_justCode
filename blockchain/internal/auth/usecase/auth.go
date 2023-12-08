@@ -108,48 +108,6 @@ func (u *Auth) Login(ctx context.Context, email, password string) (*dto.LoginRes
 	}, nil
 }
 
-//func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
-//	span, spanCtx := opentracing.StartSpanFromContext(ctx, "refresh use case")
-//	defer span.Finish()
-//	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-//		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-//			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-//		}
-//
-//		return []byte(u.cfg.SecretKey), nil
-//	})
-//	var claims jwt.MapClaims
-//	var ok bool
-//	if claims, ok = token.Claims.(jwt.MapClaims); ok && token.Valid {
-//		if exp, ok := claims["exp"].(float64); ok {
-//			expirationTime := time.Unix(int64(exp), 0)
-//			if time.Now().After(expirationTime) {
-//				return "", "", err
-//			}
-//		} else {
-//			return "", "", err
-//		}
-//	} else {
-//		return "", "", err
-//	}
-//	if err != nil || !token.Valid {
-//		return "", "", err
-//	}
-//
-//	userEmail := fmt.Sprintf("%v", claims["email"])
-//	user, err := u.repo.GetUserByEmail(spanCtx, userEmail)
-//	if err != nil {
-//		return "", "", err
-//	}
-//
-//	accessToken, _, err := u.generateTokens(spanCtx, user)
-//	if err != nil {
-//		return "", "", err
-//	}
-//
-//	return accessToken, refreshToken, nil
-//}
-
 func (u *Auth) Refresh(ctx context.Context, refreshToken string) (string, string, error) {
 	span, spanCtx := opentracing.StartSpanFromContext(ctx, "refresh use case")
 	defer span.Finish()

@@ -26,7 +26,7 @@ type BlockchainRepo struct {
 
 func NewBlockchainRepo(db *sql.DB, address string, userGrpcTransport *transport.UserGrpcTransport) *BlockchainRepo {
 	chain := blockchainlogic.CreateBlockchain(db, address)
-	fetchBTCPriceAndStoreInChannel()
+	fetchBTCPrice()
 
 	return &BlockchainRepo{db, chain, userGrpcTransport}
 }
@@ -136,7 +136,7 @@ func (br *BlockchainRepo) TopUp(ctx context.Context, from, to string, amount flo
 	return nil
 }
 
-func fetchBTCPriceAndStoreInChannel() {
+func fetchBTCPrice() {
 	go func() {
 		for {
 			url := "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
@@ -156,7 +156,10 @@ func fetchBTCPriceAndStoreInChannel() {
 			}
 
 			btcPrice = data.Bitcoin.USD
-			response.Body.Close()
+			err = response.Body.Close()
+			if err != nil {
+				return
+			}
 
 			time.Sleep(10 * time.Second)
 		}

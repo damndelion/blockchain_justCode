@@ -4,19 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e5bfccb6-f889-4bc6-b435-536e3f27b5ff" name="Changes" comment="linter fix">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/2d73c08a-3a3c-45a9-9a84-95b367f27e0e.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/2d73c08a-3a3c-45a9-9a84-95b367f27e0e.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384/storage_v2/_src_/database/auth_service.HiO95g/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/b8617bd9-b1f8-4b49-854b-dd019e2af384/storage_v2/_src_/database/auth_service.HiO95g/schema/public.abK9xQ.meta" afterDir="false" />
+    <list default="true" id="e5bfccb6-f889-4bc6-b435-536e3f27b5ff" name="Changes" comment="Jwt refresh token fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/config/auth/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/config/auth/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/entity/token.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/entity/token.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/auth.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/intrefaces.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/intrefaces.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.dat" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/pkg/blockchain_logic/wallet.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +104,7 @@
       <recent name="$PROJECT_DIR$/blockchain/docs" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/auth">
+  <component name="RunManager" selected="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user">
     <configuration name="go build github.com/damndelion/blockchain_justCode/cmd/auth" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="blockchain" />
       <working_directory value="$PROJECT_DIR$/blockchain" />
@@ -265,8 +257,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/blockchain" />
         <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/user" />
+        <item itemvalue="Go Build.go build github.com/damndelion/blockchain_justCode/cmd/blockchain" />
         <item itemvalue="Go Test.go test github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
         <item itemvalue="Go Test.TestBlockchain_Wallet in github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
         <item itemvalue="Go Test.TestBlockchain_TopUp in github.com/damndelion/blockchain_justCode/internal/blockchain/usecase" />
@@ -289,7 +281,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="changed the architecture + added jwt verification" />
     <MESSAGE value="added pprof and fixed logger" />
     <MESSAGE value="added grafana promethues and swagger" />
     <MESSAGE value="refresh token added" />
@@ -314,7 +305,8 @@
     <MESSAGE value="add .gitattributes" />
     <MESSAGE value="final commit" />
     <MESSAGE value="linter fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="linter fix" />
+    <MESSAGE value="Jwt refresh token fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Jwt refresh token fix" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
@@ -331,41 +323,6 @@
           <url>file://$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go</url>
           <line>170</line>
           <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go</url>
-          <line>197</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/internal/user/usecase/repo/admin_postgres.go</url>
-          <line>206</line>
-          <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go</url>
-          <line>138</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/usecase/repo/blockchain_postgres.go</url>
-          <line>120</line>
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/pkg/blockchain_logic/blockchain.go</url>
-          <line>266</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/pkg/blockchain_logic/blockchain.go</url>
-          <line>289</line>
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go</url>
-          <line>278</line>
-          <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go</url>
@@ -389,8 +346,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/blockchain/internal/auth/usecase/repo/token_postgres.go</url>
-          <line>33</line>
+          <line>24</line>
           <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/blockchain/internal/blockchain/controller/http/v1/blockchain.go</url>
+          <line>278</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

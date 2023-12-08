@@ -21,14 +21,6 @@ func NewAuthRepo(db *gorm.DB, userGrpcTransport *transport.UserGrpcTransport) *A
 	return &AuthRepo{db, userGrpcTransport}
 }
 
-//func (t *AuthRepo) CreateUserToken(_ context.Context, userToken authEntity.Token) error {
-//	if err := t.DB.Create(&userToken).Error; err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
-
 func (t *AuthRepo) CreateUserToken(_ context.Context, userToken authEntity.Token) error {
 	existingToken := authEntity.Token{}
 	err := t.DB.Model(&userToken).Where("user_id = ?", userToken.UserID).First(&existingToken).Error
